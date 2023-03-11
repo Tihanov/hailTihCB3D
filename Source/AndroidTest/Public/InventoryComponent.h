@@ -20,6 +20,7 @@ struct FInvItemDataTableOptional
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector				Scale = { 1,1,1 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32				___TEST___ = -1;
 };
 
 USTRUCT(BlueprintType)
@@ -32,7 +33,8 @@ struct FInvItemDataTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UStaticMesh*	Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UTexture2D*	Ico;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				WeightKg		= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				Price			= 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				BuyPrice		= 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				CellPrice		= 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MaxStackCount	= 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AActor> Class;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvItemDataTableOptional Other;
@@ -76,4 +78,6 @@ public:
 		int32 GetSize() const;
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
+	UFUNCTION(BlueprintCallable)
+		void ThrowAwayItem(int32 Index, int32 Count);
 };

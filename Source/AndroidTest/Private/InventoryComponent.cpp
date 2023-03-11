@@ -71,3 +71,18 @@ int32 UInventoryComponent::GetCountOfItems() const
 	return Count;
 }
 
+void UInventoryComponent::ThrowAwayItem(int32 Index, int32 Count)
+{
+	if(Index < 0 || Index >= InventoryArray.Num())
+		return;
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(InventoryArray[Index].RowName, "");
+	if (InventoryArray[Index].Count - Count <= 0)
+	{
+		Weight -= Row->WeightKg * InventoryArray[Index].Count;
+		InventoryArray.RemoveAt(Index);
+		return;
+	}
+	InventoryArray[Index].Count -= Count;
+	Weight -= Row->WeightKg * Count;
+}
+
