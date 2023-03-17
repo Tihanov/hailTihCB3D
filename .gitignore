@@ -12,3 +12,10 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+/Build/*
+!/Build
+/Build/*
+!/Build/Android/
+/Build/Android/res
+/Build/Android/src
+/Build/Android/*.prop*
