@@ -28,7 +28,7 @@ public:
 		UStaticMeshComponent* RootMeshComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FName RowName;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UDataTable* InvDataTable;
 	UFUNCTION(BlueprintCallable)
 		FName PickUp(class APlayerController* PlayerController);

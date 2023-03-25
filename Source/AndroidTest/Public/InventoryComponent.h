@@ -6,21 +6,22 @@
 #include "Components/ActorComponent.h"
 
 #include "Engine/DataTable.h"
+#include "AndroidTest/Public/InventoryItemBaseActor.h"
 
 #include "InventoryComponent.generated.h"
 
 UENUM(BlueprintType)
 enum class EInvItemType : uint8
 {
-	DEFAULT				UMETA(Display = "Default")
+	Default				UMETA(Display = "Default")
 };
 
 USTRUCT(BlueprintType)
 struct FInvItemDataTableOptional
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector				Scale = { 1,1,1 };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32				___TEST___ = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>	Class = AInventoryItemBaseActor::StaticClass();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector									Scale = { 1,1,1 };
 };
 
 USTRUCT(BlueprintType)
@@ -29,14 +30,13 @@ struct FInvItemDataTable : public FTableRowBase
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				DisplayName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				Description;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) EInvItemType		Type			= EInvItemType::DEFAULT;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) EInvItemType		Type			= EInvItemType::Default;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UStaticMesh*	Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UTexture2D*	Ico;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				WeightKg		= 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				BuyPrice		= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				CellPrice		= 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				SellPrice		= 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MaxStackCount	= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AActor> Class;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvItemDataTableOptional Other;
 };
 
