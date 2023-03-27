@@ -3,8 +3,6 @@
 
 #include "InventoryComponent.h"
 
-#include <stdexcept>
-
 #include "Log.h"
 
 UInventoryComponent::UInventoryComponent()
@@ -71,18 +69,22 @@ int32 UInventoryComponent::GetCountOfItems() const
 	return Count;
 }
 
-void UInventoryComponent::ThrowAwayItem(int32 Index, int32 Count)
+bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
 {
 	if(Index < 0 || Index >= InventoryArray.Num())
-		return;
+		return false;
+	RowName = InventoryArray[Index].RowName;
+
 	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(InventoryArray[Index].RowName, "");
 	if (InventoryArray[Index].Count - Count <= 0)
 	{
 		Weight -= Row->WeightKg * InventoryArray[Index].Count;
 		InventoryArray.RemoveAt(Index);
-		return;
+		return true;
 	}
 	InventoryArray[Index].Count -= Count;
 	Weight -= Row->WeightKg * Count;
+
+	return true;
 }
 

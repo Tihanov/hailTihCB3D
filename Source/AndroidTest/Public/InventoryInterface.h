@@ -7,7 +7,7 @@
 #include "InventoryInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(BlueprintType)
 class UInventoryInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool PickUpItem(class AInventoryItemBaseActor* Item);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		bool ThrowOutItem(int32 Index);
+		bool ThrowOutItem(int32 Index, int32 Count);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		const UInventoryComponent* GetInventoryComponent() const;
 };

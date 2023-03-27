@@ -65,7 +65,7 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite)
 		TArray<FInvItemArray> InventoryArray;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 		UDataTable* InvDataTable;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		float MaxWeight = 100.f;
@@ -79,5 +79,5 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
 	UFUNCTION(BlueprintCallable)
-		void ThrowAwayItem(int32 Index, int32 Count);
+		bool TrashItem(int32 Index, int32 Count, FName& RowName);
 };

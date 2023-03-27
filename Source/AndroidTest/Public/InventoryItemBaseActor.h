@@ -32,4 +32,6 @@ public:
 		UDataTable* InvDataTable;
 	UFUNCTION(BlueprintCallable)
 		FName PickUp(class APlayerController* PlayerController);
+	UFUNCTION(BlueprintCallable)
+		void Init(FName Name, UDataTable* DataTable);
 };
