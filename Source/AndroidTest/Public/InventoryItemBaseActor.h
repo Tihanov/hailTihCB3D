@@ -9,6 +9,16 @@
 
 #include "InventoryItemBaseActor.generated.h"
 
+USTRUCT(BlueprintType)
+struct FInventoryItemInitStruct
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) FName Name;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) UDataTable* DataTable;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) int32 CountOf;
+};
+
 UCLASS()
 class ANDROIDTEST_API AInventoryItemBaseActor : public AActor
 {
@@ -30,8 +40,12 @@ public:
 		FName RowName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UDataTable* InvDataTable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 CountOf;
+
+public:
 	UFUNCTION(BlueprintCallable)
 		FName PickUp(class APlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable)
-		void Init(FName Name, UDataTable* DataTable);
+		void Init(FInventoryItemInitStruct InitStruct);
 };

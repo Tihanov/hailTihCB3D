@@ -29,31 +29,36 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 }
 
-bool UInventoryComponent::AddItem(FName RowName)
+int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32 CountOfItems)
 {
-	FInvItemArray* ToInc = nullptr;
 	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
 	if(!Row)
 	{
 		ULog::Error("no RowName in InvDataTable", LO_Both);
-		return false;
+		return CountOfItems;
 	}
-	if (MaxWeight < Weight + Row->WeightKg)
-		return false;
+	auto CountOfAdd = FMath::Clamp(static_cast<int32>(FMath::Floor(
+		(MaxWeight - Weight) / Row->WeightKg)), 0, CountOfItems);
+	const int32 CountOfNotAddedItems_ToRet = CountOfItems - CountOfAdd;
+	if(CountOfAdd == 0)
+		return CountOfNotAddedItems_ToRet;
+	Weight += Row->WeightKg * CountOfAdd;
 
 	for (auto& i : InventoryArray)
 	{
 		if (i.RowName == RowName && Row->MaxStackCount != i.Count)
-			ToInc = &i;
+		{
+			auto TempAdd = FMath::Clamp(CountOfAdd, 0, Row->MaxStackCount - i.Count);
+			i.Count += TempAdd;
+			CountOfAdd -= TempAdd;
+		}
 	}
 
-	if(!ToInc)
-		InventoryArray.Add({ RowName, 1 });
-	else 
-		ToInc->Count++;
-	Weight += Row->WeightKg;
+	if (CountOfAdd == 0)
+		return CountOfNotAddedItems_ToRet;
+	InventoryArray.Add({ RowName, CountOfAdd });
 
-	return true;
+	return CountOfNotAddedItems_ToRet;
 }
 
 int32 UInventoryComponent::GetSize() const

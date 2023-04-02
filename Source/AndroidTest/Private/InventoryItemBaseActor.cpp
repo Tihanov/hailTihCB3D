@@ -12,6 +12,7 @@ AInventoryItemBaseActor::AInventoryItemBaseActor()
 
 	RootMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("RootMesh");
 	SetRootComponent(RootMeshComponent);
+	CountOf = 1;
 }
 
 void AInventoryItemBaseActor::BeginPlay()
@@ -43,10 +44,11 @@ FName AInventoryItemBaseActor::PickUp(APlayerController* PlayerController)
 	return RowName;
 }
 
-void AInventoryItemBaseActor::Init(FName Name, UDataTable* DataTable)
+void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 {
-	InvDataTable = DataTable;
-	RowName = Name;
+	InvDataTable = InitStruct.DataTable;
+	RowName = InitStruct.Name;
+	CountOf = InitStruct.CountOf;
 
 	if (!InvDataTable)
 		return;

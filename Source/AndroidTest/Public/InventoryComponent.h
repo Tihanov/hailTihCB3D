@@ -73,7 +73,7 @@ protected:
 		float Weight = 0.f;
 public:
 	UFUNCTION(BlueprintCallable)
-		bool AddItem(FName RowName);
+		UPARAM(DisplayName="CountOfNotAddedItems") int32 AddItem(FName RowName, int32 CountOfItems);
 	UFUNCTION(BlueprintPure)
 		int32 GetSize() const;
 	UFUNCTION(BlueprintPure)
