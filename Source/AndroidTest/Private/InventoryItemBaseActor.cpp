@@ -3,8 +3,6 @@
 
 #include "InventoryItemBaseActor.h"
 
-#include <stdexcept>
-
 #include "InventoryComponent.h"
 #include "Log.h"
 
@@ -14,11 +12,15 @@ AInventoryItemBaseActor::AInventoryItemBaseActor()
 
 	RootMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("RootMesh");
 	SetRootComponent(RootMeshComponent);
+	CountOf = 1;
 }
 
 void AInventoryItemBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!InvDataTable || RowName == TEXT("None"))
+		return;
 
 	auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
 	if(!Row)
@@ -40,5 +42,24 @@ FName AInventoryItemBaseActor::PickUp(APlayerController* PlayerController)
 {
 	ULog::Info("Picked", LO_Viewport);
 	return RowName;
+}
+
+void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
+{
+	InvDataTable = InitStruct.DataTable;
+	RowName = InitStruct.Name;
+	CountOf = InitStruct.CountOf;
+
+	if (!InvDataTable)
+		return;
+
+	auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	if(!Row)
+	{
+		ULog::Error("Cannt find row", LO_Both);
+		return;
+	}
+	RootMeshComponent->SetStaticMesh(Row->Mesh);
+	SetActorScale3D( Row->Other.Scale );
 }
 
