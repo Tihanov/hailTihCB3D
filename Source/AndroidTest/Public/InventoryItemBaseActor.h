@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Engine/DataTable.h"
+#include "AndroidTest/Public/ActionInterface.h"
 
 #include "InventoryItemBaseActor.generated.h"
 
@@ -20,7 +21,9 @@ struct FInventoryItemInitStruct
 };
 
 UCLASS()
-class ANDROIDTEST_API AInventoryItemBaseActor : public AActor
+class ANDROIDTEST_API AInventoryItemBaseActor
+	: public AActor
+	, public IActionInterface
 {
 	GENERATED_BODY()
 	
@@ -48,4 +51,5 @@ public:
 		FName PickUp(class APlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable)
 		void Init(FInventoryItemInitStruct InitStruct);
+	EActionType GetActionType_Implementation() override;
 };

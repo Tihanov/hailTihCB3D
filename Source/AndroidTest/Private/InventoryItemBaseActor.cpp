@@ -63,3 +63,8 @@ void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 	SetActorScale3D( Row->Other.Scale );
 }
 
+EActionType AInventoryItemBaseActor::GetActionType_Implementation()
+{
+	return EActionType::PickUp;
+}
+
