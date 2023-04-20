@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Engine/DataTable.h"
-#include "AndroidTest/Public/ActionInterface.h"
+#include "Action/ActionInterface.h"
 
 #include "InventoryItemBaseActor.generated.h"
 

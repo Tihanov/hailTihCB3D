@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InventoryItemBaseActor.h"
+#include "Inventory/InventoryItemBaseActor.h"
 
-#include "InventoryComponent.h"
+#include "Inventory/InventoryComponent.h"
 #include "Log.h"
 
 AInventoryItemBaseActor::AInventoryItemBaseActor()

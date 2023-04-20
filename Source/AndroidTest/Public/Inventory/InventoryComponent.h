@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 
 #include "Engine/DataTable.h"
-#include "AndroidTest/Public/InventoryItemBaseActor.h"
+#include "Inventory/InventoryItemBaseActor.h"
 
 #include "InventoryComponent.generated.h"
 
