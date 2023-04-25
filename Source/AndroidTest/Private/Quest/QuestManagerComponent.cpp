@@ -31,37 +31,38 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 {
 	FQuestCompletingInfo Info;
 	Info.QuestPart = 0;
-	for(const auto& Task: Quest->Parts[0].Tasks)
-		Info.TasksToComplete.Add(DuplicateObject(Task, nullptr), false);
-	Info.QuestAsset = Quest;
-	CurrentQuests.Add(Quest, Info);
+	for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
+		Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
+	CurrentQuestsAndInfo.Add(Quest, Info);
 }
 
 void UQuestManagerComponent::TaskCheck()
 {
-	for (auto& CurrentQuest : CurrentQuests)
+	for (auto& QuestAndInfo : CurrentQuestsAndInfo)
 	{
-		auto& QuestComplInfo = CurrentQuest.Value; 
-		auto& TasksToComplete = QuestComplInfo.TasksToComplete;
+		auto& Quest = QuestAndInfo.Key;
+		auto& Info = QuestAndInfo.Value;
+		auto& Tasks = Info.TasksAndState;	
+		
 		int CompletedTasks = 0;
-		for (auto& Task : TasksToComplete)
+		for (auto& Task : Tasks)
 		{
 			if(!Task.Value)
 				Task.Value = Task.Key->IsDone(Cast<APlayerController>(GetOwner()));
 			CompletedTasks += static_cast<int>(Task.Value);
 		}
-		if(CompletedTasks == TasksToComplete.Num())
+		if(CompletedTasks == Tasks.Num())
 		{
-			if(CurrentQuest.Key->Parts.Num() == QuestComplInfo.QuestPart + 1)
+			if(Quest->Parts.Num() == Info.QuestPart + 1)
 			{
-				CompletedQuests.Add(CurrentQuest.Key);
-				CurrentQuests.Remove(CurrentQuest.Key);
+				CompletedQuests.Add(Quest);
+				CurrentQuestsAndInfo.Remove(Quest);
 				continue;
 			}
-			QuestComplInfo.QuestPart += 1;
-			QuestComplInfo.TasksToComplete.Empty();
-			for(const auto& Task: QuestComplInfo.QuestAsset->Parts[QuestComplInfo.QuestPart].Tasks)
-				QuestComplInfo.TasksToComplete.Add(DuplicateObject(Task, nullptr), false);
+			Info.QuestPart += 1;
+			Info.TasksAndState.Empty();
+			for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
+			  	Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
 		}
 	}
 }

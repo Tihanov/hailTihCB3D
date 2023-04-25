@@ -13,8 +13,7 @@ struct FQuestCompletingInfo
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite) int QuestPart = 0;
-	UPROPERTY(BlueprintReadWrite) TMap<UTaskType*, bool> TasksToComplete;
-	UPROPERTY(BlueprintReadWrite) UQuestAsset* QuestAsset;
+	UPROPERTY(BlueprintReadWrite) TMap<UTaskType*, bool> TasksAndState;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -34,7 +33,7 @@ public:
 	
 public:
 	UPROPERTY(BlueprintReadWrite)
-		TMap<UQuestAsset*, FQuestCompletingInfo> CurrentQuests;
+		TMap<UQuestAsset*, FQuestCompletingInfo> CurrentQuestsAndInfo;
 	UPROPERTY(BlueprintReadWrite)
 		TArray<UQuestAsset*> CompletedQuests;
 

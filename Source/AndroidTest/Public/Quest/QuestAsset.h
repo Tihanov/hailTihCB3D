@@ -43,10 +43,10 @@ class ANDROIDTEST_API UQuestAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName Description;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText DisplayName;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "IsMainQuest?") bool IsMain;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FQuestPartInfo> Parts;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FName> QuestsToDoNext;	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<UQuestAsset*> QuestsToDoNext;	
 };
