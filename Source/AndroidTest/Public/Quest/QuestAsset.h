@@ -4,38 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Inventory/InventoryItemBaseActor.h"
+#include "Quest/QuestStructures.h"
 #include "QuestAsset.generated.h"
 
-USTRUCT(BlueprintType)
-struct FQuestRewardsInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float ExpReward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FInventoryItemInitStruct> ItemsReward;  	
-};
-
-UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew)
-class UTaskType: public UObject 
-{
-	GENERATED_BODY()
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-		bool IsDone(class APlayerController* PlayerController);
-};
-
-USTRUCT(BlueprintType)
-struct FQuestPartInfo
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText Description;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced) TArray<UTaskType*> Tasks;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FQuestRewardsInfo Rewards;
-};
 
 UCLASS(BlueprintType)
 class ANDROIDTEST_API UQuestAsset : public UDataAsset

@@ -13,7 +13,7 @@ struct FQuestCompletingInfo
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite) int QuestPart = 0;
-	UPROPERTY(BlueprintReadWrite) TMap<UTaskType*, bool> TasksAndState;
+	UPROPERTY(BlueprintReadWrite) TMap<UQuestTask*, bool> TasksAndState;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -30,6 +30,11 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 		void AddQuest(UQuestAsset* Quest);
+	UFUNCTION(BlueprintPure)
+		UPARAM(DisplayName = "Part Info") FQuestPartInfo
+			GetCurrentPartFromQuest(
+				UQuestAsset* Quest,
+				UPARAM(DisplayName = "DoesExist?") bool& Exist);
 	
 public:
 	UPROPERTY(BlueprintReadWrite)

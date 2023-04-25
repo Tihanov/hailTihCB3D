@@ -3,10 +3,10 @@
 
 #include "Quest/QuestManagerComponent.h"
 
-#include "Log.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "UObject/UObjectGlobals.h"
+#include "Quest/QuestTask.h"
 
 
 UQuestManagerComponent::UQuestManagerComponent()
@@ -34,6 +34,18 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 	for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
 		Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
 	CurrentQuestsAndInfo.Add(Quest, Info);
+}
+
+FQuestPartInfo UQuestManagerComponent::GetCurrentPartFromQuest(UQuestAsset* Quest, bool& Exist)
+{
+	const auto& Result = CurrentQuestsAndInfo.Find(Quest);
+	if(!Result)
+	{
+		Exist = false;
+		return {};
+	}
+	Exist = true;
+	return Quest->Parts[Result->QuestPart];
 }
 
 void UQuestManagerComponent::TaskCheck()
