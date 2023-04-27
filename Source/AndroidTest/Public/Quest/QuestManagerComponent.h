@@ -7,6 +7,9 @@
 #include "Quest/QuestAsset.h"
 #include "QuestManagerComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddNewQuestDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveQuestDelegate, UQuestAsset*, Quest);
+
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
 {
@@ -41,6 +44,12 @@ public:
 		TMap<UQuestAsset*, FQuestCompletingInfo> CurrentQuestsAndInfo;
 	UPROPERTY(BlueprintReadWrite)
 		TArray<UQuestAsset*> CompletedQuests;
+
+public: // DELEGATES
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnAddNewQuest")
+		FAddNewQuestDelegate OnAddNewQuestDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnRemoveQuest")
+		FRemoveQuestDelegate OnRemoveQuestDelegate;
 
 private:
 	FTimerHandle TaskCheckTimerHandle;

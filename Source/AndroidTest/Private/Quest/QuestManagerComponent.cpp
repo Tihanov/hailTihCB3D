@@ -34,6 +34,8 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 	for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
 		Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
 	CurrentQuestsAndInfo.Add(Quest, Info);
+
+	OnAddNewQuestDelegate.Broadcast(Quest);
 }
 
 FQuestPartInfo UQuestManagerComponent::GetCurrentPartFromQuest(UQuestAsset* Quest, bool& Exist)
