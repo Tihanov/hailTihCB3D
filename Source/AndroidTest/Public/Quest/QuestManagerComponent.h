@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddNewQuestDelegate, UQuestAsset*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveQuestDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNewCompletedQuestDelegate, UQuestAsset*, Quest);
 
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
@@ -33,6 +34,8 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 		void AddQuest(UQuestAsset* Quest);
+	UFUNCTION(BlueprintCallable)
+		bool RemoveQuest(UQuestAsset* Quest, bool IsComplete = false);
 	UFUNCTION(BlueprintPure)
 		UPARAM(DisplayName = "Part Info") FQuestPartInfo
 			GetCurrentPartFromQuest(
@@ -50,6 +53,8 @@ public: // DELEGATES
 		FAddNewQuestDelegate OnAddNewQuestDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnRemoveQuest")
 		FRemoveQuestDelegate OnRemoveQuestDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnCompleteQuest")
+		FNewCompletedQuestDelegate OnCompleteQuestDelegate;
 
 private:
 	FTimerHandle TaskCheckTimerHandle;

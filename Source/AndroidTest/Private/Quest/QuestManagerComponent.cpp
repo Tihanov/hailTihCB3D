@@ -38,6 +38,21 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 	OnAddNewQuestDelegate.Broadcast(Quest);
 }
 
+bool UQuestManagerComponent::RemoveQuest(UQuestAsset* Quest, bool IsComplete)
+{
+	auto QuestAndInfo = CurrentQuestsAndInfo.Find(Quest);
+	if(!QuestAndInfo)
+		return false;
+	if(IsComplete)
+	{
+		CompletedQuests.Add(Quest);
+		OnCompleteQuestDelegate.Broadcast(Quest);
+	}
+	CurrentQuestsAndInfo.Remove(Quest);
+	OnRemoveQuestDelegate.Broadcast(Quest);
+	return true;
+}
+
 FQuestPartInfo UQuestManagerComponent::GetCurrentPartFromQuest(UQuestAsset* Quest, bool& Exist)
 {
 	const auto& Result = CurrentQuestsAndInfo.Find(Quest);
@@ -69,8 +84,7 @@ void UQuestManagerComponent::TaskCheck()
 		{
 			if(Quest->Parts.Num() == Info.QuestPart + 1)
 			{
-				CompletedQuests.Add(Quest);
-				CurrentQuestsAndInfo.Remove(Quest);
+				this->RemoveQuest(Quest, true);
 				continue;
 			}
 			Info.QuestPart += 1;
