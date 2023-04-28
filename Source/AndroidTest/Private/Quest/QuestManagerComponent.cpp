@@ -29,6 +29,8 @@ void UQuestManagerComponent::BeginPlay()
 
 void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 {
+	if(CompletedQuests.Find(Quest) != INDEX_NONE || CurrentQuestsAndInfo.Find(Quest))
+		return;
 	FQuestCompletingInfo Info;
 	Info.QuestPart = 0;
 	for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
