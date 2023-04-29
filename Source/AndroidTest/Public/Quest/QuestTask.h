@@ -13,6 +13,8 @@ class ANDROIDTEST_API UQuestTask: public UObject
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-		bool IsDone(class APlayerController* PlayerController);
+		void Init(class APlayerController* PlayerController);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+		bool IsDone();
 };
 

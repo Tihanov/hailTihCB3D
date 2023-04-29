@@ -59,4 +59,5 @@ public: // DELEGATES
 private:
 	FTimerHandle TaskCheckTimerHandle;
 	void TaskCheck();
+	void UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo);
 };

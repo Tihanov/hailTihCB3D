@@ -33,8 +33,7 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 		return;
 	FQuestCompletingInfo Info;
 	Info.QuestPart = 0;
-	for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
-		Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
+	UpdateQuestCompletingInfoToDoTasks(Quest, Info);
 	CurrentQuestsAndInfo.Add(Quest, Info);
 
 	OnAddNewQuestDelegate.Broadcast(Quest);
@@ -79,7 +78,7 @@ void UQuestManagerComponent::TaskCheck()
 		for (auto& Task : Tasks)
 		{
 			if(!Task.Value)
-				Task.Value = Task.Key->IsDone(Cast<APlayerController>(GetOwner()));
+				Task.Value = Task.Key->IsDone();
 			CompletedTasks += static_cast<int>(Task.Value);
 		}
 		if(CompletedTasks == Tasks.Num())
@@ -91,9 +90,18 @@ void UQuestManagerComponent::TaskCheck()
 			}
 			Info.QuestPart += 1;
 			Info.TasksAndState.Empty();
-			for (const auto& Task : Quest->Parts[Info.QuestPart].Tasks)
-			  	Info.TasksAndState.Add(DuplicateObject(Task, nullptr), false);
+			UpdateQuestCompletingInfoToDoTasks(Quest, Info);
 		}
+	}
+}
+
+void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo)
+{
+	for (const auto& Task : Quest->Parts[ToInitInfo.QuestPart].Tasks)
+	{
+		auto NewTask = DuplicateObject(Task, nullptr);
+		ToInitInfo.TasksAndState.Add(NewTask, false);
+		NewTask->Init(Cast<APlayerController>(GetOwner()));
 	}
 }
 
