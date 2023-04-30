@@ -39,18 +39,14 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 	OnAddNewQuestDelegate.Broadcast(Quest);
 }
 
-bool UQuestManagerComponent::RemoveQuest(UQuestAsset* Quest, bool IsComplete)
+bool UQuestManagerComponent::SetQuestComplete(UQuestAsset* Quest)
 {
 	auto QuestAndInfo = CurrentQuestsAndInfo.Find(Quest);
 	if(!QuestAndInfo)
 		return false;
-	if(IsComplete)
-	{
-		CompletedQuests.Add(Quest);
-		OnCompleteQuestDelegate.Broadcast(Quest);
-	}
+	CompletedQuests.Add(Quest);
 	CurrentQuestsAndInfo.Remove(Quest);
-	OnRemoveQuestDelegate.Broadcast(Quest);
+	OnQuestCompleteDelegate.Broadcast(Quest);
 	return true;
 }
 
@@ -85,7 +81,7 @@ void UQuestManagerComponent::TaskCheck()
 		{
 			if(Quest->Parts.Num() == Info.QuestPart + 1)
 			{
-				this->RemoveQuest(Quest, true);
+				this->SetQuestComplete(Quest);
 				continue;
 			}
 			Info.QuestPart += 1;

@@ -8,8 +8,7 @@
 #include "QuestManagerComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddNewQuestDelegate, UQuestAsset*, Quest);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveQuestDelegate, UQuestAsset*, Quest);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNewCompletedQuestDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleteDelegate, UQuestAsset*, Quest);
 
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
@@ -34,8 +33,6 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 		void AddQuest(UQuestAsset* Quest);
-	UFUNCTION(BlueprintCallable)
-		bool RemoveQuest(UQuestAsset* Quest, bool IsComplete = false);
 	UFUNCTION(BlueprintPure)
 		UPARAM(DisplayName = "Part Info") FQuestPartInfo
 			GetCurrentPartFromQuest(
@@ -51,13 +48,12 @@ public:
 public: // DELEGATES
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnAddNewQuest")
 		FAddNewQuestDelegate OnAddNewQuestDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnRemoveQuest")
-		FRemoveQuestDelegate OnRemoveQuestDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnCompleteQuest")
-		FNewCompletedQuestDelegate OnCompleteQuestDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestComplete")
+		FQuestCompleteDelegate OnQuestCompleteDelegate;
 
 private:
 	FTimerHandle TaskCheckTimerHandle;
 	void TaskCheck();
+	bool SetQuestComplete(UQuestAsset* Quest);
 	void UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo);
 };
