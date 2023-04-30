@@ -51,6 +51,13 @@ FQuestPartInfo UQuestManagerComponent::GetCurrentPartFromQuest(UQuestAsset* Ques
 	return Quest->Parts[Result->QuestPart];
 }
 
+TMap<UQuestTask*, bool>& UQuestManagerComponent::GetAllTasksFromQuest(UQuestAsset* Quest)
+{
+	const auto& Result = CurrentQuestsAndInfo.Find(Quest);
+	ULog::Error_WithCondition("Cant find Quest", !Result);
+	return Result->TasksAndState;
+}
+
 void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 {
 	auto& QuestInfo = CurrentQuestsAndInfo[QuestAsset];

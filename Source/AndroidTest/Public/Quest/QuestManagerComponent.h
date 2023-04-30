@@ -35,6 +35,10 @@ public:
 			GetCurrentPartFromQuest(
 				UQuestAsset* Quest,
 				UPARAM(DisplayName = "DoesExist?") bool& Exist);
+	UFUNCTION(BlueprintPure)
+		UPARAM(DisplayName = "Task And State Array") TMap<UQuestTask*, bool>&
+			GetAllTasksFromQuest(
+				UQuestAsset* Quest);
 	
 public:
 	UPROPERTY(BlueprintReadWrite)

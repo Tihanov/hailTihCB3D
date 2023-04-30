@@ -24,5 +24,7 @@ public:
 		void Init(class APlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 		bool IsDone();
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
+		FText GetDisplayName();
 };
 
