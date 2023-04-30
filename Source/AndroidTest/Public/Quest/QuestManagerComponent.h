@@ -27,9 +27,6 @@ class ANDROIDTEST_API UQuestManagerComponent : public UActorComponent
 public:
 	UQuestManagerComponent();
 
-protected:
-	virtual void BeginPlay() override;
-
 public:
 	UFUNCTION(BlueprintCallable)
 		void AddQuest(UQuestAsset* Quest);
@@ -52,8 +49,8 @@ public: // DELEGATES
 		FQuestCompleteDelegate OnQuestCompleteDelegate;
 
 private:
-	FTimerHandle TaskCheckTimerHandle;
-	void TaskCheck();
+	void CheckOnAllTasksCompleted(UQuestAsset* QuestAsset);
+	UFUNCTION() void OnTaskDoneCallback(UQuestTask* Task);
 	bool SetQuestComplete(UQuestAsset* Quest);
 	void UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo);
 };

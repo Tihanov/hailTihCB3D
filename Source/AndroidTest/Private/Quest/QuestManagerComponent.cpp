@@ -3,8 +3,10 @@
 
 #include "Quest/QuestManagerComponent.h"
 
+#include "Log.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "UObject/UObjectGlobals.h"
 #include "Quest/QuestTask.h"
 
@@ -12,19 +14,6 @@
 UQuestManagerComponent::UQuestManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-}
-
-void UQuestManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	GetWorld()->GetTimerManager().SetTimer(
-		TaskCheckTimerHandle,
-		this,
-		&UQuestManagerComponent::TaskCheck,
-		0.2,
-		true);
 }
 
 void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
@@ -62,33 +51,35 @@ FQuestPartInfo UQuestManagerComponent::GetCurrentPartFromQuest(UQuestAsset* Ques
 	return Quest->Parts[Result->QuestPart];
 }
 
-void UQuestManagerComponent::TaskCheck()
+void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 {
-	for (auto& QuestAndInfo : CurrentQuestsAndInfo)
+	auto& QuestInfo = CurrentQuestsAndInfo[QuestAsset];
+	int CompletedTasks = 0;
+	for(const auto& Task : QuestInfo.TasksAndState)
+		CompletedTasks += Task.Value;
+	
+	if(CompletedTasks == QuestInfo.TasksAndState.Num())
 	{
-		auto& Quest = QuestAndInfo.Key;
-		auto& Info = QuestAndInfo.Value;
-		auto& Tasks = Info.TasksAndState;	
-		
-		int CompletedTasks = 0;
-		for (auto& Task : Tasks)
+		if(QuestAsset->Parts.Num() == QuestInfo.QuestPart + 1)
 		{
-			if(!Task.Value)
-				Task.Value = Task.Key->IsDone();
-			CompletedTasks += static_cast<int>(Task.Value);
+			this->SetQuestComplete(QuestAsset);
+			return;
 		}
-		if(CompletedTasks == Tasks.Num())
-		{
-			if(Quest->Parts.Num() == Info.QuestPart + 1)
-			{
-				this->SetQuestComplete(Quest);
-				continue;
-			}
-			Info.QuestPart += 1;
-			Info.TasksAndState.Empty();
-			UpdateQuestCompletingInfoToDoTasks(Quest, Info);
-		}
+		QuestInfo.QuestPart += 1;
+		QuestInfo.TasksAndState.Empty();
+		UpdateQuestCompletingInfoToDoTasks(QuestAsset, QuestInfo);
 	}
+}
+
+void UQuestManagerComponent::OnTaskDoneCallback(UQuestTask* Task)
+{
+	auto QuestInfo = CurrentQuestsAndInfo.Find(Task->ParentQuestAsset);
+	ULog::Error_WithCondition("Cant find quest", !QuestInfo, LO_Both);
+	auto TaskState = QuestInfo->TasksAndState.Find(Task);
+	ULog::Error_WithCondition("Cant find task", !TaskState, LO_Both);
+	*TaskState = true;
+
+	CheckOnAllTasksCompleted(Task->ParentQuestAsset);
 }
 
 void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo)
@@ -98,6 +89,8 @@ void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Que
 		auto NewTask = DuplicateObject(Task, nullptr);
 		ToInitInfo.TasksAndState.Add(NewTask, false);
 		NewTask->Init(Cast<APlayerController>(GetOwner()));
+		NewTask->OnTaskDoneDelegate.AddDynamic(this, &UQuestManagerComponent::OnTaskDoneCallback);
+		NewTask->ParentQuestAsset = Quest;
 	}
 }
 
