@@ -7,10 +7,9 @@
 
 UInventoryComponent::UInventoryComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 }
-
 
 void UInventoryComponent::BeginPlay()
 {
@@ -20,13 +19,6 @@ void UInventoryComponent::BeginPlay()
 	{
 		ULog::Error("InvDataTable == nullptr", LO_Both);
 	}
-}
-
-
-void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 }
 
 int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32 CountOfItems)
@@ -61,17 +53,24 @@ int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32
 	return CountOfNotAddedItems_ToRet;
 }
 
-int32 UInventoryComponent::GetSize() const
+void UInventoryComponent::PickUpItem(AInventoryItemBaseActor* ItemActor)
 {
-	return InventoryArray.Num();
-}
+	if(!ItemActor)
+	{
+		ULog::Warning("ItemActor == nullptr");
+		return;
+	}
 
-int32 UInventoryComponent::GetCountOfItems() const
-{
-	int32 Count = 0;
-	for (auto i : InventoryArray)
-		Count += i.Count;
-	return Count;
+	int CountOfNotAddedItems = AddItem(ItemActor->RowName, ItemActor->CountOf);
+	if(CountOfNotAddedItems == ItemActor->CountOf)
+		return;
+
+	OnItemPickedUpDelegate.Broadcast(ItemActor->RowName, ItemActor->CountOf - CountOfNotAddedItems);
+	
+	if(CountOfNotAddedItems == 0)
+		ItemActor->Destroy(true);
+	else
+		ItemActor->CountOf = CountOfNotAddedItems;
 }
 
 bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
@@ -91,5 +90,48 @@ bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
 	Weight -= Row->WeightKg * Count;
 
 	return true;
+}
+
+void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
+{
+	FName RowName;
+	if(!TrashItem(Index, Count, RowName))
+	{
+		ULog::Warning("Cannot throw out item");
+		return;
+	}
+
+	auto ItemDTR = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	if(!ItemDTR)
+	{
+		ULog::Warning("Cannot find Item Data Table Row by Row Name");
+		return;
+	}
+
+	const auto Transform = GetOwner()->GetActorTransform();
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	auto Item =
+		Cast<AInventoryItemBaseActor>(
+			GetWorld()->SpawnActor(ItemDTR->Other.Class, &Transform, Params));
+
+	Item->Init({
+		RowName,
+		InvDataTable,
+		Count
+	});
+}
+
+int32 UInventoryComponent::GetSize() const
+{
+	return InventoryArray.Num();
+}
+
+int32 UInventoryComponent::GetCountOfItems() const
+{
+	int32 Count = 0;
+	for (auto i : InventoryArray)
+		Count += i.Count;
+	return Count;
 }
 

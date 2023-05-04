@@ -5,40 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "Engine/DataTable.h"
-#include "Inventory/InventoryItemBaseActor.h"
+#include "Inventory/InventoryStructures.h"
 
 #include "InventoryComponent.generated.h"
 
-UENUM(BlueprintType)
-enum class EInvItemType : uint8
-{
-	Default				UMETA(Display = "Default")
-};
-
-USTRUCT(BlueprintType)
-struct FInvItemDataTableOptional
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>	Class = AInventoryItemBaseActor::StaticClass();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector									Scale = { 1,1,1 };
-};
-
-USTRUCT(BlueprintType)
-struct FInvItemDataTable : public FTableRowBase
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				Description;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) EInvItemType		Type			= EInvItemType::Default;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UStaticMesh*	Mesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UTexture2D*	Ico;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				WeightKg		= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				BuyPrice		= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				SellPrice		= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MaxStackCount	= 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvItemDataTableOptional Other;
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
 
 USTRUCT(BlueprintType)
 struct FInvItemArray
@@ -59,9 +30,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 protected:
 	UPROPERTY(BlueprintReadWrite)
 		TArray<FInvItemArray> InventoryArray;
@@ -71,13 +39,30 @@ protected:
 		float MaxWeight = 100.f;
 	UPROPERTY(BlueprintReadOnly)
 		float Weight = 0.f;
+	
 public:
+	// Direct add item to inventory
 	UFUNCTION(BlueprintCallable)
-		UPARAM(DisplayName="CountOfNotAddedItems") int32 AddItem(FName RowName, int32 CountOfItems);
+		UPARAM(DisplayName="CountOfNotAddedItems")int32
+		AddItem(FName RowName, int32 CountOfItems);
+	// Take item from the world, add to inventory, delete if CountOf == 0, change CountOf	
+	UFUNCTION(BlueprintCallable)
+		void PickUpItem(AInventoryItemBaseActor* ItemActor);
+
+	// Direct delete item from the inventory
+	UFUNCTION(BlueprintCallable)
+		bool TrashItem(int32 Index, int32 Count, FName& RowName);
+	// Throw item out to the level and delete it from the inventory
+	UFUNCTION(BlueprintCallable)
+		void ThrowOutItem(int32 Index, int32 Count);
+	
 	UFUNCTION(BlueprintPure)
 		int32 GetSize() const;
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
-	UFUNCTION(BlueprintCallable)
-		bool TrashItem(int32 Index, int32 Count, FName& RowName);
+
+public: /* Delegates */
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
+		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
+	
 };
