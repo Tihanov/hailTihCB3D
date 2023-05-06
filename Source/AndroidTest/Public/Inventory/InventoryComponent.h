@@ -10,6 +10,7 @@
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
 
 USTRUCT(BlueprintType)
 struct FInvItemArray
@@ -64,5 +65,6 @@ public:
 public: /* Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
 		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
-	
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemThrowOut")
+		FOnItemThrowOutDelegate OnItemThrowOutDelegate;
 };

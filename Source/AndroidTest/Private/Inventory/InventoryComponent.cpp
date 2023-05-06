@@ -108,7 +108,17 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 		return;
 	}
 
-	const auto Transform = GetOwner()->GetActorTransform();
+	FTransform Transform;
+	if(const auto Controller = Cast<APlayerController>(GetOwner()))
+	{
+		const auto Actor = Controller->GetPawn();
+		if(Actor)
+			Transform = Actor->GetTransform();
+	}
+	else
+		Transform = GetOwner()->GetActorTransform();
+	Transform.SetRotation(FQuat{0,0,0,0});
+	Transform.SetScale3D(FVector::OneVector);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	auto Item =
@@ -120,6 +130,8 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 		InvDataTable,
 		Count
 	});
+
+	OnItemThrowOutDelegate.Broadcast(Item, Index);
 }
 
 int32 UInventoryComponent::GetSize() const
