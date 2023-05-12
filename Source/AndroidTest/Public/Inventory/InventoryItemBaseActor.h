@@ -48,8 +48,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-		FName PickUp(class APlayerController* PlayerController);
-	UFUNCTION(BlueprintCallable)
 		void Init(FInventoryItemInitStruct InitStruct);
 	EActionType GetActionType_Implementation() override;
 };

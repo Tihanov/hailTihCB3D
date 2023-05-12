@@ -15,7 +15,7 @@ class ANDROIDTEST_API UQuestAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine = true)) FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "IsMainQuest?") bool IsMain;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FQuestPartInfo> Parts;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;	

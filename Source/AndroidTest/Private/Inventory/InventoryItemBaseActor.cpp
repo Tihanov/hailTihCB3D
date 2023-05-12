@@ -38,12 +38,6 @@ void AInventoryItemBaseActor::Tick(float DeltaTime)
 
 }
 
-FName AInventoryItemBaseActor::PickUp(APlayerController* PlayerController)
-{
-	ULog::Info("Picked", LO_Viewport);
-	return RowName;
-}
-
 void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 {
 	InvDataTable = InitStruct.DataTable;

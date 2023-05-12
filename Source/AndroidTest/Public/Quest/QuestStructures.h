@@ -41,7 +41,7 @@ struct FQuestPartInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FName Id;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine = true)) FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestTask*> Tasks;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;
 };
