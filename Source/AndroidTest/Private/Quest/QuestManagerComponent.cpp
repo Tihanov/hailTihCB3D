@@ -57,6 +57,12 @@ TMap<UQuestTask*, bool>& UQuestManagerComponent::GetAllTasksFromQuest(UQuestAsse
 	return Result->TasksAndState;
 }
 
+void UQuestManagerComponent::TrackQuest(UQuestAsset* ToTrack)
+{
+	TrackedQuest = ToTrack;
+	OnTrackedQuestSetDelegate.Broadcast(ToTrack);
+}
+
 void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 {
 	auto& QuestInfo = CurrentQuestsAndInfo[QuestAsset];
@@ -69,11 +75,13 @@ void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 		if(QuestAsset->Parts.Num() == QuestInfo.QuestPart + 1)
 		{
 			this->SetQuestComplete(QuestAsset);
+			OnQuestStateChangedDelegate.Broadcast(QuestAsset);
 			return;
 		}
 		QuestInfo.QuestPart += 1;
 		QuestInfo.TasksAndState.Empty();
 		UpdateQuestCompletingInfoToDoTasks(QuestAsset, QuestInfo);
+		OnQuestStateChangedDelegate.Broadcast(QuestAsset);
 	}
 }
 
@@ -84,6 +92,7 @@ void UQuestManagerComponent::OnTaskDoneCallback(UQuestTask* Task)
 	auto TaskState = QuestInfo->TasksAndState.Find(Task);
 	ULog::Error_WithCondition("Cant find task", !TaskState, LO_Both);
 	*TaskState = true;
+	OnQuestStateChangedDelegate.Broadcast(Task->ParentQuestAsset);
 
 	CheckOnAllTasksCompleted(Task->ParentQuestAsset);
 }

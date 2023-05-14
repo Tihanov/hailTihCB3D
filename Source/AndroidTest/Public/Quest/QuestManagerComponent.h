@@ -9,6 +9,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddNewQuestDelegate, UQuestAsset*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleteDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestStateChangedDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTrackedQuestSetDelegate, UQuestAsset*, Quest);
 
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
@@ -39,19 +41,29 @@ public:
 		UPARAM(DisplayName = "Task And State Array") TMap<UQuestTask*, bool>&
 			GetAllTasksFromQuest(
 				UQuestAsset* Quest);
+	UFUNCTION(BlueprintSetter)
+		void TrackQuest(UQuestAsset* ToTrack);
+	UFUNCTION(BlueprintGetter)
+		UQuestAsset* GetTrackedQuest() const {return TrackedQuest; }
 	
 public:
 	UPROPERTY(BlueprintReadWrite)
 		TMap<UQuestAsset*, FQuestCompletingInfo> CurrentQuestsAndInfo;
 	UPROPERTY(BlueprintReadWrite)
 		TArray<UQuestAsset*> CompletedQuests;
+	UPROPERTY(BlueprintGetter = GetTrackedQuest, BlueprintSetter = TrackQuest, Category = "Quests")
+		UQuestAsset* TrackedQuest; 
 
 public: // DELEGATES
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnAddNewQuest")
 		FAddNewQuestDelegate OnAddNewQuestDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestComplete")
 		FQuestCompleteDelegate OnQuestCompleteDelegate;
-
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestStateChanged")
+		FQuestStateChangedDelegate OnQuestStateChangedDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTrackedQuestSet")
+		FTrackedQuestSetDelegate OnTrackedQuestSetDelegate;
+	
 private:
 	void CheckOnAllTasksCompleted(UQuestAsset* QuestAsset);
 	UFUNCTION() void OnTaskDoneCallback(UQuestTask* Task);
