@@ -6,7 +6,6 @@
 #include "Log.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
-#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "UObject/UObjectGlobals.h"
 #include "Quest/QuestTask.h"
 
