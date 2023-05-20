@@ -1,0 +1,3 @@
+[submodule "Plugins/DlgSystem"]
+	path = Plugins/DlgSystem
+	url = https://github.com/NotYetGames/DlgSystem.git

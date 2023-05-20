@@ -18,7 +18,8 @@ public class AndroidTest : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
         {
-			"Debug"
+			"Debug",
+			"DlgSystem"
         });
 
 		// Uncomment if you are using Slate UI
