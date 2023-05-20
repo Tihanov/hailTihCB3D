@@ -74,6 +74,8 @@ void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 	{
 		if(QuestAsset->Parts.Num() == QuestInfo.QuestPart + 1)
 		{
+			for (const auto& DoAfter : QuestAsset->ToDoAfter)
+				DoAfter->Do();
 			this->SetQuestComplete(QuestAsset);
 			OnQuestStateChangedDelegate.Broadcast(QuestAsset);
 			return;

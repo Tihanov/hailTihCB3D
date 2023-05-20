@@ -48,10 +48,19 @@ struct FQuestPartInfo
 
 
 ////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////	METHODS TO DO AFTER:
 ////////////////////////////////////////////////////////
 
 
+UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew)
+class ANDROIDTEST_API UQuestMethodToDoAfter: public UObject 
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+		void Do();
+};
 
 
 

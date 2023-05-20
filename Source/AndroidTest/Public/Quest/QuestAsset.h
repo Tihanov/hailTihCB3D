@@ -19,5 +19,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "IsMainQuest?") bool IsMain;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FQuestPartInfo> Parts;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<UQuestAsset*> QuestsToDoNext;	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<UQuestAsset*> QuestsToDoNext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestMethodToDoAfter*> ToDoAfter;
 };
