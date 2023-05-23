@@ -13,9 +13,11 @@ class ANDROIDTEST_API UQuestTask: public UObject
 {
 	GENERATED_BODY()
 
-public:
+public: /*Delegates*/
 	UPROPERTY(BlueprintCallable, Category = "Delegates", DisplayName = "OnTaskDone")
 		FTaskDoneDelegate OnTaskDoneDelegate;
+
+public: /*Vars*/
 	UPROPERTY(BlueprintReadOnly)
 		class UQuestAsset* ParentQuestAsset;
 

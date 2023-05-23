@@ -59,8 +59,9 @@ TMap<UQuestTask*, bool>& UQuestManagerComponent::GetAllTasksFromQuest(UQuestAsse
 
 void UQuestManagerComponent::TrackQuest(UQuestAsset* ToTrack)
 {
+	auto OldQuest = TrackedQuest;
 	TrackedQuest = ToTrack;
-	OnTrackedQuestSetDelegate.Broadcast(ToTrack);
+	OnTrackedQuestSetDelegate.Broadcast(ToTrack, OldQuest);
 }
 
 void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)

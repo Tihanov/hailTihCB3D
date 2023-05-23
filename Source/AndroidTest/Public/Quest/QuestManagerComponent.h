@@ -10,7 +10,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddNewQuestDelegate, UQuestAsset*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleteDelegate, UQuestAsset*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestStateChangedDelegate, UQuestAsset*, Quest);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTrackedQuestSetDelegate, UQuestAsset*, Quest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTrackedQuestSetDelegate, UQuestAsset*, NewQuest, UQuestAsset*, OldQuest);
 
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
@@ -59,7 +59,7 @@ public: // DELEGATES
 		FAddNewQuestDelegate OnAddNewQuestDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestComplete")
 		FQuestCompleteDelegate OnQuestCompleteDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestStateChanged")
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestStateChanged")
 		FQuestStateChangedDelegate OnQuestStateChangedDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTrackedQuestSet")
 		FTrackedQuestSetDelegate OnTrackedQuestSetDelegate;
