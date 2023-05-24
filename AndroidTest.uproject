@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.27",
+	"EngineAssociation": "{ECE355ED-4843-0D75-5EE5-CA922C448A71}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -25,6 +25,10 @@
 			"Name": "FlatNodes",
 			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/b719437f3fb54c259b34227363df8cab"
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
 		}
 	]
 }
