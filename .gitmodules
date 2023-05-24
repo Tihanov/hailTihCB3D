@@ -1,3 +1,6 @@
 [submodule "Plugins/DlgSystem"]
 	path = Plugins/DlgSystem
 	url = https://github.com/NotYetGames/DlgSystem.git
+[submodule "Plugins/DebugLogLibrary"]
+	path = Plugins/DebugLogLibrary
+	url = https://github.com/AliElSaleh/DebugLogLibrary-UE4.git
