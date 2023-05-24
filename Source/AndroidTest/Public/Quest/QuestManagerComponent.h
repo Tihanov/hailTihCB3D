@@ -51,7 +51,8 @@ public:
 		TMap<UQuestAsset*, FQuestCompletingInfo> CurrentQuestsAndInfo;
 	UPROPERTY(BlueprintReadWrite)
 		TArray<UQuestAsset*> CompletedQuests;
-	UPROPERTY(BlueprintGetter = GetTrackedQuest, BlueprintSetter = TrackQuest, Category = "Quests")
+private:
+	UPROPERTY(BlueprintGetter = GetTrackedQuest, BlueprintSetter = TrackQuest, Category = "Quests", meta=(AllowPrivateAccess))
 		UQuestAsset* TrackedQuest; 
 
 public: // DELEGATES

@@ -109,11 +109,12 @@ void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Que
 		NewTask->Init(Cast<APlayerController>(GetOwner()));
 		NewTask->OnTaskDoneDelegate.AddDynamic(this, &UQuestManagerComponent::OnTaskDoneCallback);
 		NewTask->ParentQuestAsset = Quest;
-		auto OldQuest = Quest;
 		if(NewTask->IsDone())
 		{
+			const auto& QuestInfo = CurrentQuestsAndInfo[Quest];
+			const int CurrentPart = QuestInfo.QuestPart;
 			OnTaskDoneCallback(NewTask);
-			if(OldQuest != Quest)
+			if(CurrentPart != QuestInfo.QuestPart || CompletedQuests.Contains(Quest))
 				break;
 		}
 	}
