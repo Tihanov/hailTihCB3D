@@ -52,13 +52,19 @@ public:
 		FOnHealthPointsMaxChangedDelegate OnHealthPointsMaxChangedDelegate;
 	UPROPERTY(BlueprintAssignable, Category=HealthPoints, DisplayName = "OnPawnDeath")
 		FOnPawnDeathDelegate OnPawnDeathDelegate;
-	
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=HealthPoints)
+		float DamageTimeout;
 private:
 	UPROPERTY(BlueprintGetter=GetMaxHealthPoints, BlueprintSetter=SetMaxHealthPoints, EditAnywhere, Category=HealthPoints, meta=(ClampMin=0, ClampMax=100.f, AllowPrivateAccess=true))
 		float MaxHealthPoints;
 	UPROPERTY(BlueprintGetter=GetHealthPoints, BlueprintSetter=SetHealthPoints, VisibleAnywhere, Category=HealthPoints, meta=(AllowPrivateAccess=true))
 		float HealthPoints;
+
+private:
 	UFUNCTION()
 		void OnTakeAnyDamagePureHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 		void CheckOnDeath();
+	FTimerHandle DamageTimeoutHandler;
 };

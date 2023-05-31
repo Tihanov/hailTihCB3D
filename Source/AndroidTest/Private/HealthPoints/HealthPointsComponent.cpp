@@ -50,6 +50,14 @@ bool UHealthPointsComponent::IsDead() const
 void UHealthPointsComponent::OnTakeAnyDamagePureHandler(AActor* DamagedActor, float Damage,
                                                         const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+	auto& TimeManager = GetWorld()->GetTimerManager();
+
+	if(TimeManager.GetTimerElapsed(DamageTimeoutHandler) != -1)
+		return;
+
+	TimeManager.SetTimer(
+               		DamageTimeoutHandler,DamageTimeout,false,DamageTimeout);
+	
 	SetHealthPoints(GetHealthPoints() - Damage);
 	CheckOnDeath();
 }
