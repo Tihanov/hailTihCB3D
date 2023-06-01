@@ -27,7 +27,7 @@ float UHealthPointsComponent::GetHealthPoints() const
 void UHealthPointsComponent::SetHealthPoints(float Hp)
 {
 	const auto Prev = HealthPoints;
-	HealthPoints = Hp;
+	HealthPoints = FMath::Clamp(Hp, 0, MaxHealthPoints);
 }
 
 float UHealthPointsComponent::GetMaxHealthPoints() const
@@ -36,9 +36,9 @@ float UHealthPointsComponent::GetMaxHealthPoints() const
 }
 void UHealthPointsComponent::SetMaxHealthPoints(float MaxHp)
 {
-	const auto Prev = HealthPoints;
+	const auto Prev = MaxHealthPoints;
 	MaxHealthPoints = MaxHp;
-	OnHealthPointsMaxChangedDelegate.Broadcast(this, HealthPoints, Prev);	
+	OnHealthPointsMaxChangedDelegate.Broadcast(this, MaxHealthPoints, Prev);	
 }
 
 bool UHealthPointsComponent::IsDead() const
