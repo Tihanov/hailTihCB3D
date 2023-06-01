@@ -8,10 +8,6 @@
 
 class UHealthPointsComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHealthPointsChangedDelegate,
-	UHealthPointsComponent*, HpComponent,
-	float, CurrHp,
-	float, PrevHp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHealthPointsMaxChangedDelegate,
 	UHealthPointsComponent*, HpComponent,
 	float, CurrHp,
@@ -42,29 +38,29 @@ public:
 	UFUNCTION(BlueprintSetter, BlueprintCallable, Category=HealthPoints)
 		void SetMaxHealthPoints(float MaxHp);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category=HealthPoints)
 		bool IsDead() const;
 
 	/*Delegates*/
-	UPROPERTY(BlueprintAssignable, Category=HealthPoints, DisplayName = "OnHealthPointsChanged")
-		FOnHealthPointsChangedDelegate OnHealthPointsChangedDelegate;
 	UPROPERTY(BlueprintAssignable, Category=HealthPoints, DisplayName = "OnHealthPointsMaxChanged")
 		FOnHealthPointsMaxChangedDelegate OnHealthPointsMaxChangedDelegate;
 	UPROPERTY(BlueprintAssignable, Category=HealthPoints, DisplayName = "OnPawnDeath")
 		FOnPawnDeathDelegate OnPawnDeathDelegate;
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=HealthPoints)
-		float DamageTimeout;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=HealthPoints, DisplayName="UseDamageTimeout?")
+		bool bUseTakeDamageTimeout;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=HealthPoints, meta=(EditCondition = "bUseTakeDamageTimeout"))
+		float TakeDamageTimeout;
 private:
 	UPROPERTY(BlueprintGetter=GetMaxHealthPoints, BlueprintSetter=SetMaxHealthPoints, EditAnywhere, Category=HealthPoints, meta=(ClampMin=0, ClampMax=100.f, AllowPrivateAccess=true))
 		float MaxHealthPoints;
-	UPROPERTY(BlueprintGetter=GetHealthPoints, BlueprintSetter=SetHealthPoints, VisibleAnywhere, Category=HealthPoints, meta=(AllowPrivateAccess=true))
+	UPROPERTY(BlueprintGetter=GetHealthPoints, BlueprintSetter=SetHealthPoints, Category=HealthPoints, meta=(AllowPrivateAccess=true))
 		float HealthPoints;
 
 private:
 	UFUNCTION()
 		void OnTakeAnyDamagePureHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 		void CheckOnDeath();
-	FTimerHandle DamageTimeoutHandler;
+	FTimerHandle TakeDamageTimeoutHandler;
 };

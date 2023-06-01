@@ -28,7 +28,6 @@ void UHealthPointsComponent::SetHealthPoints(float Hp)
 {
 	const auto Prev = HealthPoints;
 	HealthPoints = Hp;
-	OnHealthPointsChangedDelegate.Broadcast(this, HealthPoints, Prev);	
 }
 
 float UHealthPointsComponent::GetMaxHealthPoints() const
@@ -52,11 +51,14 @@ void UHealthPointsComponent::OnTakeAnyDamagePureHandler(AActor* DamagedActor, fl
 {
 	auto& TimeManager = GetWorld()->GetTimerManager();
 
-	if(TimeManager.GetTimerElapsed(DamageTimeoutHandler) != -1)
-		return;
+	if(bUseTakeDamageTimeout)
+	{
+		if(TimeManager.GetTimerElapsed(TakeDamageTimeoutHandler) != -1)
+			return;
 
-	TimeManager.SetTimer(
-               		DamageTimeoutHandler,DamageTimeout,false,DamageTimeout);
+		TimeManager.SetTimer(
+						   TakeDamageTimeoutHandler,TakeDamageTimeout,false,TakeDamageTimeout);
+	}
 	
 	SetHealthPoints(GetHealthPoints() - Damage);
 	CheckOnDeath();
