@@ -49,5 +49,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 		void Init(FInventoryItemInitStruct InitStruct);
-	EActionType GetActionType_Implementation() override;
+	
+	virtual void DoAction_Implementation(const UActionManagerComponent* ActionManagerComponent) override;
+	virtual FText GetDisplayDescription_Implementation() const override;
+	virtual UTexture2D* GetIco_Implementation() const override;
 };

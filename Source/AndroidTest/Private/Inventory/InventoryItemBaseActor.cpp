@@ -57,8 +57,19 @@ void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 	SetActorScale3D( Row->Other.Scale );
 }
 
-EActionType AInventoryItemBaseActor::GetActionType_Implementation()
+void AInventoryItemBaseActor::DoAction_Implementation(const UActionManagerComponent* ActionManagerComponent)
 {
-	return EActionType::PickUp;
+	
 }
 
+FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
+{
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	return Row->DisplayName;
+}
+
+UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
+{
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	return Row->Ico;
+}
