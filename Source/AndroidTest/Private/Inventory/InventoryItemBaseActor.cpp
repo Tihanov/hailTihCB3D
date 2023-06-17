@@ -68,7 +68,7 @@ void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 	check(CausedBy);
 	const auto InvComp = Cast<UInventoryComponent>(CausedBy->GetComponentByClass(UInventoryComponent::StaticClass()));
 	InvComp->PickUpItem(this);
-	if(!this->IsActorBeingDestroyed())
+	if( this && !this->IsActorBeingDestroyed())
 	{
 		const auto ActComp = Cast<UActionManagerComponent>(CausedBy->GetComponentByClass(UActionManagerComponent::StaticClass()));
 		ActComp->OnRefreshActionDelegate.Broadcast(ActComp, this);
@@ -78,7 +78,7 @@ void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
 {
 	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
-	return Row->DisplayName;
+	return FText::Format(FText::FromString("{0} x{1}"), Row->DisplayName, CountOf);
 }
 
 UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
