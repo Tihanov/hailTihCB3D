@@ -8,10 +8,13 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAddActionDelegate,
 	class UActionManagerComponent*, ActionManager,
-	IActionInterface*, ActionInterface);
+	AActor*, Actor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRemoveActionDelegate,
 	class UActionManagerComponent*, ActionManager,
-	IActionInterface*, ActionInterface);
+	AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRefreshActionDelegate,
+	class UActionManagerComponent*, ActionManager,
+	AActor*, Actor);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANDROIDTEST_API UActionManagerComponent : public UActorComponent
@@ -28,6 +31,8 @@ public: /*delegates*/
 		FOnAddActionDelegate OnAddActionDelegate;
 	UPROPERTY(BlueprintAssignable, Category=Delegates, DisplayName = "OnRemoveAction")
 		FOnRemoveActionDelegate OnRemoveActionDelegate;
+	UPROPERTY(BlueprintAssignable, Category=Delegates, DisplayName = "OnRefreshAction")
+		FOnRefreshActionDelegate OnRefreshActionDelegate;
 	
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Update)

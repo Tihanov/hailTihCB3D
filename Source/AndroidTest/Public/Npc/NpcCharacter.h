@@ -38,7 +38,12 @@ public:
 	/*Implementation of IDlgDialogueParticipant*/
 	virtual FName GetParticipantName_Implementation() const override;
 	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;
+	
+	/*Implementation of IActionInterface*/
 	virtual EActionType GetActionType_Implementation() override;
+	virtual void DoAction_Implementation(AActor* CausedBy) override;
+	virtual FText GetDisplayDescription_Implementation() const override;
+	virtual UTexture2D* GetIco_Implementation() const override;
 	
 	/*Getters, Setters*/
 	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Dialogue")

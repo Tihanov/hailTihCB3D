@@ -3,6 +3,8 @@
 
 #include "Npc/NpcCharacter.h"
 
+#include "Log.h"
+
 
 ANpcCharacter::ANpcCharacter()
 {
@@ -30,6 +32,21 @@ FText ANpcCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeake
 EActionType ANpcCharacter::GetActionType_Implementation()
 {
 	return EActionType::NPCDialogue;
+}
+
+void ANpcCharacter::DoAction_Implementation(AActor* CausedBy)
+{
+	ULog::Info("Talking with someone", LO_Both);
+}
+
+FText ANpcCharacter::GetDisplayDescription_Implementation() const
+{
+	return DlgDisplayName;
+}
+
+UTexture2D* ANpcCharacter::GetIco_Implementation() const
+{
+	return nullptr;
 }
 
 UDlgDialogue* ANpcCharacter::GetDialogue() const

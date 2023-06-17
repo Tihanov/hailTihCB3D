@@ -52,7 +52,7 @@ void UActionManagerComponent::Scan()
 			ScannedActors.Add(ToAddActor, &bExists);
 			ScannedActorsTemp.Add(ToAddActor);
 			if(!bExists)
-				OnAddActionDelegate.Broadcast(this, Casted);
+				OnAddActionDelegate.Broadcast(this, ToAddActor);
 		}
 	}
 
@@ -61,7 +61,7 @@ void UActionManagerComponent::Scan()
 	for (const auto& ItElement : Dif)
 	{
 		bIfHaveDif = true;
-		OnRemoveActionDelegate.Broadcast(this, Cast<IActionInterface>(ItElement));
+		OnRemoveActionDelegate.Broadcast(this, ItElement);
 	}
 
 	if(bIfHaveDif)

@@ -5,6 +5,7 @@
 
 #include "Inventory/InventoryComponent.h"
 #include "Log.h"
+#include "Action/ActionManagerComponent.h"
 
 AInventoryItemBaseActor::AInventoryItemBaseActor()
 {
@@ -57,9 +58,21 @@ void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 	SetActorScale3D( Row->Other.Scale );
 }
 
-void AInventoryItemBaseActor::DoAction_Implementation(const UActionManagerComponent* ActionManagerComponent)
+EActionType AInventoryItemBaseActor::GetActionType_Implementation()
 {
-	
+	return EActionType::PickUp;	
+}
+
+void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
+{
+	check(CausedBy);
+	const auto InvComp = Cast<UInventoryComponent>(CausedBy->GetComponentByClass(UInventoryComponent::StaticClass()));
+	InvComp->PickUpItem(this);
+	if(!this->IsActorBeingDestroyed())
+	{
+		const auto ActComp = Cast<UActionManagerComponent>(CausedBy->GetComponentByClass(UActionManagerComponent::StaticClass()));
+		ActComp->OnRefreshActionDelegate.Broadcast(ActComp, this);
+	}
 }
 
 FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
