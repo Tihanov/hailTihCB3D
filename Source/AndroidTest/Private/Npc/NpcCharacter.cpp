@@ -4,6 +4,7 @@
 #include "Npc/NpcCharacter.h"
 
 #include "Log.h"
+#include "Player/MainPlayerController.h"
 
 
 ANpcCharacter::ANpcCharacter()
@@ -36,7 +37,10 @@ EActionType ANpcCharacter::GetActionType_Implementation()
 
 void ANpcCharacter::DoAction_Implementation(AActor* CausedBy)
 {
-	ULog::Info("Talking with someone", LO_Both);
+	if(const auto PlayerController = Cast<AMainPlayerController>(CausedBy); PlayerController != nullptr)
+	{
+		PlayerController->StartDialogue(Dialogue, TArray<AActor*>{this});
+	}
 }
 
 FText ANpcCharacter::GetDisplayDescription_Implementation() const
