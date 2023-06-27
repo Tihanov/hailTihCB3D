@@ -44,6 +44,7 @@ public:
 	virtual void DoAction_Implementation(AActor* CausedBy) override;
 	virtual FText GetDisplayDescription_Implementation() const override;
 	virtual UTexture2D* GetIco_Implementation() const override;
+	virtual bool CanDoAction_Implementation() const override;
 	
 	/*Getters, Setters*/
 	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Dialogue")
@@ -62,6 +63,9 @@ public:
 		FName DlgSystemName;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Dialogue")
 		FText DlgDisplayName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName = "CanPlayerSpeakWith?", Category = "Dialogue")
+		bool bCanPlayerSpeakWith = false;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Quest|Mesh")
 		UStaticMesh* QstHaveQuestStaticMesh;

@@ -147,3 +147,25 @@ int32 UInventoryComponent::GetCountOfItems() const
 	return Count;
 }
 
+void UInventoryComponent::SetItemInHand(int32 Index)
+{
+	if(IndexOfInHandItem == Index)
+		return;
+	check(InventoryArray.IsValidIndex(Index));
+	IndexOfInHandItem = Index;
+	const auto Result = InventoryArray[Index];
+	OnSetItemInHandDelegate.Broadcast(Index, Result.RowName, Result.Count);
+}
+
+void UInventoryComponent::UnsetHandItem()
+{
+	IndexOfInHandItem = -1;
+	OnUnsetHandItemDelegate.Broadcast();
+}
+
+int32 UInventoryComponent::GetIndexOfInHandItem(bool& bIsInHandItemSet) const
+{
+	bIsInHandItemSet = IndexOfInHandItem != -1;
+	return IndexOfInHandItem;
+}
+

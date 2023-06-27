@@ -37,6 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 		void DoAction(AActor* CausedBy);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+		bool CanDoAction() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 		FText GetDisplayDescription() const;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 		UTexture2D* GetIco() const;

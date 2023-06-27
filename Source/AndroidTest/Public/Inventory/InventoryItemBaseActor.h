@@ -45,6 +45,8 @@ public:
 		UDataTable* InvDataTable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 CountOf;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "CanBePickUpped?",Category = "Options")
+		bool bCanBePickUpped = true;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -54,4 +56,5 @@ public:
 	virtual void DoAction_Implementation(AActor* CausedBy) override;
 	virtual FText GetDisplayDescription_Implementation() const override;
 	virtual UTexture2D* GetIco_Implementation() const override;
+	virtual bool CanDoAction_Implementation() const override;
 };

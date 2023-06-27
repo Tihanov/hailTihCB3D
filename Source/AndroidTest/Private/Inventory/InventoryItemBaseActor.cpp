@@ -66,7 +66,19 @@ EActionType AInventoryItemBaseActor::GetActionType_Implementation()
 void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 {
 	check(CausedBy);
-	const auto InvComp = Cast<UInventoryComponent>(CausedBy->GetComponentByClass(UInventoryComponent::StaticClass()));
+	UInventoryComponent* InvComp = Cast<UInventoryComponent>(CausedBy->GetComponentByClass(UInventoryComponent::StaticClass()));
+	if(APlayerController* PlayerController = Cast<APlayerController>(CausedBy); !InvComp && PlayerController)
+	{
+		const auto ControlledPawn = PlayerController->GetPawn();
+		check(ControlledPawn);
+		InvComp = Cast<UInventoryComponent>(ControlledPawn->GetComponentByClass(UInventoryComponent::StaticClass()));
+		check(InvComp);
+	}
+	else
+		ULog::Error(
+			FString::Printf(TEXT("method DoAction(ActionInterface, AInventoryItemBaseActor); Line: %i"), __LINE__),
+			LO_Console);
+	
 	InvComp->PickUpItem(this);
 	if( this && !this->IsActorBeingDestroyed())
 	{
@@ -85,4 +97,9 @@ UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
 {
 	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
 	return Row->Ico;
+}
+
+bool AInventoryItemBaseActor::CanDoAction_Implementation() const
+{
+	return bCanBePickUpped;	
 }

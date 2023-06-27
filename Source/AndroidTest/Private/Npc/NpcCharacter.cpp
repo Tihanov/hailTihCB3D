@@ -53,6 +53,11 @@ UTexture2D* ANpcCharacter::GetIco_Implementation() const
 	return nullptr;
 }
 
+bool ANpcCharacter::CanDoAction_Implementation() const
+{
+	return bCanPlayerSpeakWith;
+}
+
 UDlgDialogue* ANpcCharacter::GetDialogue() const
 {
 	return Dialogue;

@@ -46,7 +46,7 @@ void UActionManagerComponent::Scan()
 	for (auto& Result : Out)
 	{
 		const auto ToAddActor = Result.GetActor();
-		if(const auto Casted = Cast<IActionInterface>(ToAddActor); Casted != nullptr)
+		if(const auto Casted = Cast<IActionInterface>(ToAddActor); Casted != nullptr && Casted->Execute_CanDoAction(ToAddActor))
 		{
 			bool bExists = false;
 			ScannedActors.Add(ToAddActor, &bExists);

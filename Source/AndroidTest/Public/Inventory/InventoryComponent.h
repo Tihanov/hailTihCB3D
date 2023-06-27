@@ -11,6 +11,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSetItemInHandDelegate, int32, Index, FName, ItemRowName, int32, CountOf);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnsetHandItemDelegate);
 
 USTRUCT(BlueprintType)
 struct FInvItemArray
@@ -40,6 +42,8 @@ protected:
 		float MaxWeight = 100.f;
 	UPROPERTY(BlueprintReadOnly)
 		float Weight = 0.f;
+
+	int IndexOfInHandItem = -1;
 	
 public:
 	// Direct add item to inventory
@@ -62,9 +66,20 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
 
+	UFUNCTION(BlueprintCallable)
+		void SetItemInHand(int32 Index);
+	UFUNCTION(BlueprintCallable)
+		void UnsetHandItem();
+	UFUNCTION(BlueprintPure)
+		int32 GetIndexOfInHandItem(bool& bIsInHandItemSet) const;
+
 public: /* Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
 		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemThrowOut")
 		FOnItemThrowOutDelegate OnItemThrowOutDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnSetItemInHand")
+		FOnSetItemInHandDelegate OnSetItemInHandDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnUnsetHandItem")
+		FOnUnsetHandItemDelegate OnUnsetHandItemDelegate;
 };

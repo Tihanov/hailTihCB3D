@@ -10,10 +10,27 @@
 
 #include "InventoryStructures.generated.h"
 
+USTRUCT(BlueprintType)
+struct FInvHealingItemSettings
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsHealing = false;
+};
+
+USTRUCT(BlueprintType)
+struct FInvWeaponItemSettings
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsWeapon = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MagazineCapacity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotRange;
+};
+
 UENUM(BlueprintType)
 enum class EInvItemType : uint8
 {
-	Default				UMETA(Display = "Default")
+	Default				UMETA(Display = "Default"),
+	Weapon				UMETA(Display = "Weapon"),
 };
 
 USTRUCT(BlueprintType)
@@ -22,6 +39,8 @@ struct FInvItemDataTableOptional
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>	Class = AInventoryItemBaseActor::StaticClass();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector									Scale = { 1,1,1 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvHealingItemSettings					HealingItemSettings;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings					WeaponItemSettings;
 };
 
 USTRUCT(BlueprintType)
