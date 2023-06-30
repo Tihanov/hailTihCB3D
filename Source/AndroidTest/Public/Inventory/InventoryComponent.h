@@ -11,8 +11,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSetItemInHandDelegate, int32, Index, FName, ItemRowName, int32, CountOf);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnsetHandItemDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEquipWeaponDelegate, int32, Index, FName, ItemRowName, int32, CountOf);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnequipWeaponDelegate);
 
 USTRUCT(BlueprintType)
 struct FInvItemArray
@@ -43,7 +43,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 		float Weight = 0.f;
 
-	int IndexOfInHandItem = -1;
+	int IndexOfEquippedWeapon = -1;
 	
 public:
 	// Direct add item to inventory
@@ -67,19 +67,21 @@ public:
 		int32 GetCountOfItems() const;
 
 	UFUNCTION(BlueprintCallable)
-		void SetItemInHand(int32 Index);
+		void EquipWeapon(int32 Index);
 	UFUNCTION(BlueprintCallable)
-		void UnsetHandItem();
+		void UnequipWeapon();
 	UFUNCTION(BlueprintPure)
-		int32 GetIndexOfInHandItem(bool& bIsInHandItemSet) const;
+		UPARAM(DisplayName = "Index") int32
+		GetIndexOfEquippedWeapon(
+			UPARAM(DisplayName = "IsWeaponEquipped?") bool& bIsWeaponEquipped) const;
 
 public: /* Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
 		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemThrowOut")
 		FOnItemThrowOutDelegate OnItemThrowOutDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnSetItemInHand")
-		FOnSetItemInHandDelegate OnSetItemInHandDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnUnsetHandItem")
-		FOnUnsetHandItemDelegate OnUnsetHandItemDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnEquipWeapon")
+		FOnEquipWeaponDelegate OnEquipWeaponDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnUnequipWeapon")
+		FOnUnequipWeaponDelegate OnUnequipWeaponDelegate;
 };

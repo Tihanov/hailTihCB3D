@@ -147,25 +147,25 @@ int32 UInventoryComponent::GetCountOfItems() const
 	return Count;
 }
 
-void UInventoryComponent::SetItemInHand(int32 Index)
+void UInventoryComponent::EquipWeapon(int32 Index)
 {
-	if(IndexOfInHandItem == Index)
+	if(IndexOfEquippedWeapon == Index)
 		return;
 	check(InventoryArray.IsValidIndex(Index));
-	IndexOfInHandItem = Index;
+	IndexOfEquippedWeapon = Index;
 	const auto Result = InventoryArray[Index];
-	OnSetItemInHandDelegate.Broadcast(Index, Result.RowName, Result.Count);
+	OnEquipWeaponDelegate.Broadcast(Index, Result.RowName, Result.Count);
 }
 
-void UInventoryComponent::UnsetHandItem()
+void UInventoryComponent::UnequipWeapon()
 {
-	IndexOfInHandItem = -1;
-	OnUnsetHandItemDelegate.Broadcast();
+	IndexOfEquippedWeapon = -1;
+	OnUnequipWeaponDelegate.Broadcast();
 }
 
-int32 UInventoryComponent::GetIndexOfInHandItem(bool& bIsInHandItemSet) const
+int32 UInventoryComponent::GetIndexOfEquippedWeapon(bool& bIsWeaponEquipped) const
 {
-	bIsInHandItemSet = IndexOfInHandItem != -1;
-	return IndexOfInHandItem;
+	bIsWeaponEquipped = IndexOfEquippedWeapon != -1;
+	return IndexOfEquippedWeapon;
 }
 
