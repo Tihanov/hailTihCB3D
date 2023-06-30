@@ -9,11 +9,6 @@
 
 #include "InventoryComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEquipWeaponDelegate, int32, Index, FName, ItemRowName, int32, CountOf);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnequipWeaponDelegate);
-
 USTRUCT(BlueprintType)
 struct FInvItemArray
 {
@@ -21,6 +16,22 @@ struct FInvItemArray
 	UPROPERTY(BlueprintReadOnly) FName RowName;
 	UPROPERTY(BlueprintReadOnly) int32 Count;
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponIndexSetToSlotDelegate,
+	int32, SlotIndex,
+	int32, SetWeaponIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponIndexRemovedFromSlotDelegate,
+	int32, SlotIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEquipWeaponFromSlotDelegate,
+	int32, EquippedWeaponIndex,
+	int32, SlotIndex,
+	FInvItemArray, Options);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnequipWeaponDelegate);
+
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ANDROIDTEST_API UInventoryComponent : public UActorComponent
@@ -43,7 +54,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 		float Weight = 0.f;
 
-	int IndexOfEquippedWeapon = -1;
+	// Contains indexes(for InventoryArray)
+	TStaticArray<TOptional<int32>, 5> WeaponSlots;
+	TOptional<int32> EquippedWeaponSlot;
 	
 public:
 	// Direct add item to inventory
@@ -66,22 +79,42 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
 
-	UFUNCTION(BlueprintCallable)
-		void EquipWeapon(int32 Index);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		void SetWeaponToSlot(int32 SlotIndex, int32 WeaponIndex);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		void RemoveWeaponFromSlot(int32 SlotIndex);
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		UPARAM(DisplayName = "WeaponIndex")int32
+			GetWeaponIndexFromSlot(int32 SlotIndex,
+			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& DoesWeaponSetInSlot) const;
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		TArray<int32> GetWeaponSlots() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+		void EquipWeaponFromSlot(int32 SlotIndex);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		void UnequipWeapon();
-	UFUNCTION(BlueprintPure)
-		UPARAM(DisplayName = "Index") int32
-		GetIndexOfEquippedWeapon(
-			UPARAM(DisplayName = "IsWeaponEquipped?") bool& bIsWeaponEquipped) const;
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		UPARAM(DisplayName = "IndexOfSlot") int32
+			GetEquippedWeaponSlot(
+			UPARAM(DisplayName = "IsSomeWeaponSlotEquipped?") bool& IsSomeWeaponSlotEquipped) const;
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		UPARAM(DisplayName = "WeaponIndex")int32
+			GetEquippedWeaponIndex(
+			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& IsWeaponEquipped) const;
+	
 
 public: /* Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
 		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemThrowOut")
 		FOnItemThrowOutDelegate OnItemThrowOutDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnEquipWeapon")
-		FOnEquipWeaponDelegate OnEquipWeaponDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnWeaponIndexSetToSlot")
+		FOnWeaponIndexSetToSlotDelegate OnWeaponIndexSetToSlotDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnWeaponIndexRemovedFromSlot")
+		FOnWeaponIndexRemovedFromSlotDelegate OnWeaponIndexRemovedFromSlotDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnEquipWeaponFromSlot")
+		FOnEquipWeaponFromSlotDelegate OnEquipWeaponFromSlotDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnUnequipWeapon")
 		FOnUnequipWeaponDelegate OnUnequipWeaponDelegate;
 };
