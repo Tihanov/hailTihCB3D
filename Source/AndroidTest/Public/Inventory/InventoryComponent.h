@@ -102,6 +102,13 @@ public:
 		UPARAM(DisplayName = "WeaponIndex")int32
 			GetEquippedWeaponIndex(
 			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& IsWeaponEquipped) const;
+
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+	FInvItemArray GetWeaponInfoFromSlot(int32 SlotIndex,
+		UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& DoesWeaponSetInSlot) const;
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		FInvItemArray GetEquippedWeaponInfo(
+			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& IsWeaponEquipped) const;
 	
 
 public: /* Delegates */

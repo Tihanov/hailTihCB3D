@@ -246,3 +246,19 @@ int32 UInventoryComponent::GetEquippedWeaponIndex(bool& IsWeaponEquipped) const
 	return EquippedSlot.Get(-1);
 }
 
+FInvItemArray UInventoryComponent::GetWeaponInfoFromSlot(int32 SlotIndex, bool& DoesWeaponSetInSlot) const
+{
+	const auto Index = GetWeaponIndexFromSlot(SlotIndex, DoesWeaponSetInSlot);
+	if(!DoesWeaponSetInSlot)
+		return {TEXT(""), 0};
+	return InventoryArray[Index];
+}
+
+FInvItemArray UInventoryComponent::GetEquippedWeaponInfo(bool& IsWeaponEquipped) const
+{
+	const auto Index = GetEquippedWeaponIndex(IsWeaponEquipped);
+	if(!IsWeaponEquipped)
+		return {TEXT(""), 0};
+	return InventoryArray[Index];
+}
+
