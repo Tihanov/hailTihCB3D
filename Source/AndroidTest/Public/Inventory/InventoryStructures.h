@@ -22,8 +22,13 @@ struct FInvWeaponItemSettings
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsWeapon = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MagazineCapacity;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MagazineCapacity = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotRange = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotScatter = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				MaxScatter = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				MinScatter = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ScatterReductionInOneSec = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				Damage = 10.f;
 };
 
 UENUM(BlueprintType)

@@ -22,8 +22,14 @@ class ANDROIDTEST_API IInvWeaponItemInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "InvWeaponInterface")
-		void InitAsEquippedWeapon(FInvItemDataTable Options);
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "InvWeaponInterface")
-		void Shoot(AActor* CausedBy);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		void InitAsEquippedWeapon(AActor* CausedBy, FInvItemDataTable Options);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		void WeaponTickUpdate(float DeltaTime);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		void StartShooting();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		void StopShooting();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		float GetWeaponScatter() const;
 };
