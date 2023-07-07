@@ -26,10 +26,20 @@ public:
 		void InitAsEquippedWeapon(AActor* CausedBy, FInvItemDataTable Options);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
 		void WeaponTickUpdate(float DeltaTime);
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StartShooting();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StopShooting();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Scatter")
 		float GetWeaponScatter() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
+		FInvItemDataTable GetWeaponSettings() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
+		void ReloadWeapon();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
+		bool IsWeaponReloading() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
+		float GetCurrentWeaponReloadingTimeout() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
+		int GetMagazineCapacity() const;
 };
