@@ -30,6 +30,8 @@ struct FInvWeaponItemSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ScatterReductionInOneSec = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				Damage = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ReloadTimeoutInSec = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				VerticalRecoilInShot = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				HorizontalRecoilInShot = 1.f;
 };
 
 UENUM(BlueprintType)
