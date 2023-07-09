@@ -22,6 +22,7 @@ struct FInvWeaponItemSettings
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsWeapon = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<class AWeaponBase> WeaponClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MagazineCapacity = 20;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotRange = 1000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotScatter = 10.f;
