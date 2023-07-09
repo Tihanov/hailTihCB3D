@@ -26,14 +26,16 @@ public:
 		void InitAsEquippedWeapon(AActor* CausedBy, FInvItemDataTable Options);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
 		void WeaponTickUpdate(float DeltaTime);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		FInvItemDataTable GetWeaponSettings() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+		bool CanWeaponShoot() const;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StartShooting();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StopShooting();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Scatter")
 		float GetWeaponScatter() const;
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
-		FInvItemDataTable GetWeaponSettings() const;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
 		void ReloadWeapon();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Reload")
