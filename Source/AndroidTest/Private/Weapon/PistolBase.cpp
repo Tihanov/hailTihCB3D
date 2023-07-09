@@ -62,12 +62,13 @@ void APistolBase::StartShooting_Implementation()
 	CurrentMagazineCapacity -= 1;
 
 	FHitResult HitResult;
-	FCollisionQueryParams Params;
+	bool IsDamageWasDone = false;
+	float DoneDamage = 0.f;
+	AActor* DamagedActor = nullptr;
 	FVector Start = OwnerAimCameraRight->GetComponentLocation();
 	FVector End = Start
 		+ UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OwnerAimCameraRight->GetForwardVector(), CurrentScatter)
 		* ItemSettings.Other.WeaponItemSettings.ShotRange;
-	Params.AddIgnoredActors(TArray<AActor*>{this, GetOwner()});
 	auto MainGameState = Cast<AMainGameState>(GetWorld()->GetGameState());
 
 	auto Result = UKismetSystemLibrary::LineTraceSingle(
@@ -87,6 +88,7 @@ void APistolBase::StartShooting_Implementation()
 			+ UKismetMathLibrary::GetForwardVector(
 				UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, HitResult.ImpactPoint))
 			* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+		
 		Result = UKismetSystemLibrary::LineTraceSingle(
 				GetWorld(),
 				Start, End,
@@ -98,7 +100,9 @@ void APistolBase::StartShooting_Implementation()
 				true);
 		if(Result)
 		{
-			auto Damage =
+			IsDamageWasDone = true;
+			DamagedActor = HitResult.GetActor();	
+			DoneDamage =
 				UGameplayStatics::ApplyPointDamage(
 					HitResult.GetActor(),
 					ItemSettings.Other.WeaponItemSettings.Damage,
@@ -108,7 +112,6 @@ void APistolBase::StartShooting_Implementation()
 					GetOwner(),
 					{}
 				);
-			OnMadeShotDelegate.Broadcast(this, HitResult.GetActor(), Damage);
 		}
 	}
 	CurrentScatter = FMath::Clamp(
@@ -116,6 +119,7 @@ void APistolBase::StartShooting_Implementation()
 		ItemSettings.Other.WeaponItemSettings.MinScatter,
 		ItemSettings.Other.WeaponItemSettings.MaxScatter);
 	IsShotDelay = true;
+	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, DamagedActor, DoneDamage);
 }
 void APistolBase::StopShooting_Implementation()
 {

@@ -210,12 +210,14 @@ void UInventoryComponent::EquipWeaponFromSlot(int32 SlotIndex)
 		return;
 	}
 
-	if(!WeaponSlots[SlotIndex].IsSet())
-	{
-		UnequipWeapon();
+	if(EquippedWeaponSlotIndex.Get(-1) == SlotIndex)
 		return;
-	}
 
+	UnequipWeapon();
+
+	if(!WeaponSlots[SlotIndex].IsSet())
+		return;
+	
 	EquippedWeaponSlotIndex = SlotIndex;
 	OnEquipWeaponDelegate.Broadcast(
 		this,

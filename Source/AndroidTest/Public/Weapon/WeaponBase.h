@@ -7,8 +7,9 @@
 #include "Inventory/InventoryStructures.h"
 #include "WeaponBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMadeShotDelegate,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnMadeShotDelegate,
 	class AWeaponBase*, Weapon,
+	bool, IsDamageWasDone,
 	AActor*, DamagedActor,
 	float, Damage);
 
