@@ -73,6 +73,12 @@ void APistolBase::StartShooting_Implementation()
 		* ItemSettings.Other.WeaponItemSettings.ShotRange;
 	auto MainGameState = Cast<AMainGameState>(GetWorld()->GetGameState());
 
+	UGameplayStatics::PlaySoundAtLocation(
+		GetWorld(),
+		ItemSettings.Other.WeaponItemSettings.ShotSound,
+		RootMeshComponent->GetSocketLocation("ShootFrom"),
+		FRotator::ZeroRotator);
+
 	auto Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
 			Start, End,

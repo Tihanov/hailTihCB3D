@@ -22,8 +22,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|Weapon")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|Debug|Weapon")
 		TEnumAsByte<EDrawDebugTrace::Type> DebugWeaponTracersType;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|Weapon")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|Debug|Weapon")
 		TEnumAsByte<EDrawDebugTrace::Type> DebugCameraTracersType;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|GameSettings|Game")
+		bool EnableFpsCounter = true;
 };
