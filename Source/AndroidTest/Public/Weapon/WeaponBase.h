@@ -13,6 +13,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnMadeShotDelegate,
 	AActor*, DamagedActor,
 	float, Damage);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartShooting,
+	class AWeaponBase*, Weapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStopShooting,
+	class AWeaponBase*, Weapon);
+
 UCLASS(Abstract, BlueprintType, Blueprintable)
 class ANDROIDTEST_API AWeaponBase : public AActor
 {

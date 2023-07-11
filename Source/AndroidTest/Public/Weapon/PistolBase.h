@@ -24,6 +24,9 @@ protected:
 	bool IsShotDelay				= false;
 	float CurrentShotDelay			= 0.f;
 	
+	bool IsShootingNow              = false;
+	float WeaponShootingTime		= 0.f;
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 	

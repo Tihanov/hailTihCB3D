@@ -61,6 +61,8 @@ void APistolBase::StartShooting_Implementation()
 		return;
 	CurrentMagazineCapacity -= 1;
 
+	IsShootingNow = true;
+
 	FHitResult HitResult;
 	bool IsDamageWasDone = false;
 	float DoneDamage = 0.f;
