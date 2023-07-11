@@ -3,6 +3,9 @@
 
 #include "Npc/NpcCharacter.h"
 
+#include "Log.h"
+#include "Player/MainPlayerController.h"
+
 
 ANpcCharacter::ANpcCharacter()
 {
@@ -30,6 +33,29 @@ FText ANpcCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeake
 EActionType ANpcCharacter::GetActionType_Implementation()
 {
 	return EActionType::NPCDialogue;
+}
+
+void ANpcCharacter::DoAction_Implementation(AActor* CausedBy)
+{
+	if(const auto PlayerController = Cast<AMainPlayerController>(CausedBy); PlayerController != nullptr)
+	{
+		PlayerController->StartDialogue(Dialogue, TArray<AActor*>{this});
+	}
+}
+
+FText ANpcCharacter::GetDisplayDescription_Implementation() const
+{
+	return DlgDisplayName;
+}
+
+UTexture2D* ANpcCharacter::GetIco_Implementation() const
+{
+	return nullptr;
+}
+
+bool ANpcCharacter::CanDoAction_Implementation() const
+{
+	return bCanPlayerSpeakWith;
 }
 
 UDlgDialogue* ANpcCharacter::GetDialogue() const

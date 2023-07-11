@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "ActionInterface.generated.h"
 
+/*TODO: DELETE*/
 UENUM(BlueprintType)
 enum class EActionType : uint8
 {
@@ -30,6 +31,15 @@ class ANDROIDTEST_API IActionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	/*TODO: DELETE*/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
 		EActionType GetActionType();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+		void DoAction(AActor* CausedBy);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+		bool CanDoAction() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+		FText GetDisplayDescription() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+		UTexture2D* GetIco() const;
 };

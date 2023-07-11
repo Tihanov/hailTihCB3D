@@ -147,3 +147,104 @@ int32 UInventoryComponent::GetCountOfItems() const
 	return Count;
 }
 
+FInvItemArray UInventoryComponent::GetItemOnIndex(int32 Index, bool& DoesExist) const
+{
+	if(InventoryArray.IsValidIndex(Index))
+	{
+		DoesExist = true;
+		return InventoryArray[Index];
+	}
+	DoesExist = false;
+	return {};
+}
+
+void UInventoryComponent::SetWeaponToSlot(int32 SlotIndex, const FInvItemArray& Weapon)
+{
+	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
+	{
+		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
+		return;
+	}
+
+	WeaponSlots[SlotIndex] = Weapon;
+	OnWeaponSlotsUpdatedDelegate.Broadcast(this, {GetWeaponSlots()});
+}
+
+void UInventoryComponent::RemoveWeaponFromSlot(int32 SlotIndex)
+{
+	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
+	{
+		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
+		return;
+	}
+	WeaponSlots[SlotIndex].Reset();
+	OnWeaponSlotsUpdatedDelegate.Broadcast(this, {GetWeaponSlots()});
+}
+
+FInvItemArray UInventoryComponent::GetWeaponFromSlot(int32 SlotIndex, bool& DoesWeaponSetInSlot) const
+{
+	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
+	{
+		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
+		DoesWeaponSetInSlot = false;
+		return {};
+	}
+	DoesWeaponSetInSlot = WeaponSlots[SlotIndex].IsSet();
+	return WeaponSlots[SlotIndex].Get({});
+}
+
+TArray<FInvItemArray> UInventoryComponent::GetWeaponSlots() const
+{
+	TArray<FInvItemArray> ToRet;
+	ToRet.SetNum(WeaponSlots.Num());
+	for(int i = 0; i < WeaponSlots.Num(); ++i)
+		ToRet[i] = WeaponSlots[i].Get({});
+	return ToRet;
+}
+
+void UInventoryComponent::EquipWeaponFromSlot(int32 SlotIndex)
+{
+	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
+	{
+		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
+		return;
+	}
+
+	if(EquippedWeaponSlotIndex.Get(-1) == SlotIndex)
+		return;
+
+	UnequipWeapon();
+
+	if(!WeaponSlots[SlotIndex].IsSet())
+		return;
+	
+	EquippedWeaponSlotIndex = SlotIndex;
+	OnEquipWeaponDelegate.Broadcast(
+		this,
+		WeaponSlots[SlotIndex].Get({}),
+		!WeaponSlots[SlotIndex].IsSet());
+}
+
+void UInventoryComponent::UnequipWeapon()
+{
+	EquippedWeaponSlotIndex.Reset();
+	OnUnequipWeaponDelegate.Broadcast(this);
+}
+
+int32 UInventoryComponent::GetEquippedWeaponSlot(bool& IsSomeWeaponSlotEquipped) const
+{
+	IsSomeWeaponSlotEquipped = EquippedWeaponSlotIndex.IsSet();
+	return EquippedWeaponSlotIndex.Get(-1);
+}
+
+FInvItemArray UInventoryComponent::GetEquippedWeaponInfo(bool& IsWeaponEquipped) const
+{
+	IsWeaponEquipped = EquippedWeaponSlotIndex.IsSet();
+	if(IsWeaponEquipped)
+	{
+		IsWeaponEquipped = WeaponSlots[EquippedWeaponSlotIndex.GetValue()].IsSet();
+		return WeaponSlots[EquippedWeaponSlotIndex.GetValue()].Get({});
+	}
+	return {};
+}
+

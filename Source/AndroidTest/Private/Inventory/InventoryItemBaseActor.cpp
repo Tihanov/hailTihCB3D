@@ -5,6 +5,7 @@
 
 #include "Inventory/InventoryComponent.h"
 #include "Log.h"
+#include "Action/ActionManagerComponent.h"
 
 AInventoryItemBaseActor::AInventoryItemBaseActor()
 {
@@ -59,6 +60,46 @@ void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 
 EActionType AInventoryItemBaseActor::GetActionType_Implementation()
 {
-	return EActionType::PickUp;
+	return EActionType::PickUp;	
 }
 
+void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
+{
+	check(CausedBy);
+	UInventoryComponent* InvComp = Cast<UInventoryComponent>(CausedBy->GetComponentByClass(UInventoryComponent::StaticClass()));
+	if(APlayerController* PlayerController = Cast<APlayerController>(CausedBy); !InvComp && PlayerController)
+	{
+		const auto ControlledPawn = PlayerController->GetPawn();
+		check(ControlledPawn);
+		InvComp = Cast<UInventoryComponent>(ControlledPawn->GetComponentByClass(UInventoryComponent::StaticClass()));
+		check(InvComp);
+	}
+	else
+		ULog::Error(
+			FString::Printf(TEXT("method DoAction(ActionInterface, AInventoryItemBaseActor); Line: %i"), __LINE__),
+			LO_Console);
+	
+	InvComp->PickUpItem(this);
+	if( this && !this->IsActorBeingDestroyed())
+	{
+		const auto ActComp = Cast<UActionManagerComponent>(CausedBy->GetComponentByClass(UActionManagerComponent::StaticClass()));
+		ActComp->OnRefreshActionDelegate.Broadcast(ActComp, this);
+	}
+}
+
+FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
+{
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	return FText::Format(FText::FromString("{0} x{1}"), Row->DisplayName, CountOf);
+}
+
+UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
+{
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	return Row->Ico;
+}
+
+bool AInventoryItemBaseActor::CanDoAction_Implementation() const
+{
+	return bCanBePickUpped;	
+}

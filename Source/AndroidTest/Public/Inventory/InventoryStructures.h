@@ -10,10 +10,40 @@
 
 #include "InventoryStructures.generated.h"
 
+USTRUCT(BlueprintType)
+struct FInvHealingItemSettings
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsHealing = false;
+};
+
+USTRUCT(BlueprintType)
+struct FInvWeaponItemSettings
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				bIsWeapon = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<class AWeaponBase> WeaponClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) int					MagazineCapacity = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotRange = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotScatter = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				MaxScatter = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				MinScatter = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ScatterReductionInOneSec = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				Damage = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ReloadTimeoutInSec = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				VerticalRecoilInShot = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) UCurveFloat*		VerticalRecoilCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				HorizontalRecoilInShot = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) UCurveFloat*		HorizontalRecoilCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				RecoilTimeInSec = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotDelayInSec = 1.f;
+};
+
 UENUM(BlueprintType)
 enum class EInvItemType : uint8
 {
-	Default				UMETA(Display = "Default")
+	Default				UMETA(Display = "Default"),
+	Weapon				UMETA(Display = "Weapon"),
 };
 
 USTRUCT(BlueprintType)
@@ -22,6 +52,8 @@ struct FInvItemDataTableOptional
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>	Class = AInventoryItemBaseActor::StaticClass();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector									Scale = { 1,1,1 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvHealingItemSettings					HealingItemSettings;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings					WeaponItemSettings;
 };
 
 USTRUCT(BlueprintType)
