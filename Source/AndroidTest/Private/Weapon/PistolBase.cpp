@@ -127,7 +127,9 @@ void APistolBase::StartShooting_Implementation()
 		ItemSettings.Other.WeaponItemSettings.MinScatter,
 		ItemSettings.Other.WeaponItemSettings.MaxScatter);
 	IsShotDelay = true;
-	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, DamagedActor, DoneDamage);
+	decltype(FDamagedActorsAndDamageProxyMap::DamagedActors) TempMap;
+	TempMap.Add(DamagedActor, DoneDamage);
+	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
 }
 void APistolBase::StopShooting_Implementation()
 {

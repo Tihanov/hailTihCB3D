@@ -7,11 +7,19 @@
 #include "Inventory/InventoryStructures.h"
 #include "WeaponBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnMadeShotDelegate,
+USTRUCT(BlueprintType)
+struct FDamagedActorsAndDamageProxyMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TMap<AActor*, float> DamagedActors;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMadeShotDelegate,
 	class AWeaponBase*, Weapon,
 	bool, IsDamageWasDone,
-	AActor*, DamagedActor,
-	float, Damage);
+	FDamagedActorsAndDamageProxyMap, DamagedActors);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartShooting,
 	class AWeaponBase*, Weapon);
