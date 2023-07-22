@@ -85,6 +85,7 @@ float AAutomaticWeaponBase::GetWeaponScatter_Implementation() const
 
 void AAutomaticWeaponBase::ReloadWeapon_Implementation()
 {
+	StopShooting_Implementation();
 	IsWeaponInReloading = true;
 }
 bool AAutomaticWeaponBase::IsWeaponReloading_Implementation() const
@@ -131,7 +132,6 @@ void AAutomaticWeaponBase::TryShoot()
 	if(CurrentMagazineCapacity <= 0)
 	{
 		ReloadWeapon_Implementation();
-		StopShooting_Implementation();
 		return;
 	}
 	if(!CanWeaponShoot_Implementation())
@@ -163,46 +163,47 @@ void AAutomaticWeaponBase::TryShoot()
 			MainGameState->DebugCameraTracersType,
 			HitResult,
 			true);
+
+	FVector ShootFromLocation = RootMeshComponent->GetSocketLocation("ShootFrom");
+	Start = ShootFromLocation;
+	End = Start
+		+ UKismetMathLibrary::GetForwardVector(
+			UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
+		* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+		
+	Result = UKismetSystemLibrary::LineTraceSingle(
+			GetWorld(),
+			Start, End,
+			TraceTypeQuery1,
+			false,
+			TArray<AActor*>{this, GetOwner()},
+			MainGameState->DebugWeaponTracersType,
+			HitResult,
+			true);
 	if(Result)
 	{
-		FVector ShootFromLocation = RootMeshComponent->GetSocketLocation("ShootFrom");
-		Start = ShootFromLocation;
-		End = Start
-			+ UKismetMathLibrary::GetForwardVector(
-				UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, HitResult.ImpactPoint))
-			* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
-		
-		Result = UKismetSystemLibrary::LineTraceSingle(
-				GetWorld(),
-				Start, End,
-				TraceTypeQuery1,
-				false,
-				TArray<AActor*>{this, GetOwner()},
-				MainGameState->DebugWeaponTracersType,
+		IsDamageWasDone = true;
+		DamagedActor = HitResult.GetActor();
+		DoneDamage =
+			UGameplayStatics::ApplyPointDamage(
+				HitResult.GetActor(),
+				ItemSettings.Other.WeaponItemSettings.Damage
+				* (1.f - (HitResult.Distance / ItemSettings.Other.WeaponItemSettings.ShotRange)),
+				FVector::ZeroVector /*TODO*/,
 				HitResult,
-				true);
-		if(Result)
-		{
-			IsDamageWasDone = true;
-			DamagedActor = HitResult.GetActor();	
-			DoneDamage =
-				UGameplayStatics::ApplyPointDamage(
-					HitResult.GetActor(),
-					ItemSettings.Other.WeaponItemSettings.Damage,
-					FVector::ZeroVector /*TODO*/,
-					HitResult,
-					GetOwner()->GetInstigatorController(),
-					GetOwner(),
-					{}
-				);
-		}
+				GetOwner()->GetInstigatorController(),
+				GetOwner(),
+				{}
+			);
 	}
+
 	CurrentScatter = FMath::Clamp(
 		CurrentScatter + ItemSettings.Other.WeaponItemSettings.ShotScatter,
 		ItemSettings.Other.WeaponItemSettings.MinScatter,
 		ItemSettings.Other.WeaponItemSettings.MaxScatter);
 	decltype(FDamagedActorsAndDamageProxyMap::DamagedActors) TempMap;
-	TempMap.Add(DamagedActor, DoneDamage);
+	if(IsDamageWasDone)
+		TempMap.Add(DamagedActor, DoneDamage);
 	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
 }
 

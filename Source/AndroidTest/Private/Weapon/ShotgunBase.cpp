@@ -72,7 +72,7 @@ void AShotgunBase::StartShooting_Implementation()
 		End = Start
 			+ UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OwnerAimCameraRight->GetForwardVector(), CurrentScatter)
 			* ItemSettings.Other.WeaponItemSettings.ShotRange;
-		UKismetSystemLibrary::LineTraceSingle(
+		auto Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
 			Start, End,
 			TraceTypeQuery1,
@@ -86,10 +86,10 @@ void AShotgunBase::StartShooting_Implementation()
 		Start = ShootFromLocation;
 		End = Start
 			+ UKismetMathLibrary::GetForwardVector(
-				UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, HitResult.ImpactPoint))
+				UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
 			* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
 	
-		auto Result = UKismetSystemLibrary::LineTraceSingle(
+		Result = UKismetSystemLibrary::LineTraceSingle(
 				GetWorld(),
 				Start, End,
 				TraceTypeQuery1,
@@ -105,7 +105,8 @@ void AShotgunBase::StartShooting_Implementation()
 				.FindOrAdd(HitResult.GetActor())
 				+= UGameplayStatics::ApplyPointDamage(
                		HitResult.GetActor(),
-               		ItemSettings.Other.WeaponItemSettings.Damage,
+               		ItemSettings.Other.WeaponItemSettings.Damage
+					* (1.f - (HitResult.Distance / ItemSettings.Other.WeaponItemSettings.ShotRange)),
                		FVector::ZeroVector /*TODO*/,
                		HitResult,
                		GetOwner()->GetInstigatorController(),
