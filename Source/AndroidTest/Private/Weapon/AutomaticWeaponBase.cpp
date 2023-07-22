@@ -20,6 +20,7 @@ void AAutomaticWeaponBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	ReduceScatter(DeltaTime);
 	TryReload(DeltaTime);
+	ShotDelay(DeltaTime);
 }
 
 void AAutomaticWeaponBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvItemDataTable Options,
@@ -49,6 +50,7 @@ void AAutomaticWeaponBase::StartShooting_Implementation()
 	}
 	if(!CanWeaponShoot_Implementation())
 		return;
+	IsShotDelay = true;
 	GetWorld()
 		->GetTimerManager()
 		.SetTimer(ShootTimerHandler,
@@ -69,7 +71,7 @@ void AAutomaticWeaponBase::StopShooting_Implementation()
 
 bool AAutomaticWeaponBase::CanWeaponShoot_Implementation() const
 {
-	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
+	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading;
 }
 
 
