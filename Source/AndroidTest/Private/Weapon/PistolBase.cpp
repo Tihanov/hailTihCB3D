@@ -39,15 +39,6 @@ void APistolBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvIt
 	CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
 }
 
-FInvItemDataTable APistolBase::GetWeaponSettings_Implementation() const
-{
-	return ItemSettings;
-}
-
-bool APistolBase::CanWeaponShoot_Implementation() const
-{
-	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
-}
 
 void APistolBase::StartShooting_Implementation()
 {
@@ -59,9 +50,8 @@ void APistolBase::StartShooting_Implementation()
 	}
 	if(!CanWeaponShoot_Implementation())
 		return;
+	OnStartShootingDelegate.Broadcast(this);
 	CurrentMagazineCapacity -= 1;
-
-	IsShootingNow = true;
 
 	FHitResult HitResult;
 	bool IsDamageWasDone = false;
@@ -131,9 +121,16 @@ void APistolBase::StartShooting_Implementation()
 	TempMap.Add(DamagedActor, DoneDamage);
 	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
 }
+
 void APistolBase::StopShooting_Implementation()
 {
 	Super::StopShooting_Implementation();
+	OnStopShootingDelegate.Broadcast(this);
+}
+
+bool APistolBase::CanWeaponShoot_Implementation() const
+{
+	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
 float APistolBase::GetWeaponScatter_Implementation() const

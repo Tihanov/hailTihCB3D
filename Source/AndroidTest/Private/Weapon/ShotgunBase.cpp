@@ -40,15 +40,6 @@ void AShotgunBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvI
 	CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
 }
 
-FInvItemDataTable AShotgunBase::GetWeaponSettings_Implementation() const
-{
-	return ItemSettings;
-}
-
-bool AShotgunBase::CanWeaponShoot_Implementation() const
-{
-	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
-}
 
 void AShotgunBase::StartShooting_Implementation()
 {
@@ -60,9 +51,8 @@ void AShotgunBase::StartShooting_Implementation()
 	}
 	if(!CanWeaponShoot_Implementation())
 		return;
+	OnStartShootingDelegate.Broadcast(this);
 	CurrentMagazineCapacity -= 1;
-
-	IsShootingNow = true;
 
 	FHitResult HitResult;
 	bool IsDamageWasDone = false;
@@ -134,6 +124,11 @@ void AShotgunBase::StartShooting_Implementation()
 void AShotgunBase::StopShooting_Implementation()
 {
 	Super::StopShooting_Implementation();
+	OnStopShootingDelegate.Broadcast(this);
+}
+bool AShotgunBase::CanWeaponShoot_Implementation() const
+{
+	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
 float AShotgunBase::GetWeaponScatter_Implementation() const

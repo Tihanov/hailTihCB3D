@@ -21,9 +21,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMadeShotDelegate,
 	bool, IsDamageWasDone,
 	FDamagedActorsAndDamageProxyMap, DamagedActors);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartShooting,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStartShootingDelegate,
 	class AWeaponBase*, Weapon);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStopShooting,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStopShootingDelegate,
 	class AWeaponBase*, Weapon);
 
 UCLASS(Abstract, BlueprintType, Blueprintable)
@@ -41,18 +41,18 @@ protected:
 	FInvItemDataTable ItemSettings;
 	
 public:
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+		FInvItemDataTable GetWeaponSettings() const;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
 		void InitAsEquippedWeapon(APawn* WeaponOwner, FInvItemDataTable Options, FName ItemName);
-	
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon")
-		FInvItemDataTable GetWeaponSettings() const;
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon")
-		bool CanWeaponShoot() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StartShooting();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
 		void StopShooting();
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon")
+		bool CanWeaponShoot() const;
 	
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon|Scatter")
 		float GetWeaponScatter() const;
@@ -69,4 +69,8 @@ public:
 public: /*DELEGATES*/
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnMadeShot")
 		FOnMadeShotDelegate OnMadeShotDelegate;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnStartShooting")
+		FOnStartShootingDelegate OnStartShootingDelegate;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnStopShooting")
+		FOnStopShootingDelegate OnStopShootingDelegate;
 };

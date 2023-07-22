@@ -29,10 +29,11 @@ void AWeaponBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvIt
 	RootMeshComponent->SetWorldScale3D(ItemSettings.Other.Scale);
 }
 
-FInvItemDataTable AWeaponBase::GetWeaponSettings_Implementation() const
+FInvItemDataTable AWeaponBase::GetWeaponSettings() const
 {
-	return {};
+	return ItemSettings;
 }
+
 
 bool AWeaponBase::CanWeaponShoot_Implementation() const
 {

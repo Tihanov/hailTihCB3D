@@ -37,6 +37,7 @@ struct FInvWeaponItemSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				HorizontalRecoilInShot = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) UCurveFloat*		HorizontalRecoilCurve;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				RecoilTimeInSec = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				StopRecoilImmediatelyAfterStopShooting = false;  
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				ShotDelayInSec = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UAnimMontage* AimAnimationMontage;
 };

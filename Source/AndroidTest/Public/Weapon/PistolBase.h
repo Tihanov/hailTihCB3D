@@ -24,19 +24,14 @@ protected:
 	bool IsShotDelay				= false;
 	float CurrentShotDelay			= 0.f;
 	
-	bool IsShootingNow              = false;
-	float WeaponShootingTime		= 0.f;
-	
 public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvItemDataTable Options, FName ItemName) override;
 	
-	virtual FInvItemDataTable GetWeaponSettings_Implementation() const override;
-	virtual bool CanWeaponShoot_Implementation() const override;
-	
 	virtual void StartShooting_Implementation() override;
 	virtual void StopShooting_Implementation() override;
+	virtual bool CanWeaponShoot_Implementation() const override;
 	
 	virtual float GetWeaponScatter_Implementation() const override;
 
