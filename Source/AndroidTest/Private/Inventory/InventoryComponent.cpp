@@ -4,11 +4,13 @@
 #include "Inventory/InventoryComponent.h"
 
 #include "Log.h"
+#include "Inventory/InventorySlotsComponent.h"
 
 UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	InventorySlots = CreateDefaultSubobject<UInventorySlotsComponent>(TEXT("InventorySlots"));
 }
 
 void UInventoryComponent::BeginPlay()
@@ -38,17 +40,19 @@ int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32
 
 	for (auto& i : InventoryArray)
 	{
-		if (i.RowName == RowName && Row->MaxStackCount != i.Count)
+		if (i->RowName == RowName && Row->MaxStackCount != i->Count)
 		{
-			auto TempAdd = FMath::Clamp(CountOfAdd, 0, Row->MaxStackCount - i.Count);
-			i.Count += TempAdd;
+			auto TempAdd = FMath::Clamp(CountOfAdd, 0, Row->MaxStackCount - i->Count);
+			i->Count += TempAdd;
 			CountOfAdd -= TempAdd;
+			OnItemChangedDelegate.Broadcast(i);
 		}
 	}
 
 	if (CountOfAdd == 0)
 		return CountOfNotAddedItems_ToRet;
-	InventoryArray.Add({ RowName, CountOfAdd });
+	InventoryArray.Add(CreateInventoryItemInfo( RowName, CountOfAdd ));
+	OnItemAddedDelegate.Broadcast(InventoryArray.Last());
 
 	return CountOfNotAddedItems_ToRet;
 }
@@ -65,8 +69,6 @@ void UInventoryComponent::PickUpItem(AInventoryItemBaseActor* ItemActor)
 	if(CountOfNotAddedItems == ItemActor->CountOf)
 		return;
 
-	OnItemPickedUpDelegate.Broadcast(ItemActor->RowName, ItemActor->CountOf - CountOfNotAddedItems);
-	
 	if(CountOfNotAddedItems == 0)
 		ItemActor->Destroy(true);
 	else
@@ -77,18 +79,22 @@ bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
 {
 	if(Index < 0 || Index >= InventoryArray.Num())
 		return false;
-	RowName = InventoryArray[Index].RowName;
+	RowName = InventoryArray[Index]->RowName;
 
-	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(InventoryArray[Index].RowName, "");
-	if (InventoryArray[Index].Count - Count <= 0)
+	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(InventoryArray[Index]->RowName, "");
+	if (InventoryArray[Index]->Count - Count <= 0)
 	{
-		Weight -= Row->WeightKg * InventoryArray[Index].Count;
+		Weight -= Row->WeightKg * InventoryArray[Index]->Count;
+		OnItemTrashedDelegate.Broadcast(InventoryArray[Index]);
+		InventoryArray[Index]->ConditionalBeginDestroy();
 		InventoryArray.RemoveAt(Index);
+		InventorySlots->CheckAllSlotsOnValid();
 		return true;
 	}
-	InventoryArray[Index].Count -= Count;
+	InventoryArray[Index]->Count -= Count;
 	Weight -= Row->WeightKg * Count;
-
+	OnItemChangedDelegate.Broadcast(InventoryArray[Index]);
+	
 	return true;
 }
 
@@ -130,8 +136,6 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 		InvDataTable,
 		Count
 	});
-
-	OnItemThrowOutDelegate.Broadcast(Item, Index);
 }
 
 int32 UInventoryComponent::GetSize() const
@@ -143,108 +147,6 @@ int32 UInventoryComponent::GetCountOfItems() const
 {
 	int32 Count = 0;
 	for (auto i : InventoryArray)
-		Count += i.Count;
+		Count += i->Count;
 	return Count;
 }
-
-FInvItemArray UInventoryComponent::GetItemOnIndex(int32 Index, bool& DoesExist) const
-{
-	if(InventoryArray.IsValidIndex(Index))
-	{
-		DoesExist = true;
-		return InventoryArray[Index];
-	}
-	DoesExist = false;
-	return {};
-}
-
-void UInventoryComponent::SetWeaponToSlot(int32 SlotIndex, const FInvItemArray& Weapon)
-{
-	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
-	{
-		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
-		return;
-	}
-
-	WeaponSlots[SlotIndex] = Weapon;
-	OnWeaponSlotsUpdatedDelegate.Broadcast(this, {GetWeaponSlots()});
-}
-
-void UInventoryComponent::RemoveWeaponFromSlot(int32 SlotIndex)
-{
-	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
-	{
-		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
-		return;
-	}
-	WeaponSlots[SlotIndex].Reset();
-	OnWeaponSlotsUpdatedDelegate.Broadcast(this, {GetWeaponSlots()});
-}
-
-FInvItemArray UInventoryComponent::GetWeaponFromSlot(int32 SlotIndex, bool& DoesWeaponSetInSlot) const
-{
-	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
-	{
-		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
-		DoesWeaponSetInSlot = false;
-		return {};
-	}
-	DoesWeaponSetInSlot = WeaponSlots[SlotIndex].IsSet();
-	return WeaponSlots[SlotIndex].Get({});
-}
-
-TArray<FInvItemArray> UInventoryComponent::GetWeaponSlots() const
-{
-	TArray<FInvItemArray> ToRet;
-	ToRet.SetNum(WeaponSlots.Num());
-	for(int i = 0; i < WeaponSlots.Num(); ++i)
-		ToRet[i] = WeaponSlots[i].Get({});
-	return ToRet;
-}
-
-void UInventoryComponent::EquipWeaponFromSlot(int32 SlotIndex)
-{
-	if(SlotIndex < 0 || SlotIndex >= WeaponSlots.Num())
-	{
-		ULog::Warning(FString::Printf(TEXT("SlotIndex must by > 0 and < %i"), WeaponSlots.Num()));
-		return;
-	}
-
-	if(EquippedWeaponSlotIndex.Get(-1) == SlotIndex)
-		return;
-
-	UnequipWeapon();
-
-	if(!WeaponSlots[SlotIndex].IsSet())
-		return;
-	
-	EquippedWeaponSlotIndex = SlotIndex;
-	OnEquipWeaponDelegate.Broadcast(
-		this,
-		WeaponSlots[SlotIndex].Get({}),
-		!WeaponSlots[SlotIndex].IsSet());
-}
-
-void UInventoryComponent::UnequipWeapon()
-{
-	EquippedWeaponSlotIndex.Reset();
-	OnUnequipWeaponDelegate.Broadcast(this);
-}
-
-int32 UInventoryComponent::GetEquippedWeaponSlot(bool& IsSomeWeaponSlotEquipped) const
-{
-	IsSomeWeaponSlotEquipped = EquippedWeaponSlotIndex.IsSet();
-	return EquippedWeaponSlotIndex.Get(-1);
-}
-
-FInvItemArray UInventoryComponent::GetEquippedWeaponInfo(bool& IsWeaponEquipped) const
-{
-	IsWeaponEquipped = EquippedWeaponSlotIndex.IsSet();
-	if(IsWeaponEquipped)
-	{
-		IsWeaponEquipped = WeaponSlots[EquippedWeaponSlotIndex.GetValue()].IsSet();
-		return WeaponSlots[EquippedWeaponSlotIndex.GetValue()].Get({});
-	}
-	return {};
-}
-

@@ -9,36 +9,28 @@
 
 #include "InventoryComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FInvItemArray
-{
-	GENERATED_BODY()
-	UPROPERTY(BlueprintReadOnly) FName RowName;
-	UPROPERTY(BlueprintReadOnly) int32 Count;
-};
-
-USTRUCT(BlueprintType)
-struct FInvArrayOfItemsProxyStruct
+UCLASS(BlueprintType)
+class UInventoryItemDefaultInfo : public UObject
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
-		TArray<FInvItemArray> Array;
+public:
+	UPROPERTY(BlueprintReadWrite) FName RowName;
+	UPROPERTY(BlueprintReadWrite) int32 Count;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUpDelegate, FName, ItemRowName, int32, CountOf);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemThrowOutDelegate, AInventoryItemBaseActor*, SpawnedItem, int32, InventoryIndex);
+inline UInventoryItemDefaultInfo* CreateInventoryItemInfo(FName RowName, int32 Count,
+	TSubclassOf<UInventoryItemDefaultInfo> Class = UInventoryItemDefaultInfo::StaticClass())
+{
+	const auto ToRet = NewObject<UInventoryItemDefaultInfo>(GetTransientPackage(), Class);
+	ToRet->RowName = RowName;
+	ToRet->Count = Count;
+	return ToRet;
+}
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotsUpdatedDelegate,
-	class UInventoryComponent*, InventoryComponent,
-	FInvArrayOfItemsProxyStruct, WeaponSlots);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEquipWeaponDelegate,
-	class UInventoryComponent*, InventoryComponent,
-	FInvItemArray, WeaponInfo,
-	bool, IsNull);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUnequipWeaponDelegate,
-	class UInventoryComponent*, InventoryComponent);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemChangedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemTrashedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ANDROIDTEST_API UInventoryComponent : public UActorComponent
@@ -52,17 +44,8 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	UPROPERTY(BlueprintReadWrite)
-		TArray<FInvItemArray> InventoryArray;
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-		UDataTable* InvDataTable;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float MaxWeight = 100.f;
-	UPROPERTY(BlueprintReadOnly)
-		float Weight = 0.f;
-
-	TStaticArray<TOptional<FInvItemArray>, 5> WeaponSlots;
-	TOptional<int32> EquippedWeaponSlotIndex;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+		class UInventorySlotsComponent* InventorySlots;
 	
 public:
 	// Direct add item to inventory
@@ -85,44 +68,22 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
 
-	UFUNCTION(BlueprintPure)
-		FInvItemArray GetItemOnIndex(
-			int32 Index,
-			UPARAM(DisplayName = "DoesExist?")bool& DoesExist) const;
-
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		void SetWeaponToSlot(int32 SlotIndex, const FInvItemArray& Weapon);
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		void RemoveWeaponFromSlot(int32 SlotIndex);
-	UFUNCTION(BlueprintPure, Category = "Weapon")
-		UPARAM(DisplayName = "Weapon")FInvItemArray
-			GetWeaponFromSlot(int32 SlotIndex,
-			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& DoesWeaponSetInSlot) const;
-	UFUNCTION(BlueprintPure, Category = "Weapon")
-		TArray<FInvItemArray> GetWeaponSlots() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		void EquipWeaponFromSlot(int32 SlotIndex);
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-		void UnequipWeapon();
-	UFUNCTION(BlueprintPure, Category = "Weapon")
-		UPARAM(DisplayName = "IndexOfSlot") int32
-			GetEquippedWeaponSlot(
-			UPARAM(DisplayName = "IsSomeWeaponSlotEquipped?") bool& IsSomeWeaponSlotEquipped) const;
-	UFUNCTION(BlueprintPure, Category = "Weapon")
-		FInvItemArray GetEquippedWeaponInfo(
-			UPARAM(DisplayName = "DoesWeaponSetInSlot?")bool& IsWeaponEquipped) const;
-	
 
 public: /* Delegates */
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemPickedUp")
-		FOnItemPickedUpDelegate OnItemPickedUpDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemThrowOut")
-		FOnItemThrowOutDelegate OnItemThrowOutDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnWeaponSlotsUpdated")
-		FOnWeaponSlotsUpdatedDelegate OnWeaponSlotsUpdatedDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnEquipWeapon")
-		FOnEquipWeaponDelegate OnEquipWeaponDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnUnequipWeapon")
-		FOnUnequipWeaponDelegate OnUnequipWeaponDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemAdded")
+		FOnItemAddedDelegate OnItemAddedDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemChanged")
+		FOnItemChangedDelegate OnItemChangedDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemTrashed")
+		FOnItemTrashedDelegate OnItemTrashedDelegate;
+
+protected:
+	UPROPERTY(BlueprintReadWrite)
+		TArray<UInventoryItemDefaultInfo*> InventoryArray;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+		UDataTable* InvDataTable;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		float MaxWeight = 100.f;
+	UPROPERTY(BlueprintReadOnly)
+		float Weight = 0.f;
 };
