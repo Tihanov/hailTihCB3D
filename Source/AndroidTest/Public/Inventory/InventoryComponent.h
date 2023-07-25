@@ -6,27 +6,11 @@
 #include "Components/ActorComponent.h"
 
 #include "Inventory/InventoryStructures.h"
+#include "Inventory/InventoryItemDefaultInfo.h"
 
 #include "InventoryComponent.generated.h"
 
-UCLASS(BlueprintType)
-class UInventoryItemDefaultInfo : public UObject
-{
-	GENERATED_BODY()
 
-public:
-	UPROPERTY(BlueprintReadWrite) FName RowName;
-	UPROPERTY(BlueprintReadWrite) int32 Count;
-};
-
-inline UInventoryItemDefaultInfo* CreateInventoryItemInfo(FName RowName, int32 Count,
-	TSubclassOf<UInventoryItemDefaultInfo> Class = UInventoryItemDefaultInfo::StaticClass())
-{
-	const auto ToRet = NewObject<UInventoryItemDefaultInfo>(GetTransientPackage(), Class);
-	ToRet->RowName = RowName;
-	ToRet->Count = Count;
-	return ToRet;
-}
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemChangedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
@@ -58,10 +42,10 @@ public:
 
 	// Direct delete item from the inventory
 	UFUNCTION(BlueprintCallable)
-		bool TrashItem(int32 Index, int32 Count, FName& RowName);
+		bool TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
 	// Throw item out to the level and delete it from the inventory
 	UFUNCTION(BlueprintCallable)
-		void ThrowOutItem(int32 Index, int32 Count);
+		void ThrowOutItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetSize() const;

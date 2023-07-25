@@ -12,30 +12,15 @@ UInventorySlotsComponent::UInventorySlotsComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UInventorySlotsComponent::CheckAllSlotsOnValid()
+void UInventorySlotsComponent::BeginPlay()
 {
-	for (auto& Slot : Slots)
-	{
-		auto& EquippedItemIndex = Slot.Value.EquippedItemIndex;
-		int32 Index = 0;
-		for (auto& Item : Slot.Value.Array)
-		{
-			if(Item == nullptr)
-				continue;
-			if(Item->IsReadyForFinishDestroy())
-			{
-				Item = nullptr;
-				OnSlotsUpdatesDelegate.Broadcast(Slot.Key, Slot.Value);
-				if(Index == EquippedItemIndex)
-				{
-					EquippedItemIndex = -1;
-					OnItemUnequipsFromSlotDelegate.Broadcast(Slot.Key);
-				}
-			}
-			
-			Index += 1;
-		}
-	}
+	Super::BeginPlay();
+
+	const auto InventoryComponent = Cast<UInventoryComponent>(
+		GetOwner()->GetComponentByClass(UInventoryComponent::StaticClass()));
+	check(InventoryComponent);
+	InventoryComponent->OnItemTrashedDelegate.AddDynamic(this,
+		&UInventorySlotsComponent::OnItemFromInventoryTrashed);
 }
 
 void UInventorySlotsComponent::SetCountOfItemsOnSlot(ESlotType Slot, int32 Count)
@@ -126,4 +111,31 @@ UInventoryItemDefaultInfo* UInventorySlotsComponent::GetEquippedItemFromSlot(ESl
 	if(Slots[Slot].EquippedItemIndex == -1)
 		return nullptr;
 	return Slots[Slot].Array[Slots[Slot].EquippedItemIndex];
+}
+
+void UInventorySlotsComponent::OnItemFromInventoryTrashed(UInventoryItemDefaultInfo* ItemInfo)
+{
+	for (auto& Slot : Slots)
+	{
+		auto& EquippedItemIndex = Slot.Value.EquippedItemIndex;
+		int32 Index = 0;
+		for (auto& Item : Slot.Value.Array)
+		{
+			if(Item == nullptr)
+				continue;
+			if(Item == ItemInfo)
+			{
+				Item = nullptr;
+				OnSlotsUpdatesDelegate.Broadcast(Slot.Key, Slot.Value);
+				if(Index == EquippedItemIndex)
+				{
+					EquippedItemIndex = -1;
+					OnItemUnequipsFromSlotDelegate.Broadcast(Slot.Key);
+				}
+				return;
+			}
+			
+			Index += 1;
+		}
+	}
 }

@@ -39,10 +39,10 @@ class ANDROIDTEST_API UInventorySlotsComponent : public UActorComponent
 public:
 	UInventorySlotsComponent();
 
-public:
-	UFUNCTION(BlueprintCallable, Category = "Slots")
-		void CheckAllSlotsOnValid();
+protected:
+	virtual void BeginPlay() override;
 	
+public:
 	UFUNCTION(BlueprintCallable, Category = "Slots")
 		void SetCountOfItemsOnSlot(ESlotType Slot, int32 Count);
 	UFUNCTION(BlueprintCallable, Category = "Slots")
@@ -69,4 +69,8 @@ public: // DELEGATES:
 
 protected:
 	TMap<ESlotType, FItemsAndEquippedItemIndex> Slots;
+
+private:
+	UFUNCTION()
+		void OnItemFromInventoryTrashed(UInventoryItemDefaultInfo* ItemInfo);
 };

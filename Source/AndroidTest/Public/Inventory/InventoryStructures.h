@@ -67,6 +67,7 @@ struct FInvItemDataTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				DisplayName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				Description;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) EInvItemType		Type			= EInvItemType::Default;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				IsItemUnique	= false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UStaticMesh*	Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UTexture2D*	Ico;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float				WeightKg		= 1;

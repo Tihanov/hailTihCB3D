@@ -56,8 +56,32 @@ int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32
 
 	if (CountOfAdd == 0)
 		return CountOfNotAddedItems_ToRet;
-	InventoryArray.Add(CreateInventoryItemInfo( RowName, CountOfAdd ));
-	OnItemAddedDelegate.Broadcast(InventoryArray.Last());
+	const auto ToAdd = UInventoryItemDefaultInfo::Create ( RowName, CountOfAdd, *Row );
+	if(InventoryArray.IsEmpty())
+	{
+		InventoryArray.Add(ToAdd);
+		goto SKIP_FOR;
+	}
+	for(int32 i = InventoryArray.Num() - 1; i >= 0; --i)
+	{
+		if((*InventoryArray[i]) == (*ToAdd))
+		{
+			InventoryArray.Insert(ToAdd, i + 1);
+			goto SKIP_FOR;
+		}
+	}
+	for(int32 i = 0; i < InventoryArray.Num(); ++i)
+	{
+		if((*InventoryArray[i]) > (*ToAdd))
+		{
+			InventoryArray.Insert(ToAdd, i);
+			goto SKIP_FOR;
+		}
+	}
+	InventoryArray.Add(ToAdd);
+	SKIP_FOR:
+	
+	OnItemAddedDelegate.Broadcast(ToAdd);
 
 	return CountOfNotAddedItems_ToRet;
 }
@@ -80,39 +104,44 @@ void UInventoryComponent::PickUpItem(AInventoryItemBaseActor* ItemActor)
 		ItemActor->CountOf = CountOfNotAddedItems;
 }
 
-bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
+bool UInventoryComponent::TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel)
 {
-	if(Index < 0 || Index >= InventoryArray.Num())
-		return false;
-	RowName = InventoryArray[Index]->RowName;
+	bool IsUnique = ItemStack->Info.IsItemUnique;
 
-	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(InventoryArray[Index]->RowName, "");
-	if (InventoryArray[Index]->Count - Count <= 0)
+	for(int32 i = InventoryArray.Num() - 1; i >= 0; --i)
 	{
-		Weight -= Row->WeightKg * InventoryArray[Index]->Count;
-		OnItemTrashedDelegate.Broadcast(InventoryArray[Index]);
-		InventoryArray[Index]->ConditionalBeginDestroy();
-		InventoryArray.RemoveAt(Index);
-		InventorySlots->CheckAllSlotsOnValid();
-		return true;
+		const bool Condition = IsUnique
+			? InventoryArray[i] == ItemStack
+			: InventoryArray[i]->RowName == ItemStack->RowName;
+		if(Condition)
+		{
+			auto ToSub = FMath::Clamp(CountToDel, 0, InventoryArray[i]->Count);
+			CountToDel -= ToSub;
+			InventoryArray[i]->Count -= ToSub;
+			if(InventoryArray[i]->Count == 0)
+			{
+				OnItemTrashedDelegate.Broadcast(InventoryArray[i]);
+				InventoryArray.RemoveAt(i);
+			}
+			else
+				OnItemChangedDelegate.Broadcast(InventoryArray[i]);
+			if(CountToDel == 0)
+				break;
+		}
 	}
-	InventoryArray[Index]->Count -= Count;
-	Weight -= Row->WeightKg * Count;
-	OnItemChangedDelegate.Broadcast(InventoryArray[Index]);
 	
 	return true;
 }
 
-void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
+void UInventoryComponent::ThrowOutItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel)
 {
-	FName RowName;
-	if(!TrashItem(Index, Count, RowName))
+	if(!TrashItem(ItemStack, CountToDel))
 	{
 		ULog::Warning("Cannot throw out item");
 		return;
 	}
 
-	auto ItemDTR = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
+	auto ItemDTR = (*InvDataTable)->FindRow<FInvItemDataTable>(ItemStack->RowName, "");
 	if(!ItemDTR)
 	{
 		ULog::Warning("Cannot find Item Data Table Row by Row Name");
@@ -137,8 +166,8 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 			GetWorld()->SpawnActor(ItemDTR->Other.Class, &Transform, Params));
 
 	Item->Init({
-		RowName,
-		Count
+		ItemStack->RowName,
+		CountToDel
 	});
 }
 
