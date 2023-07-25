@@ -16,7 +16,6 @@ struct FInventoryItemInitStruct
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) FName Name;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) UDataTable* DataTable;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere) int32 CountOf;
 };
 
@@ -41,8 +40,6 @@ public:
 		UStaticMeshComponent* RootMeshComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FName RowName;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		UDataTable* InvDataTable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 CountOf;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "CanBePickUpped?",Category = "Options")
@@ -57,4 +54,7 @@ public:
 	virtual FText GetDisplayDescription_Implementation() const override;
 	virtual UTexture2D* GetIco_Implementation() const override;
 	virtual bool CanDoAction_Implementation() const override;
+
+private:
+	UDataTable** InvDataTable = nullptr;
 };

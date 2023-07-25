@@ -28,4 +28,6 @@ public:
 		TEnumAsByte<EDrawDebugTrace::Type> DebugCameraTracersType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|GameSettings|Game")
 		bool EnableFpsCounter = true;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|GlobalSettings")
+		class UDataTable* InventoryDataTable;
 };

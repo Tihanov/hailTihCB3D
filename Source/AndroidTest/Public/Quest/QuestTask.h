@@ -8,7 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTaskDoneDelegate, class UQuestTask*, Task);
 
-UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew)
+UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew, meta = (ShowWorldContextPin))
 class ANDROIDTEST_API UQuestTask: public UObject 
 {
 	GENERATED_BODY()

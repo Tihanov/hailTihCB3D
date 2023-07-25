@@ -5,6 +5,7 @@
 
 #include "Inventory/InventoryComponent.h"
 #include "Log.h"
+#include "MainGameState.h"
 #include "Action/ActionManagerComponent.h"
 
 AInventoryItemBaseActor::AInventoryItemBaseActor()
@@ -20,10 +21,14 @@ void AInventoryItemBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto GameState = Cast<AMainGameState>(GetWorld()->GetGameState());
+	check(GameState);
+	InvDataTable = &GameState->InventoryDataTable;
+	
 	if (!InvDataTable || RowName == TEXT("None"))
 		return;
 
-	auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	if(!Row)
 	{
 		ULog::Error("Cannt find row", LO_Both);
@@ -41,14 +46,16 @@ void AInventoryItemBaseActor::Tick(float DeltaTime)
 
 void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
 {
-	InvDataTable = InitStruct.DataTable;
+	const auto GameState = Cast<AMainGameState>(GetWorld()->GetGameState());
+	check(GameState);
+	InvDataTable = &GameState->InventoryDataTable;
 	RowName = InitStruct.Name;
 	CountOf = InitStruct.CountOf;
 
 	if (!InvDataTable)
 		return;
 
-	auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	if(!Row)
 	{
 		ULog::Error("Cannt find row", LO_Both);
@@ -89,13 +96,13 @@ void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 
 FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
 {
-	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	return FText::Format(FText::FromString("{0} x{1}"), Row->DisplayName, CountOf);
 }
 
 UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
 {
-	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	return Row->Ico;
 }
 

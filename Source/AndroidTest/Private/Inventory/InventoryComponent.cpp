@@ -4,6 +4,7 @@
 #include "Inventory/InventoryComponent.h"
 
 #include "Log.h"
+#include "MainGameState.h"
 #include "Inventory/InventorySlotsComponent.h"
 
 UInventoryComponent::UInventoryComponent()
@@ -17,6 +18,10 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto GameState = Cast<AMainGameState>(GetWorld()->GetGameState());
+	check(GameState);
+	InvDataTable = &GameState->InventoryDataTable;
+	
 	if(!InvDataTable)
 	{
 		ULog::Error("InvDataTable == nullptr", LO_Both);
@@ -25,7 +30,7 @@ void UInventoryComponent::BeginPlay()
 
 int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32 CountOfItems)
 {
-	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	if(!Row)
 	{
 		ULog::Error("no RowName in InvDataTable", LO_Both);
@@ -81,7 +86,7 @@ bool UInventoryComponent::TrashItem(int32 Index, int32 Count, FName& RowName)
 		return false;
 	RowName = InventoryArray[Index]->RowName;
 
-	const auto Row = InvDataTable->FindRow<FInvItemDataTable>(InventoryArray[Index]->RowName, "");
+	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(InventoryArray[Index]->RowName, "");
 	if (InventoryArray[Index]->Count - Count <= 0)
 	{
 		Weight -= Row->WeightKg * InventoryArray[Index]->Count;
@@ -107,7 +112,7 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 		return;
 	}
 
-	auto ItemDTR = InvDataTable->FindRow<FInvItemDataTable>(RowName, "");
+	auto ItemDTR = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
 	if(!ItemDTR)
 	{
 		ULog::Warning("Cannot find Item Data Table Row by Row Name");
@@ -133,7 +138,6 @@ void UInventoryComponent::ThrowOutItem(int32 Index, int32 Count)
 
 	Item->Init({
 		RowName,
-		InvDataTable,
 		Count
 	});
 }

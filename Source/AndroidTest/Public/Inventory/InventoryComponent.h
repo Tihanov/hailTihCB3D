@@ -80,10 +80,11 @@ public: /* Delegates */
 protected:
 	UPROPERTY(BlueprintReadWrite)
 		TArray<UInventoryItemDefaultInfo*> InventoryArray;
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-		UDataTable* InvDataTable;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		float MaxWeight = 100.f;
 	UPROPERTY(BlueprintReadOnly)
 		float Weight = 0.f;
+
+private:
+	UDataTable** InvDataTable = nullptr;
 };
