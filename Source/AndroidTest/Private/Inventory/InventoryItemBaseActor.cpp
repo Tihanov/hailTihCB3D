@@ -14,13 +14,31 @@ AInventoryItemBaseActor::AInventoryItemBaseActor()
 
 	RootMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("RootMesh");
 	SetRootComponent(RootMeshComponent);
-	CountOf = 1;
 }
 
 void AInventoryItemBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if(InitRowName != "None")
+		InitWithRowName(InitRowName, InitCountOf);
+}
+
+void AInventoryItemBaseActor::Init(UInventoryItemDefaultInfo* InitItemInfo)
+{
+	if(!InitItemInfo)
+	{
+		ULog::Error(TEXT("InitItemInfo == nullptr"), LO_Both);
+		return;
+	}
+	ItemInfo = InitItemInfo;
+	
+	RootMeshComponent->SetStaticMesh(ItemInfo->Info.Mesh);
+	SetActorScale3D( ItemInfo->Info.Other.Scale );
+}
+
+void AInventoryItemBaseActor::InitWithRowName(FName RowName, int32 CountOf)
+{
 	const auto GameState = Cast<AMainGameState>(GetWorld()->GetGameState());
 	check(GameState);
 	InvDataTable = &GameState->InventoryDataTable;
@@ -36,33 +54,9 @@ void AInventoryItemBaseActor::BeginPlay()
 	}
 	RootMeshComponent->SetStaticMesh(Row->Mesh);
 	SetActorScale3D( Row->Other.Scale );
-}
 
-void AInventoryItemBaseActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void AInventoryItemBaseActor::Init(FInventoryItemInitStruct InitStruct)
-{
-	const auto GameState = Cast<AMainGameState>(GetWorld()->GetGameState());
-	check(GameState);
-	InvDataTable = &GameState->InventoryDataTable;
-	RowName = InitStruct.Name;
-	CountOf = InitStruct.CountOf;
-
-	if (!InvDataTable)
-		return;
-
-	auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
-	if(!Row)
-	{
-		ULog::Error("Cannt find row", LO_Both);
-		return;
-	}
-	RootMeshComponent->SetStaticMesh(Row->Mesh);
-	SetActorScale3D( Row->Other.Scale );
+	ItemInfo = UInventoryItemDefaultInfo::Create(RowName, CountOf, *Row, Row->Other.InfoClass);
+	check(ItemInfo);	
 }
 
 EActionType AInventoryItemBaseActor::GetActionType_Implementation()
@@ -96,14 +90,14 @@ void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 
 FText AInventoryItemBaseActor::GetDisplayDescription_Implementation() const
 {
-	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
-	return FText::Format(FText::FromString("{0} x{1}"), Row->DisplayName, CountOf);
+	if(ItemInfo->Count > 1)
+		return FText::Format(FText::FromString("{0} x{1}"), ItemInfo->Info.DisplayName, ItemInfo->Count);
+	return FText::Format(FText::FromString("{0}"), ItemInfo->Info.DisplayName);
 }
 
 UTexture2D* AInventoryItemBaseActor::GetIco_Implementation() const
 {
-	const auto Row = (*InvDataTable)->FindRow<FInvItemDataTable>(RowName, "");
-	return Row->Ico;
+	return ItemInfo->Info.Ico;
 }
 
 bool AInventoryItemBaseActor::CanDoAction_Implementation() const

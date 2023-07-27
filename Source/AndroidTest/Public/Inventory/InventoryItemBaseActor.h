@@ -10,15 +10,6 @@
 
 #include "InventoryItemBaseActor.generated.h"
 
-USTRUCT(BlueprintType)
-struct FInventoryItemInitStruct
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) FName Name;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) int32 CountOf;
-};
-
 UCLASS()
 class ANDROIDTEST_API AInventoryItemBaseActor
 	: public AActor
@@ -32,22 +23,20 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
-
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* RootMeshComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		FName RowName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 CountOf;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "CanBePickUpped?",Category = "Options")
 		bool bCanBePickUpped = true;
 
+	UPROPERTY(BlueprintReadWrite)
+		class UInventoryItemDefaultInfo* ItemInfo;
+
 public:
 	UFUNCTION(BlueprintCallable)
-		void Init(FInventoryItemInitStruct InitStruct);
+		void Init(UInventoryItemDefaultInfo* InitItemInfo);
+	UFUNCTION(BlueprintCallable)
+		void InitWithRowName(FName RowName, int32 CountOf);
 
 	virtual EActionType GetActionType_Implementation() override;
 	virtual void DoAction_Implementation(AActor* CausedBy) override;
@@ -57,4 +46,9 @@ public:
 
 private:
 	UDataTable** InvDataTable = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Options|Init", meta = (AllowPrivateAccess = true, ClampMin = 1, UIMin = 1, UIMax = 100))
+		FName InitRowName = TEXT("None");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Options|Init", meta = (AllowPrivateAccess = true))
+		int32 InitCountOf = 1;
 };

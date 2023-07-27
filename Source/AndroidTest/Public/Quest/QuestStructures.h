@@ -23,7 +23,7 @@ struct FQuestRewardsInfo
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float ExpReward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<FInventoryItemInitStruct> ItemsReward;  	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced) TArray<class UInventoryItemDefaultInfo*> ItemsReward;  	
 };
 
 

@@ -54,10 +54,11 @@ USTRUCT(BlueprintType)
 struct FInvItemDataTableOptional
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>	Class = AInventoryItemBaseActor::StaticClass();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector									Scale = { 1,1,1 };
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvHealingItemSettings					HealingItemSettings;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings					WeaponItemSettings;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<AInventoryItemBaseActor>		Class = AInventoryItemBaseActor::StaticClass();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<class UInventoryItemDefaultInfo>InfoClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector										Scale = { 1,1,1 };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvHealingItemSettings						HealingItemSettings;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings						WeaponItemSettings;
 };
 
 USTRUCT(BlueprintType)

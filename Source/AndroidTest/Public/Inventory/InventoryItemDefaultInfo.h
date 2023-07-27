@@ -7,7 +7,7 @@
 #include "UObject/Object.h"
 #include "InventoryItemDefaultInfo.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Blueprintable, EditInlineNew)
 class UInventoryItemDefaultInfo : public UObject 
 {
 	GENERATED_BODY()

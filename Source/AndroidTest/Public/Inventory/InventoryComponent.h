@@ -10,8 +10,6 @@
 
 #include "InventoryComponent.generated.h"
 
-
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAddedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemChangedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemTrashedDelegate, UInventoryItemDefaultInfo*, ItemInfo);
@@ -36,16 +34,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 		UPARAM(DisplayName="CountOfNotAddedItems")int32
 		AddItem(FName RowName, int32 CountOfItems);
+	UFUNCTION(BlueprintCallable)
+		UPARAM(DisplayName="IsBeenAdded?")bool
+		AddUniqueItem(UInventoryItemDefaultInfo* ItemInfo);
 	// Take item from the world, add to inventory, delete if CountOf == 0, change CountOf	
 	UFUNCTION(BlueprintCallable)
 		void PickUpItem(AInventoryItemBaseActor* ItemActor);
 
 	// Direct delete item from the inventory
 	UFUNCTION(BlueprintCallable)
-		bool TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
+		void TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
 	// Throw item out to the level and delete it from the inventory
 	UFUNCTION(BlueprintCallable)
 		void ThrowOutItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
+
+	UFUNCTION(BlueprintPure)
+		int32 GetCountOfSpecificItemsByInfo(UInventoryItemDefaultInfo* ItemInfo) const;
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetSize() const;
