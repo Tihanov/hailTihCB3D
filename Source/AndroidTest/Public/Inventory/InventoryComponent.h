@@ -50,6 +50,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfSpecificItemsByInfo(UInventoryItemDefaultInfo* ItemInfo) const;
+	UFUNCTION(BlueprintPure)
+		TArray<UInventoryItemDefaultInfo*> GetItemsOfType(EInvItemType Type);
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetSize() const;

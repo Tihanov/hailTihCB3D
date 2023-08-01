@@ -48,6 +48,12 @@ enum class EInvItemType : uint8
 {
 	Default				UMETA(Display = "Default"),
 	Weapon				UMETA(Display = "Weapon"),
+
+	/**
+	 * CANT BE ASSIGNED TO ITEM
+	 * Always the last element of enum
+	 */
+	All					UMETA(DisplayName = "All")
 };
 
 USTRUCT(BlueprintType)
@@ -66,7 +72,7 @@ struct FInvItemDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText				Description;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (MultiLine = true)) FText				Description;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) EInvItemType		Type			= EInvItemType::Default;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) bool				IsItemUnique	= false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UStaticMesh*	Mesh;

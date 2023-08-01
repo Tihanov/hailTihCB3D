@@ -224,6 +224,28 @@ int32 UInventoryComponent::GetCountOfSpecificItemsByInfo(UInventoryItemDefaultIn
 	return RetCount;
 }
 
+TArray<UInventoryItemDefaultInfo*> UInventoryComponent::GetItemsOfType(EInvItemType Type)
+{
+	if(Type == EInvItemType::All)
+		return InventoryArray;
+	TArray<UInventoryItemDefaultInfo*> ToRet;
+	bool IsTypeFound = false;
+	
+	for (auto& i: InventoryArray)
+	{
+		if(i->Info.Type == Type)
+		{
+			ToRet.Add(i);
+			IsTypeFound = true;
+			continue;
+		}
+		if(IsTypeFound)
+			break;
+	}
+
+	return ToRet;
+}
+
 int32 UInventoryComponent::GetSize() const
 {
 	return InventoryArray.Num();
