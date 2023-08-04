@@ -44,20 +44,22 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Slots")
-		void SetCountOfItemsOnSlot(ESlotType Slot, int32 Count);
+		void SetCountOfItemsOnSlot(ESlotType SlotType, int32 Count);
 	UFUNCTION(BlueprintCallable, Category = "Slots")
-		void SetItemIntoSlot(ESlotType Slot, int32 Index, UInventoryItemDefaultInfo* Item);
+		void SetItemIntoSlot(ESlotType SlotType, int32 Index, UInventoryItemDefaultInfo* Item);
 	UFUNCTION(BlueprintCallable, Category = "Slots")
-		void UnsetItemFromSlot(ESlotType Slot, int32 Index);
+		void UnsetItemFromSlot(ESlotType SlotType, int32 Index);
 	UFUNCTION(BlueprintPure, Category = "Slots")
-		FItemsAndEquippedItemIndex GetItemsFromSlot(ESlotType Slot) const;
+		FItemsAndEquippedItemIndex GetItemsFromSlotsOfType(ESlotType SlotType) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Slots|Equip")
-		void EquipItemFromSlot(ESlotType Slot, int32 Index);
+		void EquipItemFromSlot(ESlotType SlotType, int32 Index);
 	UFUNCTION(BlueprintCallable, Category = "Slots|Equip")
-		void UnequipItemFromSlot(ESlotType Slot);
+		void UnequipItemFromSlot(ESlotType SlotType);
 	UFUNCTION(BlueprintPure, Category = "Slots|Equip")
-		UInventoryItemDefaultInfo* GetEquippedItemFromSlot(ESlotType Slot) const;
+		UInventoryItemDefaultInfo* GetEquippedItemFromSlotsOfType(ESlotType SlotType) const;
+	UFUNCTION(BlueprintPure, Category = "Slots|Equip")
+		int32 GetEquippedSlotIndexOfSlotType(ESlotType SlotType) const;
 
 public: // DELEGATES:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegate", DisplayName = "OnSlotsUpdates")
