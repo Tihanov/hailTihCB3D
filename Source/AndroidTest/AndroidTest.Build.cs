@@ -13,7 +13,9 @@ public class AndroidTest : ModuleRules
             "Core", 
             "CoreUObject", 
             "Engine", 
-            "InputCore"
+            "InputCore",
+            "AIModule",
+            "GameplayTasks"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[]
