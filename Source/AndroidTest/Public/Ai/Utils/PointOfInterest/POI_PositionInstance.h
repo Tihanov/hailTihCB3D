@@ -35,7 +35,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options",
 		meta = (EditCondition = "PositionSource == EPOI_PositionInstancePositionSource::Actor", EditConditionHides))
 		bool bAttachToActor = false;
-	
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options")
+		float CollisionRadius = 300.f;
 };
 
 UCLASS()

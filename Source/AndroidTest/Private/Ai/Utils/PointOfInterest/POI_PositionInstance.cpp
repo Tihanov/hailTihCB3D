@@ -16,6 +16,7 @@ UPOI_PositionInstance::UPOI_PositionInstance()
 APOI_Position::APOI_Position()
 {
 	SphereCollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController)
@@ -23,6 +24,10 @@ void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, AV
 	Super::Init_Implementation(Instance, AiController);
 
 	const auto Inst = GetInstance<UPOI_PositionInstance>();
+
+	SphereCollisionComponent->InitSphereRadius(Inst->CollisionRadius);
+	SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	
 	if(Inst->PositionSource == EPOI_PositionInstancePositionSource::Location)
 	{
 		SetActorLocation(Inst->Location);
