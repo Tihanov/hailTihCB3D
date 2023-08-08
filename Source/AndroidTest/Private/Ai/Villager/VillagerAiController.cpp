@@ -32,6 +32,8 @@ AAiPointOfInterest* AVillagerAiController::GetCurrentPointOfInterest() const
 
 void AVillagerAiController::SwapToNextInterest()
 {
+	if(IsValid(CurrentPoi))
+		CurrentPoi->Destroy();
 	const auto Villager = GetControlledAiCharacter();
 	IndexOfCurrentPointOfInterest += 1;
 	if(!Villager->PointsOfInterest.IsValidIndex(IndexOfCurrentPointOfInterest))

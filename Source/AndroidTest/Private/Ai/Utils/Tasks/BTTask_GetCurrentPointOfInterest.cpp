@@ -9,7 +9,7 @@
 
 UBTTask_GetCurrentPointOfInterest::UBTTask_GetCurrentPointOfInterest()
 {
-	NodeName = TEXT("Get Next Point Of Interest");
+	NodeName = TEXT("Get Current Point Of Interest");
 }
 
 EBTNodeResult::Type UBTTask_GetCurrentPointOfInterest::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
