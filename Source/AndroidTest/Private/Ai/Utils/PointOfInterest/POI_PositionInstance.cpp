@@ -27,6 +27,8 @@ void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, AV
 
 	SphereCollisionComponent->InitSphereRadius(Inst->CollisionRadius);
 	SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereCollisionComponent->SetCollisionProfileName("OverlapAll", true);
+	SphereCollisionComponent->SetCollisionObjectType(ECC_WorldStatic);
 	
 	if(Inst->PositionSource == EPOI_PositionInstancePositionSource::Location)
 	{
@@ -60,11 +62,45 @@ bool APOI_Position::IsComplete_Implementation() const
 	return bIsComplete;
 }
 
+bool APOI_Position::IsArrived_Implementation() const
+{
+	return bIsArrived;	
+}
+
 void APOI_Position::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	if(Cast<APawn>(OtherActor) != GetAiController()->GetPawn())
 		return;
+
+	OnArrived();
+	
+	const auto Inst = GetInstance<UPOI_PositionInstance>();
+	if(Inst->OnArrivedTimeout == 0.f)
+	{
+		OnComplete();
+		return;
+	}
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle,
+		this,
+		&APOI_Position::OnComplete,
+		Inst->OnArrivedTimeout);
+}
+
+void APOI_Position::OnComplete()
+{
+	Super::OnComplete();
+	
 	bIsComplete = true;
+}
+
+void APOI_Position::OnArrived()
+{
+	Super::OnArrived();
+	
+	bIsArrived = true;
+
 }
