@@ -16,5 +16,4 @@ AVillagerCharacter::AVillagerCharacter()
 void AVillagerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 }

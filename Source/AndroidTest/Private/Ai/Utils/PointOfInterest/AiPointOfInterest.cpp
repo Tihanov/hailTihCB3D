@@ -17,6 +17,10 @@ void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instanc
 
 	check(AiController);
 	VillagerAiController = AiController;
+
+	const auto Inst = GetInstance();
+	if(Inst->bOnStartUseCallback)
+		Inst->OnStartCallback->Execute(this);
 }
 
 bool AAiPointOfInterest::IsComplete_Implementation() const
@@ -41,8 +45,14 @@ AVillagerAiController* AAiPointOfInterest::GetAiController() const
 
 void AAiPointOfInterest::OnArrived()
 {
+	if(IsArrived_Implementation())
+		return;
 	const auto Pawn = GetAiController()->GetPawn();
 	const auto Inst = GetInstance();
+
+	if(Inst->bOnArrivedUseCallback)
+		Inst->OnArrivedCallback->Execute(this);
+	
 	if(IsValid(Inst->OnArrivedAnimation))
 	{
 		const auto SkeletalMesh
@@ -52,24 +62,27 @@ void AAiPointOfInterest::OnArrived()
 
 	if(Inst->bOnArrivedChangeTransform)
 		Pawn->SetActorTransform(Inst->OnArrivedTransform);
-
-	if(Inst->bOnArrivedUseCallback)
-		Inst->OnArrivedCallback->Execute(this);
 }
 
 void AAiPointOfInterest::OnComplete()
 {
+	if(IsComplete_Implementation())
+		return;
+	const auto Pawn = GetAiController()->GetPawn();
 	const auto Inst = GetInstance();
+
+	if(Inst->bOnCompleteUseCallback)
+		Inst->OnCompleteCallback->Execute(this);
+
+	if(Inst->bOnCompleteChangeTransform)
+		Pawn->SetActorTransform(Inst->OnCompleteTransform);
+	
 	if(IsValid(Inst->OnArrivedAnimation))
 	{
-		const auto Pawn = GetAiController()->GetPawn();
 		const auto SkeletalMesh
 			= Cast<USkeletalMeshComponent>(Pawn->GetComponentByClass(USkeletalMeshComponent::StaticClass()));
 		SkeletalMesh->GetAnimInstance()->Montage_Stop(1.f);
 	}
-
-	if(Inst->bOnCompleteUseCallback)
-		Inst->OnCompleteCallback->Execute(this);
 }
 
 

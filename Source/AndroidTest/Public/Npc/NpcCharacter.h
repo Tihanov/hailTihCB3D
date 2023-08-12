@@ -47,39 +47,39 @@ public:
 	virtual bool CanDoAction_Implementation() const override;
 	
 	/*Getters, Setters*/
-	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Dialogue")
+	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Ai|Dialogue")
 		UDlgDialogue* GetDialogue() const;
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+	UFUNCTION(BlueprintCallable, Category = "Ai|Dialogue")
 		void SetDialogue(UDlgDialogue* Dialogue_, TEnumAsByte<EQuestStatus> QuestStatus_);
 
-	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Quest")
+	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "Ai|Quest")
 		TEnumAsByte<EQuestStatus> GetQuestStatus() const;
-	UFUNCTION(BlueprintSetter, BlueprintCallable, Category = "Quest")
+	UFUNCTION(BlueprintSetter, BlueprintCallable, Category = "Ai|Quest")
 		void SetQuestStatus(TEnumAsByte<EQuestStatus> QuestStatus_);
 
 	
 	/*Vars*/
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Dialogue")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Dialogue")
 		FName DlgSystemName;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Dialogue")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ai|Dialogue")
 		FText DlgDisplayName;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName = "CanPlayerSpeakWith?", Category = "Dialogue")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName = "CanPlayerSpeakWith?", Category = "Ai|Dialogue")
 		bool bCanPlayerSpeakWith = false;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Quest|Mesh")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Ai|Quest|Mesh")
 		UStaticMesh* QstHaveQuestStaticMesh;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Quest|Mesh")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Ai|Quest|Mesh")
 		UStaticMesh* QstHaveQuestionsStaticMesh;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Quest|Mesh")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere , Category = "Ai|Quest|Mesh")
 		UStaticMesh* QstNoneStaticMesh;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components", DisplayName = "QuestSign")
 		UStaticMeshComponent* QuestSignMeshComponent;
 	
-private:
-	UPROPERTY(BlueprintGetter = GetDialogue, EditInstanceOnly, Category = "Dialogue")
+protected:
+	UPROPERTY(BlueprintGetter = GetDialogue, EditInstanceOnly, Category = "Ai|Dialogue")
 		UDlgDialogue* Dialogue;
-	UPROPERTY(BlueprintGetter = GetQuestStatus, BlueprintSetter = SetQuestStatus, EditInstanceOnly, Category = "Quest")
+	UPROPERTY(BlueprintGetter = GetQuestStatus, BlueprintSetter = SetQuestStatus, EditInstanceOnly, Category = "Ai|Quest")
 		TEnumAsByte<EQuestStatus> QuestStatus;
 };

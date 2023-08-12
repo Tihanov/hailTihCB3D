@@ -15,8 +15,17 @@ class ANDROIDTEST_API UAiPointOfInterestInstance : public UObject
 	
 public:
 	UAiPointOfInterestInstance();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnStart")
+		bool bOnStartUseCallback = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options|OnStart",
+		meta = (EditCondition = "bOnStartUseCallback"))
+		class UPoiCallback* OnStartCallback;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnArrived")
+		bool bOnArrivedUseTimeout = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnArrived",
+		meta = (EditCondition = "bOnArrivedUseTimeout"))
 		float OnArrivedTimeout = 0.f;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnArrived")
@@ -33,6 +42,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options|OnArrived",
 		meta = (EditCondition = "bOnArrivedUseCallback"))
 		class UPoiCallback* OnArrivedCallback;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnComplete")
+		bool bOnCompleteChangeTransform = false;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnComplete",
+		meta = (EditCondition = "bOnArrivedChangeTransform"))
+		FTransform OnCompleteTransform;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnComplete")
 		bool bOnCompleteUseCallback = false;

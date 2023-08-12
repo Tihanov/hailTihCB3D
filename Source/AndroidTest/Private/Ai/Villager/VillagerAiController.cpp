@@ -25,6 +25,17 @@ void AVillagerAiController::OnPossess(APawn* InPawn)
 	SpawnPoiFromInstance(Villager->PointsOfInterest[0]);
 }
 
+bool AVillagerAiController::SetCurrentPointOfInterest(int32 Index)
+{
+	const auto Villager = GetControlledAiCharacter();
+	if(!Villager->PointsOfInterest.IsValidIndex(Index))
+		return false;
+	bIsAfterSetOfPoi = true;
+	IndexOfCurrentPointOfInterest = Index;
+	SpawnPoiFromInstance(Villager->PointsOfInterest[Index]);
+	return true;
+}
+
 AAiPointOfInterest* AVillagerAiController::GetCurrentPointOfInterest() const
 {
 	return CurrentPoi;
@@ -32,6 +43,11 @@ AAiPointOfInterest* AVillagerAiController::GetCurrentPointOfInterest() const
 
 void AVillagerAiController::SwapToNextInterest()
 {
+	if(bIsAfterSetOfPoi)
+	{
+		bIsAfterSetOfPoi = false;
+		return;
+	}
 	if(IsValid(CurrentPoi))
 		CurrentPoi->Destroy();
 	const auto Villager = GetControlledAiCharacter();

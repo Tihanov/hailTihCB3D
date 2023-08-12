@@ -22,14 +22,15 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 public:
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintCallable, Category = "PointOfInterest")
+		UPARAM(DisplayName = "Does Index Exists?")bool  SetCurrentPointOfInterest(int32 Index);
+	UFUNCTION(BlueprintPure, Category = "PointOfInterest")
 		AAiPointOfInterest* GetCurrentPointOfInterest() const;
-	UFUNCTION(BlueprintCallable)
-		void SwapToNextInterest();
-	
-
 	template<class T>
-	T* GetCurrentPointOfInterest() const;
+		T* GetCurrentPointOfInterest() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "PointOfInterest")
+		void SwapToNextInterest();
 
 protected:
 	int32 IndexOfCurrentPointOfInterest;
@@ -38,6 +39,9 @@ protected:
 private:
 	AVillagerCharacter* GetControlledAiCharacter() const;	
 	void SpawnPoiFromInstance(UAiPointOfInterestInstance* Instance);
+
+private:
+	bool bIsAfterSetOfPoi = false;	
 };
 
 

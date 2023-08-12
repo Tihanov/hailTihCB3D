@@ -77,7 +77,7 @@ void APOI_Position::NotifyActorBeginOverlap(AActor* OtherActor)
 	OnArrived();
 	
 	const auto Inst = GetInstance<UPOI_PositionInstance>();
-	if(Inst->OnArrivedTimeout == 0.f)
+	if(!Inst->bOnArrivedUseTimeout || Inst->OnArrivedTimeout == 0.f)
 	{
 		OnComplete();
 		return;
