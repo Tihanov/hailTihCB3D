@@ -19,7 +19,7 @@ APOI_ClockAndPosition::APOI_ClockAndPosition()
 }
 
 void APOI_ClockAndPosition::Init_Implementation(UAiPointOfInterestInstance* Instance,
-                                                AVillagerAiController* AiController)
+                                                ANpcAiController* AiController)
 {
 	Super::Init_Implementation(Instance, AiController);
 

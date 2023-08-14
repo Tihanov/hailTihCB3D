@@ -49,7 +49,7 @@ private:
 public:
 	APOI_Position();
 	
-	virtual void Init_Implementation(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController) override;
+	virtual void Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	

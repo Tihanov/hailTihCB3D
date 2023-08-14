@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "AiPointOfInterest.generated.h"
 
-class AVillagerAiController;
+class ANpcAiController;
 
 UENUM(BlueprintType, meta=(Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EPoiCompleteCauser : uint8
@@ -76,7 +76,7 @@ class AAiPointOfInterest : public AActor
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void Init(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController);
+		void Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController);
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
 		bool IsComplete() const;
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
@@ -96,7 +96,7 @@ public:
 		T* GetInstance() const;
 	
 	UFUNCTION(BlueprintPure)
-		AVillagerAiController* GetAiController() const;
+		ANpcAiController* GetAiController() const;
 	template<class T>
 		T* GetAiController() const;
 
@@ -106,7 +106,7 @@ protected:
 	
 private:
 	UAiPointOfInterestInstance* InstanceOfSelf = nullptr;
-	AVillagerAiController* VillagerAiController = nullptr;
+	ANpcAiController* NpcAiController = nullptr;
 	EPoiCompleteCauser CompleteCauser = EPoiCompleteCauser::NONE;
 	bool bIsComplete = false;
 	bool bIsArrived = false;

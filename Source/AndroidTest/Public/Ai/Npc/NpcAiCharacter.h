@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Npc/NpcCharacter.h"
-#include "VillagerCharacter.generated.h"
+#include "Npc/NpcBaseCharacter.h"
+#include "NpcAiCharacter.generated.h"
 
 
 class UBehaviorTree;
 class UAiPointOfInterestInstance;
 
 UCLASS(BlueprintType, Blueprintable)
-class ANDROIDTEST_API AVillagerCharacter : public ANpcCharacter
+class ANDROIDTEST_API ANpcAiCharacter : public ANpcBaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	AVillagerCharacter();
+	ANpcAiCharacter();
 
 protected:
 	virtual void BeginPlay() override;

@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "VillagerAiController.generated.h"
+#include "NpcAiController.generated.h"
 
-class AVillagerCharacter;
+class ANpcAiCharacter;
 class UAiPointOfInterestInstance;
 class AAiPointOfInterest;
 
 UCLASS()
-class ANDROIDTEST_API AVillagerAiController : public AAIController
+class ANDROIDTEST_API ANpcAiController : public AAIController
 {
 	GENERATED_BODY()
 
 public:
-	AVillagerAiController();
+	ANpcAiController();
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
@@ -37,7 +37,7 @@ protected:
 	AAiPointOfInterest* CurrentPoi = nullptr;
 	
 private:
-	AVillagerCharacter* GetControlledAiCharacter() const;	
+	ANpcAiCharacter* GetControlledAiCharacter() const;	
 	void SpawnPoiFromInstance(UAiPointOfInterestInstance* Instance);
 
 private:
@@ -51,7 +51,7 @@ private:
 
 
 template <class T>
-T* AVillagerAiController::GetCurrentPointOfInterest() const
+T* ANpcAiController::GetCurrentPointOfInterest() const
 {
 	const auto Result = Cast<T>(GetCurrentPointOfInterest());
 	return Result;

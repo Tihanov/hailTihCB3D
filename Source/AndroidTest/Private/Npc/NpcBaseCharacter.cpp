@@ -1,41 +1,41 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Npc/NpcCharacter.h"
+#include "Npc/NpcBaseCharacter.h"
 
 #include "Log.h"
 #include "Player/MainPlayerController.h"
 
 
-ANpcCharacter::ANpcCharacter()
+ANpcBaseCharacter::ANpcBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	QuestSignMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("QuestSign");
 	QuestSignMeshComponent->SetupAttachment(GetRootComponent());
 }
 
-void ANpcCharacter::BeginPlay()
+void ANpcBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	SetQuestStatus(QuestStatus);
 }
 
-FName ANpcCharacter::GetParticipantName_Implementation() const
+FName ANpcBaseCharacter::GetParticipantName_Implementation() const
 {
 	return DlgSystemName;
 }
-FText ANpcCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
+FText ANpcBaseCharacter::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
 {
 	return DlgDisplayName;
 }
 
-EActionType ANpcCharacter::GetActionType_Implementation()
+EActionType ANpcBaseCharacter::GetActionType_Implementation()
 {
 	return EActionType::NPCDialogue;
 }
 
-void ANpcCharacter::DoAction_Implementation(AActor* CausedBy)
+void ANpcBaseCharacter::DoAction_Implementation(AActor* CausedBy)
 {
 	if(const auto PlayerController = Cast<AMainPlayerController>(CausedBy); PlayerController != nullptr)
 	{
@@ -43,36 +43,36 @@ void ANpcCharacter::DoAction_Implementation(AActor* CausedBy)
 	}
 }
 
-FText ANpcCharacter::GetDisplayDescription_Implementation() const
+FText ANpcBaseCharacter::GetDisplayDescription_Implementation() const
 {
 	return DlgDisplayName;
 }
 
-UTexture2D* ANpcCharacter::GetIco_Implementation() const
+UTexture2D* ANpcBaseCharacter::GetIco_Implementation() const
 {
 	return nullptr;
 }
 
-bool ANpcCharacter::CanDoAction_Implementation() const
+bool ANpcBaseCharacter::CanDoAction_Implementation() const
 {
 	return bCanPlayerSpeakWith;
 }
 
-UDlgDialogue* ANpcCharacter::GetDialogue() const
+UDlgDialogue* ANpcBaseCharacter::GetDialogue() const
 {
 	return Dialogue;
 }
-void ANpcCharacter::SetDialogue(UDlgDialogue* Dialogue_, TEnumAsByte<EQuestStatus> QuestStatus_)
+void ANpcBaseCharacter::SetDialogue(UDlgDialogue* Dialogue_, TEnumAsByte<EQuestStatus> QuestStatus_)
 {
 	Dialogue = Dialogue_;
 	SetQuestStatus(QuestStatus_);
 }
 
-TEnumAsByte<EQuestStatus> ANpcCharacter::GetQuestStatus() const
+TEnumAsByte<EQuestStatus> ANpcBaseCharacter::GetQuestStatus() const
 {
 	return QuestStatus;
 }
-void ANpcCharacter::SetQuestStatus(TEnumAsByte<EQuestStatus> QuestStatus_)
+void ANpcBaseCharacter::SetQuestStatus(TEnumAsByte<EQuestStatus> QuestStatus_)
 {
 	QuestStatus = QuestStatus_;
 	switch (QuestStatus)

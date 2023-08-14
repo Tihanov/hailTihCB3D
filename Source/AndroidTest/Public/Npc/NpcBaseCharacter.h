@@ -7,7 +7,7 @@
 #include "DlgSystem/DlgDialogue.h"
 #include "DlgSystem/DlgDialogueParticipant.h"
 #include "AndroidTest/Public/Action/ActionInterface.h"
-#include "NpcCharacter.generated.h"
+#include "NpcBaseCharacter.generated.h"
 
 class AStaticMeshActor;
 
@@ -21,7 +21,7 @@ enum EQuestStatus
 
 
 UCLASS(BlueprintType, Blueprintable)
-class ANDROIDTEST_API ANpcCharacter
+class ANDROIDTEST_API ANpcBaseCharacter
 	: public ACharacter
 	, public IDlgDialogueParticipant
 	, public IActionInterface
@@ -29,7 +29,7 @@ class ANDROIDTEST_API ANpcCharacter
 	GENERATED_BODY()
 
 public:
-	ANpcCharacter();
+	ANpcBaseCharacter();
 
 protected:
 	virtual void BeginPlay() override;

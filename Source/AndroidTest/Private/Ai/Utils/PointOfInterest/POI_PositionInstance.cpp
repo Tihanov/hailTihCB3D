@@ -3,7 +3,7 @@
 
 #include "AndroidTest\Public\Ai\Utils\PointOfInterest\POI_PositionInstance.h"
 
-#include "Ai/Villager/VillagerAiController.h"
+#include "Ai/Npc/NpcAiController.h"
 #include "Components/SphereComponent.h"
 
 UPOI_PositionInstance::UPOI_PositionInstance()
@@ -19,7 +19,7 @@ APOI_Position::APOI_Position()
 	SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController)
+void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
 {
 	Super::Init_Implementation(Instance, AiController);
 

@@ -3,7 +3,7 @@
 #include "AndroidTest/Public/Ai/Utils/PointOfInterest/AiPointOfInterest.h"
 
 #include "Log.h"
-#include "Ai/Villager/VillagerAiController.h"
+#include "Ai/Npc/NpcAiController.h"
 
 UAiPointOfInterestInstance::UAiPointOfInterestInstance()
 {
@@ -12,13 +12,13 @@ UAiPointOfInterestInstance::UAiPointOfInterestInstance()
 
 
 
-void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController)
+void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
 {
 	check(Instance);
 	InstanceOfSelf = Instance;
 
 	check(AiController);
-	VillagerAiController = AiController;
+	NpcAiController = AiController;
 
 	const auto Inst = GetInstance();
 	if(Inst->bOnStartUseCallbacks)
@@ -63,9 +63,9 @@ UAiPointOfInterestInstance* AAiPointOfInterest::GetInstance() const
 	return InstanceOfSelf;
 }
 
-AVillagerAiController* AAiPointOfInterest::GetAiController() const
+ANpcAiController* AAiPointOfInterest::GetAiController() const
 {
-	return VillagerAiController;
+	return NpcAiController;
 }
 
 void AAiPointOfInterest::OnArrived()

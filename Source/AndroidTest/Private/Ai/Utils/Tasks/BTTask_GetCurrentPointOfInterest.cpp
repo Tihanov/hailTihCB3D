@@ -4,7 +4,7 @@
 #include "Ai/Utils/Tasks/BTTask_GetCurrentPointOfInterest.h"
 
 #include "Ai/Utils/PointOfInterest/AiPointOfInterest.h"
-#include "Ai/Villager/VillagerAiController.h"
+#include "Ai/Npc/NpcAiController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_GetCurrentPointOfInterest::UBTTask_GetCurrentPointOfInterest()
@@ -14,7 +14,7 @@ UBTTask_GetCurrentPointOfInterest::UBTTask_GetCurrentPointOfInterest()
 
 EBTNodeResult::Type UBTTask_GetCurrentPointOfInterest::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	const auto AiController = Cast<AVillagerAiController>(OwnerComp.GetAIOwner());	
+	const auto AiController = Cast<ANpcAiController>(OwnerComp.GetAIOwner());	
 	const auto Blackboard = OwnerComp.GetBlackboardComponent();
 	if(!IsValid(AiController) || !IsValid(Blackboard))
 		return EBTNodeResult::Aborted;

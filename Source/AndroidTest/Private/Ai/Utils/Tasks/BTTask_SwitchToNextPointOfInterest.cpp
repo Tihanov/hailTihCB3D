@@ -3,7 +3,7 @@
 
 #include "Ai/Utils/Tasks/BTTask_SwitchToNextPointOfInterest.h"
 
-#include "Ai/Villager/VillagerAiController.h"
+#include "Ai/Npc/NpcAiController.h"
 
 UBTTask_SwitchToNextPointOfInterest::UBTTask_SwitchToNextPointOfInterest()
 {
@@ -13,7 +13,7 @@ UBTTask_SwitchToNextPointOfInterest::UBTTask_SwitchToNextPointOfInterest()
 EBTNodeResult::Type UBTTask_SwitchToNextPointOfInterest::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 	uint8* NodeMemory)
 {
-	const auto AiController = Cast<AVillagerAiController>(OwnerComp.GetAIOwner());
+	const auto AiController = Cast<ANpcAiController>(OwnerComp.GetAIOwner());
 	if(!IsValid(AiController))
 		return EBTNodeResult::Aborted;
 
