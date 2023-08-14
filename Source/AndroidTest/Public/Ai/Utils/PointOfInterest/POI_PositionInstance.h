@@ -50,8 +50,6 @@ public:
 	APOI_Position();
 	
 	virtual void Init_Implementation(UAiPointOfInterestInstance* Instance, AVillagerAiController* AiController) override;
-	virtual bool IsComplete_Implementation() const override;
-	virtual bool IsArrived_Implementation() const override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	
@@ -59,10 +57,8 @@ public:
 		USphereComponent* SphereCollisionComponent;
 
 protected:
-	virtual void OnArrived() override;
 	virtual void OnComplete() override;
-	
-	bool bIsComplete = false;
-	bool bIsArrived = false;
 
+private:
+	void OnCompleteWrapper();
 };

@@ -24,18 +24,6 @@ void APOI_ClockAndPosition::Init_Implementation(UAiPointOfInterestInstance* Inst
 	Super::Init_Implementation(Instance, AiController);
 
 	TimeManagerSoft = GetTimeManagerFromGameMode();
-	
-	const auto TimeManager = TimeManagerSoft.Get();
-	check(TimeManager);
-	const auto Inst = GetInstance<UPOI_ClockAndPositionInstance>();
-	check(Inst);
-	
-	if(ClockCompare(TimeManager->GetCurrentTime(), Inst->Begin) == -1 ||
-		ClockCompare(TimeManager->GetCurrentTime(), Inst->End) == 1)
-	{
-		bIsCompleteCausedByClock = true;
-		OnComplete();
-	}
 }
 
 void APOI_ClockAndPosition::Tick(float DeltaSeconds)
@@ -47,9 +35,9 @@ void APOI_ClockAndPosition::Tick(float DeltaSeconds)
 	const auto Inst = GetInstance<UPOI_ClockAndPositionInstance>();
 	check(Inst);
 
-	if(ClockCompare(TimeManager->GetCurrentTime(), Inst->End) == 1)
+	if(!FClock::IsBetween(TimeManager->GetCurrentTime(), Inst->Begin, Inst->End))
 	{
-		bIsCompleteCausedByClock = true;
+		SetCompleteCauser(EPoiCompleteCauser::Clock);
 		OnComplete();
 	}
 }
@@ -63,7 +51,7 @@ void APOI_ClockAndPosition::OnComplete()
 	const auto Inst = GetInstance<UPOI_ClockAndPositionInstance>();
 	check(Inst);
 	
-	if(ClockCompare(TimeManager->GetCurrentTime(), Inst->End) != 1 && !Inst->bOnArrivedUseTimeout)
+	if(FClock::IsBetween(TimeManager->GetCurrentTime(), Inst->Begin, Inst->End) && !Inst->bOnArrivedUseTimeout)
 		return;
 	
 	Super::OnComplete();

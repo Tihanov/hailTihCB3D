@@ -8,6 +8,16 @@
 
 class AVillagerAiController;
 
+UENUM(BlueprintType, meta=(Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EPoiCompleteCauser : uint8
+{
+	NONE		= 0 UMETA(Hidden),
+	Undefined	= 1 << 0,
+	Timeout		= 1 << 1,
+	Clock		= 1 << 2,
+};
+ENUM_CLASS_FLAGS(EPoiCompleteCauser);
+
 UCLASS(BlueprintType, Abstract, Blueprintable, DefaultToInstanced, EditInlineNew)
 class ANDROIDTEST_API UAiPointOfInterestInstance : public UObject
 {
@@ -17,10 +27,10 @@ public:
 	UAiPointOfInterestInstance();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnStart")
-		bool bOnStartUseCallback = false;
+		bool bOnStartUseCallbacks = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options|OnStart",
-		meta = (EditCondition = "bOnStartUseCallback"))
-		class UPoiCallback* OnStartCallback;
+		meta = (EditCondition = "bOnStartUseCallbacks"))
+		TArray<class UPoiCallback*> OnStartCallbacks;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnArrived")
 		bool bOnArrivedUseTimeout = false;
@@ -38,10 +48,10 @@ public:
 		UAnimMontage* OnArrivedAnimation;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnArrived")
-		bool bOnArrivedUseCallback = false;
+		bool bOnArrivedUseCallbacks = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options|OnArrived",
-		meta = (EditCondition = "bOnArrivedUseCallback"))
-		class UPoiCallback* OnArrivedCallback;
+		meta = (EditCondition = "bOnArrivedUseCallbacks"))
+		TArray<class UPoiCallback*> OnArrivedCallbacks;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnComplete")
 		bool bOnCompleteChangeTransform = false;
@@ -50,10 +60,10 @@ public:
 		FTransform OnCompleteTransform;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options|OnComplete")
-		bool bOnCompleteUseCallback = false;
+		bool bOnCompleteUseCallbacks = false;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options|OnComplete",
-		meta = (EditCondition = "bOnCompleteUseCallback"))
-		class UPoiCallback* OnCompleteCallback;
+		meta = (EditCondition = "bOnCompleteUseCallbacks"))
+		TArray<class UPoiCallback*> OnCompleteCallbacks;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options")
 		TSubclassOf<class AAiPointOfInterest> POI_ToSpawnClass; 
@@ -72,6 +82,14 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
 		bool IsArrived() const;
 
+	UFUNCTION(BlueprintPure, Category = "POI")
+		EPoiCompleteCauser GetCompleteCauser() const;
+	UFUNCTION(BlueprintPure, Category = "POI")
+		bool IsCompleteByReasons(UPARAM(meta = (Bitmask, BitmaskEnum = EPoiCompleteCauser)) uint8 Reasons) const;
+protected:
+	virtual void SetCompleteCauser(EPoiCompleteCauser Causer);
+public:
+
 	UFUNCTION(BlueprintPure)
 		UAiPointOfInterestInstance* GetInstance() const;
 	template<class T>
@@ -89,6 +107,9 @@ protected:
 private:
 	UAiPointOfInterestInstance* InstanceOfSelf = nullptr;
 	AVillagerAiController* VillagerAiController = nullptr;
+	EPoiCompleteCauser CompleteCauser = EPoiCompleteCauser::NONE;
+	bool bIsComplete = false;
+	bool bIsArrived = false;
 };
 
 template <class T>

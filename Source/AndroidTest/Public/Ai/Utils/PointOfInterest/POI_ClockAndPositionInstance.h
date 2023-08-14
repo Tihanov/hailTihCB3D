@@ -34,15 +34,9 @@ public:
 
 	virtual void OnComplete() override;
 
-	UFUNCTION(BlueprintPure)
-		bool IsCompleteCausedByClock() const { return bIsCompleteCausedByClock; }
-
 protected:
 	TSoftObjectPtr<ATimeManager> TimeManagerSoft;
 
 private:
 	ATimeManager* GetTimeManagerFromGameMode() const;
-
-private:
-	bool bIsCompleteCausedByClock = false;
 };

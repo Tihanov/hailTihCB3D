@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AndroidTest/Public/Ai/Utils/PointOfInterest/AiPointOfInterest.h"
+
+#include "Log.h"
 #include "Ai/Villager/VillagerAiController.h"
 
 UAiPointOfInterestInstance::UAiPointOfInterestInstance()
@@ -19,18 +21,41 @@ void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instanc
 	VillagerAiController = AiController;
 
 	const auto Inst = GetInstance();
-	if(Inst->bOnStartUseCallback)
-		Inst->OnStartCallback->Execute(this);
+	if(Inst->bOnStartUseCallbacks)
+		for(const auto& Callback : Inst->OnStartCallbacks)
+			Callback->Execute(this);
 }
 
 bool AAiPointOfInterest::IsComplete_Implementation() const
 {
-	return true;
+	return bIsComplete;
 }
 
 bool AAiPointOfInterest::IsArrived_Implementation() const
 {
-	return true;
+	return bIsArrived;
+}
+
+EPoiCompleteCauser AAiPointOfInterest::GetCompleteCauser() const
+{
+	if(!IsComplete())
+	{
+		ULog::Error("GetCompleteCauser should use only after POI complete", LO_Both);
+		return EPoiCompleteCauser::Undefined;
+	}
+	return CompleteCauser;
+}
+
+bool AAiPointOfInterest::IsCompleteByReasons(uint8 Reasons) const
+{
+	return (CompleteCauser & static_cast<EPoiCompleteCauser>(Reasons)) != EPoiCompleteCauser::NONE;
+}
+
+void AAiPointOfInterest::SetCompleteCauser(EPoiCompleteCauser Causer)
+{
+	if(IsComplete_Implementation())
+		return;
+	CompleteCauser = Causer;
 }
 
 UAiPointOfInterestInstance* AAiPointOfInterest::GetInstance() const
@@ -47,11 +72,13 @@ void AAiPointOfInterest::OnArrived()
 {
 	if(IsArrived_Implementation())
 		return;
+	bIsArrived = true;
 	const auto Pawn = GetAiController()->GetPawn();
 	const auto Inst = GetInstance();
 
-	if(Inst->bOnArrivedUseCallback)
-		Inst->OnArrivedCallback->Execute(this);
+	if(Inst->bOnArrivedUseCallbacks)
+		for(const auto& Callback : Inst->OnArrivedCallbacks)
+			Callback->Execute(this);
 	
 	if(IsValid(Inst->OnArrivedAnimation))
 	{
@@ -68,11 +95,13 @@ void AAiPointOfInterest::OnComplete()
 {
 	if(IsComplete_Implementation())
 		return;
+	bIsComplete = true;
 	const auto Pawn = GetAiController()->GetPawn();
 	const auto Inst = GetInstance();
 
-	if(Inst->bOnCompleteUseCallback)
-		Inst->OnCompleteCallback->Execute(this);
+	if(Inst->bOnCompleteUseCallbacks)
+		for(const auto& Callback : Inst->OnCompleteCallbacks)
+			Callback->Execute(this);
 
 	if(Inst->bOnCompleteChangeTransform)
 		Pawn->SetActorTransform(Inst->OnCompleteTransform);

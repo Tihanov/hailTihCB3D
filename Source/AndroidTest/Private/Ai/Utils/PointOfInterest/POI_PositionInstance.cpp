@@ -57,16 +57,6 @@ void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, AV
 	check(false);
 }
 
-bool APOI_Position::IsComplete_Implementation() const
-{
-	return bIsComplete;
-}
-
-bool APOI_Position::IsArrived_Implementation() const
-{
-	return bIsArrived;	
-}
-
 void APOI_Position::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -79,6 +69,7 @@ void APOI_Position::NotifyActorBeginOverlap(AActor* OtherActor)
 	const auto Inst = GetInstance<UPOI_PositionInstance>();
 	if(!Inst->bOnArrivedUseTimeout || Inst->OnArrivedTimeout == 0.f)
 	{
+		SetCompleteCauser(EPoiCompleteCauser::Undefined);
 		OnComplete();
 		return;
 	}
@@ -86,21 +77,18 @@ void APOI_Position::NotifyActorBeginOverlap(AActor* OtherActor)
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle,
 		this,
-		&APOI_Position::OnComplete,
+		&APOI_Position::OnCompleteWrapper,
 		Inst->OnArrivedTimeout);
 }
 
 void APOI_Position::OnComplete()
 {
 	Super::OnComplete();
-	
-	bIsComplete = true;
 }
 
-void APOI_Position::OnArrived()
+void APOI_Position::OnCompleteWrapper()
 {
-	Super::OnArrived();
-	
-	bIsArrived = true;
-
+	SetCompleteCauser(EPoiCompleteCauser::Timeout);
+	OnComplete();
 }
+
