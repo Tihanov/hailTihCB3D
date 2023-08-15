@@ -4,6 +4,7 @@
 #include "Ai/Npc/NpcAiCharacter.h"
 
 #include "Ai/Npc/NpcAiController.h"
+#include "Components/CapsuleComponent.h"
 
 
 ANpcAiCharacter::ANpcAiCharacter()
@@ -11,6 +12,7 @@ ANpcAiCharacter::ANpcAiCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	AIControllerClass = ANpcAiController::StaticClass();
+	GetCapsuleComponent()->ComponentTags.Add(FName(TEXT("MainCapsule")));
 }
 
 void ANpcAiCharacter::BeginPlay()

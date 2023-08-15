@@ -75,12 +75,12 @@ class AAiPointOfInterest : public AActor
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController);
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
-		bool IsComplete() const;
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
-		bool IsArrived() const;
+	UFUNCTION(BlueprintCallable)
+		virtual void Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController);
+	UFUNCTION(BlueprintPure)
+		virtual bool IsComplete() const;
+	UFUNCTION(BlueprintPure)
+		virtual bool IsArrived() const;
 
 	UFUNCTION(BlueprintPure, Category = "POI")
 		EPoiCompleteCauser GetCompleteCauser() const;

@@ -19,9 +19,9 @@ APOI_Position::APOI_Position()
 	SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void APOI_Position::Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
+void APOI_Position::Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
 {
-	Super::Init_Implementation(Instance, AiController);
+	Super::Init(Instance, AiController);
 
 	const auto Inst = GetInstance<UPOI_PositionInstance>();
 

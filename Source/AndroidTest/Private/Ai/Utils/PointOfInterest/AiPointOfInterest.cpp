@@ -12,7 +12,7 @@ UAiPointOfInterestInstance::UAiPointOfInterestInstance()
 
 
 
-void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
+void AAiPointOfInterest::Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController)
 {
 	check(Instance);
 	InstanceOfSelf = Instance;
@@ -26,12 +26,12 @@ void AAiPointOfInterest::Init_Implementation(UAiPointOfInterestInstance* Instanc
 			Callback->Execute(this);
 }
 
-bool AAiPointOfInterest::IsComplete_Implementation() const
+bool AAiPointOfInterest::IsComplete() const
 {
 	return bIsComplete;
 }
 
-bool AAiPointOfInterest::IsArrived_Implementation() const
+bool AAiPointOfInterest::IsArrived() const
 {
 	return bIsArrived;
 }
@@ -53,7 +53,7 @@ bool AAiPointOfInterest::IsCompleteByReasons(uint8 Reasons) const
 
 void AAiPointOfInterest::SetCompleteCauser(EPoiCompleteCauser Causer)
 {
-	if(IsComplete_Implementation())
+	if(IsComplete())
 		return;
 	CompleteCauser = Causer;
 }
@@ -70,7 +70,7 @@ ANpcAiController* AAiPointOfInterest::GetAiController() const
 
 void AAiPointOfInterest::OnArrived()
 {
-	if(IsArrived_Implementation())
+	if(IsArrived())
 		return;
 	bIsArrived = true;
 	const auto Pawn = GetAiController()->GetPawn();
@@ -93,7 +93,7 @@ void AAiPointOfInterest::OnArrived()
 
 void AAiPointOfInterest::OnComplete()
 {
-	if(IsComplete_Implementation())
+	if(IsComplete())
 		return;
 	bIsComplete = true;
 	const auto Pawn = GetAiController()->GetPawn();

@@ -29,7 +29,7 @@ class APOI_ClockAndPosition : public APOI_Position
 public:
 	APOI_ClockAndPosition();
 	
-	virtual void Init_Implementation(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController) override;
+	virtual void Init(UAiPointOfInterestInstance* Instance, ANpcAiController* AiController) override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void OnComplete() override;

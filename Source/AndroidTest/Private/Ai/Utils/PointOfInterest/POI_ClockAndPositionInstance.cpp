@@ -18,10 +18,10 @@ APOI_ClockAndPosition::APOI_ClockAndPosition()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void APOI_ClockAndPosition::Init_Implementation(UAiPointOfInterestInstance* Instance,
+void APOI_ClockAndPosition::Init(UAiPointOfInterestInstance* Instance,
                                                 ANpcAiController* AiController)
 {
-	Super::Init_Implementation(Instance, AiController);
+	Super::Init(Instance, AiController);
 
 	TimeManagerSoft = GetTimeManagerFromGameMode();
 }
@@ -44,7 +44,7 @@ void APOI_ClockAndPosition::Tick(float DeltaSeconds)
 
 void APOI_ClockAndPosition::OnComplete()
 {
-	if(IsComplete_Implementation())
+	if(IsComplete())
 		return;
 	const auto TimeManager = TimeManagerSoft.Get();
 	check(TimeManager);
