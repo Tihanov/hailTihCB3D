@@ -7,7 +7,7 @@
 #include "Ai/Utils/PointOfInterest/AiPointOfInterest.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-struct FTaskData
+struct FTaskData_ReturnSuccessOnCompleteThePoi
 {
 	TSoftObjectPtr<AAiPointOfInterest> PointOfInterest;
 };
@@ -37,14 +37,14 @@ EBTNodeResult::Type UBTTask_ReturnSuccessOnCompleteThePoi::ExecuteTask(UBehavior
 		return EBTNodeResult::Aborted;
 	}
 
-	const auto Data = CastInstanceNodeMemory<FTaskData>(NodeMemory);
+	const auto Data = CastInstanceNodeMemory<FTaskData_ReturnSuccessOnCompleteThePoi>(NodeMemory);
 	Data->PointOfInterest = PointOfInterest_;
 	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_ReturnSuccessOnCompleteThePoi::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	const auto Data = CastInstanceNodeMemory<FTaskData>(NodeMemory);
+	const auto Data = CastInstanceNodeMemory<FTaskData_ReturnSuccessOnCompleteThePoi>(NodeMemory);
 	if(!Data->PointOfInterest.IsValid())
 		Super::FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
 
@@ -55,11 +55,11 @@ void UBTTask_ReturnSuccessOnCompleteThePoi::TickTask(UBehaviorTreeComponent& Own
 void UBTTask_ReturnSuccessOnCompleteThePoi::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
 	EBTNodeResult::Type TaskResult)
 {
-	const auto Data = CastInstanceNodeMemory<FTaskData>(NodeMemory);
+	const auto Data = CastInstanceNodeMemory<FTaskData_ReturnSuccessOnCompleteThePoi>(NodeMemory);
 	Data->PointOfInterest.Reset();
 }
 
 uint16 UBTTask_ReturnSuccessOnCompleteThePoi::GetInstanceMemorySize() const
 {
-	return sizeof(FTaskData);
+	return sizeof(FTaskData_ReturnSuccessOnCompleteThePoi);
 }
