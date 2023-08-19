@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "Npc/NpcBaseCharacter.h"
 #include "NpcAiCharacter.generated.h"
 
@@ -11,12 +12,16 @@ class UBehaviorTree;
 class UAiPointOfInterestInstance;
 
 UCLASS(BlueprintType, Blueprintable)
-class ANDROIDTEST_API ANpcAiCharacter : public ANpcBaseCharacter
+class ANDROIDTEST_API ANpcAiCharacter
+	: public ANpcBaseCharacter
+	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
 public:
 	ANpcAiCharacter();
+
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
 protected:
 	virtual void BeginPlay() override;

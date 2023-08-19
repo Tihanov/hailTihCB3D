@@ -18,11 +18,11 @@ void ANpcAiController::OnPossess(APawn* InPawn)
 
 	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(InPawn);
 	check(NpcAiCharacter);
-	check(NpcAiCharacter->StartupBehaviorTree);
-	check(!NpcAiCharacter->PointsOfInterest.IsEmpty());
 	
-	RunBehaviorTree(NpcAiCharacter->StartupBehaviorTree);
-	SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[0]);
+	if(NpcAiCharacter->StartupBehaviorTree)
+		RunBehaviorTree(NpcAiCharacter->StartupBehaviorTree);
+	if(!NpcAiCharacter->PointsOfInterest.IsEmpty())
+		SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[0]);
 }
 
 bool ANpcAiController::SetCurrentPointOfInterest(int32 Index)

@@ -3,15 +3,12 @@
 
 #include "Player/MainCharacter.h"
 
+#include "Utils/UtilsStructs.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+
 AMainCharacter::AMainCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-}
-
-EMainCharacterState AMainCharacter::GetCharacterState() const
-{
-	return CharacterState;
 }
 
 void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)
@@ -22,4 +19,12 @@ void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)
 	OnCharacterStateChangeDelegate.Broadcast(CharacterState);
 }
 
+EMainCharacterState AMainCharacter::GetCharacterState() const
+{
+	return CharacterState;
+}
 
+FGenericTeamId AMainCharacter::GetGenericTeamId() const
+{
+	return {TI_MainPlayer};
+}
