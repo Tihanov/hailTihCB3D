@@ -3,6 +3,7 @@
 
 #include "Player/MainPlayerController.h"
 
+#include "Log.h"
 #include "DlgSystem/DlgContext.h"
 #include "DlgSystem/DlgDialogue.h"
 #include "DlgSystem/DlgManager.h"
@@ -29,9 +30,13 @@ void AMainPlayerController::StartDialogue(UDlgDialogue* Dialogue, TArray<AActor*
 	for (const auto Participant : Participants)
 		Temp.Add(Cast<UObject>(Participant));	
 	DlgContext = UDlgManager::StartDialogue(Dialogue, Temp);
-	check(DlgContext);
-	if(DlgContext)
-		OnDialogueStartedDelegate.Broadcast(this, {Participants} ,DlgContext);
+	if(!DlgContext)
+	{
+		ULog::Warning("Cant start dialogue", LO_Both);
+		return;
+	}
+	
+	OnDialogueStartedDelegate.Broadcast(this, {Participants} ,DlgContext);
 }
 
 void AMainPlayerController::SelectDialogueOption(int OptionIndex)

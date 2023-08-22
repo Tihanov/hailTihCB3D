@@ -115,7 +115,7 @@ private:
 template <class T>
 T* AAiPointOfInterest::GetInstance() const
 {
-	if(!IsValid(GetInstance()))
+	if(GetInstance() == nullptr)
 		return nullptr;
 	const auto ToRet = Cast<T>(GetInstance());
 	check(ToRet);
@@ -125,7 +125,7 @@ T* AAiPointOfInterest::GetInstance() const
 template <class T>
 T* AAiPointOfInterest::GetAiController() const
 {
-	if(!IsValid(GetAiController()))
+	if(GetAiController() == nullptr)
 		return nullptr;
 	const auto ToRet = Cast<T>(GetAiController());
 	check(ToRet);
