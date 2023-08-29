@@ -50,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfSpecificItemsByInfo(UInventoryItemDefaultInfo* ItemInfo) const;
+	// Ignore unique of item
+	UFUNCTION(BlueprintPure)
+		int32 GetCountOfItemsByName(FName ItemName) const;
 	UFUNCTION(BlueprintPure)
 		TArray<UInventoryItemDefaultInfo*> GetItemsOfType(EInvItemType Type);
 	

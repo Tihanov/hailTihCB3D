@@ -8,6 +8,7 @@
 #include "NpcAiCharacter.generated.h"
 
 
+class UAIPerceptionStimuliSourceComponent;
 class UBehaviorTree;
 class UAiPointOfInterestInstance;
 
@@ -27,9 +28,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ai")
 		UBehaviorTree* StartupBehaviorTree;
-	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Ai|Point Of Interest")
 		TArray<UAiPointOfInterestInstance*> PointsOfInterest;
 };

@@ -6,11 +6,16 @@
 #include "Utils/UtilsStructs.h"
 #include "Ai/Npc/NpcAiController.h"
 #include "Components/CapsuleComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 
 ANpcAiCharacter::ANpcAiCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(
+		"PerceptionStimuliSourceComponent");
+	PerceptionStimuliSourceComponent->RegisterWithPerceptionSystem();
 	
 	AIControllerClass = ANpcAiController::StaticClass();
 	GetCapsuleComponent()->ComponentTags.Add(FName(TEXT("MainCapsule")));

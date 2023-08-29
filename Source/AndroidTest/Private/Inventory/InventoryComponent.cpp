@@ -53,6 +53,9 @@ int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32
 			OnItemChangedDelegate.Broadcast(i);
 		}
 	}
+	const auto CountOfOverhead = FMath::Clamp(CountOfAdd - Row->MaxStackCount, 0, MAX_int32);
+	Weight -= Row->WeightKg * CountOfOverhead;
+	CountOfAdd -= CountOfOverhead;
 
 	if (CountOfAdd == 0)
 		return CountOfNotAddedItems_ToRet;
@@ -83,6 +86,9 @@ int32 /*CountOfNotAddedItems*/ UInventoryComponent::AddItem(FName RowName, int32
 	
 	OnItemAddedDelegate.Broadcast(ToAdd);
 
+	if(CountOfOverhead > 0)
+		AddItem(RowName, CountOfOverhead);
+	
 	return CountOfNotAddedItems_ToRet;
 }
 
@@ -154,6 +160,7 @@ void UInventoryComponent::TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 
 	{
 		if(IsUnique && InventoryArray[i] == ItemStack)
 		{
+			Weight -= InventoryArray[i]->Info.WeightKg * CountToDel; 
 			InventoryArray.RemoveAt(i);
 			OnItemTrashedDelegate.Broadcast(ItemStack);
 			break;
@@ -161,6 +168,7 @@ void UInventoryComponent::TrashItem(UInventoryItemDefaultInfo* ItemStack, int32 
 		if(!IsUnique && InventoryArray[i]->RowName == ItemStack->RowName)
 		{
 			auto ToSub = FMath::Clamp(CountToDel, 0, InventoryArray[i]->Count);
+			Weight -= InventoryArray[i]->Info.WeightKg * ToSub; 
 			CountToDel -= ToSub;
 			InventoryArray[i]->Count -= ToSub;
 			if(InventoryArray[i]->Count == 0)
@@ -213,6 +221,24 @@ int32 UInventoryComponent::GetCountOfSpecificItemsByInfo(UInventoryItemDefaultIn
 	for (const auto ItemInfoIter : InventoryArray)
 	{
 		if(ItemInfo->RowName == ItemInfoIter->RowName)
+		{
+			RetCount += ItemInfoIter->Count;
+			IsFound = true;
+			continue;
+		}
+		if(IsFound)
+			break;
+	}
+	return RetCount;
+}
+
+int32 UInventoryComponent::GetCountOfItemsByName(FName ItemName) const
+{
+	int32 RetCount = 0;
+	bool IsFound = false;
+	for (const auto ItemInfoIter : InventoryArray)
+	{
+		if(ItemName == ItemInfoIter->RowName)
 		{
 			RetCount += ItemInfoIter->Count;
 			IsFound = true;

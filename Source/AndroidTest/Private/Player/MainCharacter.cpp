@@ -9,6 +9,10 @@
 AMainCharacter::AMainCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(
+		"PerceptionStimuliSourceComponent");
+	PerceptionStimuliSourceComponent->RegisterWithPerceptionSystem();
 }
 
 void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)
