@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "Ai/Npc/NpcAiCharacter.h"
 #include "Perception/AIPerceptionTypes.h"
-#include "AEnemyNpcAiCharacter.generated.h"
+#include "DEPRECATED_AEnemyNpcAiCharacter.generated.h"
 
 class UAIPerceptionComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFocusedActorChanged,
 	AActor*, NewFocusedActor);
 
-UCLASS()
-class ANDROIDTEST_API AAEnemyNpcAiCharacter : public ANpcAiCharacter
+UCLASS(Deprecated)
+class ANDROIDTEST_API ADEPRECATED_AEnemyNpcAiCharacter : public ANpcAiCharacter
 {
 	GENERATED_BODY()
 
 public:
-	AAEnemyNpcAiCharacter();
+	ADEPRECATED_AEnemyNpcAiCharacter();
 	
 protected:
 	virtual void BeginPlay() override;

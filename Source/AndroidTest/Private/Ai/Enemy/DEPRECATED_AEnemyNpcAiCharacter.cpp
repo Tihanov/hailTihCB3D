@@ -1,54 +1,54 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ai/Enemy/AEnemyNpcAiCharacter.h"
+#include "Ai/Enemy/DEPRECATED_AEnemyNpcAiCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Utils/UtilsStructs.h"
 #include "Perception/AIPerceptionComponent.h"
 
-AAEnemyNpcAiCharacter::AAEnemyNpcAiCharacter()
+ADEPRECATED_AEnemyNpcAiCharacter::ADEPRECATED_AEnemyNpcAiCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>("PerceptionComponent");
 }
 
-void AAEnemyNpcAiCharacter::BeginPlay()
+void ADEPRECATED_AEnemyNpcAiCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	PerceptionComponent->OnTargetPerceptionInfoUpdated.AddDynamic(this,
-		&AAEnemyNpcAiCharacter::ActorPerceptionUpdateCallBack);
+		&ADEPRECATED_AEnemyNpcAiCharacter::ActorPerceptionUpdateCallBack);
 }
 
-void AAEnemyNpcAiCharacter::Tick(float DeltaSeconds)
+void ADEPRECATED_AEnemyNpcAiCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 }
 
-FGenericTeamId AAEnemyNpcAiCharacter::GetGenericTeamId() const
+FGenericTeamId ADEPRECATED_AEnemyNpcAiCharacter::GetGenericTeamId() const
 {
 	return TI_DefaultEnemy;
 }
 
-AActor* AAEnemyNpcAiCharacter::GetFocusedActor() const
+AActor* ADEPRECATED_AEnemyNpcAiCharacter::GetFocusedActor() const
 {
 	return FocusedActor;
 }
 
-void AAEnemyNpcAiCharacter::SetFocusedActor(AActor* InFocusedActor)
+void ADEPRECATED_AEnemyNpcAiCharacter::SetFocusedActor(AActor* InFocusedActor)
 {
 	OnFocusedActorChanged.Broadcast(InFocusedActor);
 	this->FocusedActor = InFocusedActor;
 }
 
-FVector AAEnemyNpcAiCharacter::GetLastPositionOfFocusedActor() const
+FVector ADEPRECATED_AEnemyNpcAiCharacter::GetLastPositionOfFocusedActor() const
 {
 	return LastPositionOfFocusedActor;
 }
 
-void AAEnemyNpcAiCharacter::ActorPerceptionUpdateCallBack(const FActorPerceptionUpdateInfo& Info)
+void ADEPRECATED_AEnemyNpcAiCharacter::ActorPerceptionUpdateCallBack(const FActorPerceptionUpdateInfo& Info)
 {
 	if(Info.Stimulus.IsActive() && !GetFocusedActor())
 	{
