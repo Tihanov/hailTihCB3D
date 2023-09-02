@@ -3,6 +3,7 @@
 
 #include "Ai/Npc/NpcAiController.h"
 
+#include "Log.h"
 #include "Ai/Utils/PointOfInterest/AiPointOfInterest.h"
 #include "Ai/Npc/NpcAiCharacter.h"
 
@@ -18,11 +19,24 @@ void ANpcAiController::OnPossess(APawn* InPawn)
 
 	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(InPawn);
 	check(NpcAiCharacter);
+
+	NpcAiCharacter->OnNpcChangeStateDelegate.AddDynamic(this,
+		&ANpcAiController::OnNpcStateChangeCallback);
 	
-	if(NpcAiCharacter->StartupBehaviorTree)
-		RunBehaviorTree(NpcAiCharacter->StartupBehaviorTree);
+	RerunBehavior();
 	if(!NpcAiCharacter->PointsOfInterest.IsEmpty())
 		SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[0]);
+}
+
+void ANpcAiController::OnUnPossess()
+{
+	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(GetPawn());
+	check(NpcAiCharacter);
+	Super::OnUnPossess();
+	
+	NpcAiCharacter->OnNpcChangeStateDelegate.RemoveDynamic(this,
+		&ANpcAiController::OnNpcStateChangeCallback);
+	CleanupBrainComponent();
 }
 
 bool ANpcAiController::SetCurrentPointOfInterest(int32 Index)
@@ -64,6 +78,25 @@ void ANpcAiController::SpawnPoiFromInstance(UAiPointOfInterestInstance* Instance
 	CurrentPoi = Interest;
 }
 
+void ANpcAiController::RerunBehavior()
+{
+	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(GetPawn());
+	check(NpcAiCharacter);
+#if WITH_EDITOR
+	if(NpcAiCharacter->GetCurrentBehavior() == nullptr)
+	{
+		ULog::Error(FString::Printf(TEXT("%s state dont have behaviour"),
+			*UEnum::GetValueAsString(NpcAiCharacter->GetCurrentState())), LO_Both);
+		return;
+	}
+#endif
+	RunBehaviorTree(NpcAiCharacter->GetCurrentBehavior());
+}
+
+void ANpcAiController::OnNpcStateChangeCallback(ENpcState NewState, ENpcState OldState)
+{
+	RerunBehavior();
+}
 
 ANpcAiCharacter* ANpcAiController::GetControlledAiCharacter() const
 {

@@ -9,6 +9,10 @@
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnChaseNewActorDelegate,
+	AActor*, NewActor,
+	AActor*, OldActor);
+
 UCLASS()
 class ANDROIDTEST_API AANpcEnemyController : public ANpcAiController
 {
@@ -31,7 +35,13 @@ public: /*components:*/
 
 	UFUNCTION(BlueprintPure, Category = "Ai")
 		AActor* GetCurrentChasingActor(UPARAM(DisplayName = "IsChasingActor?") bool& OutIsChasingActor) const;
+	UFUNCTION(BlueprintCallable, Category = "Ai")
+		void ChaiseActor(AActor* NewActor);
 
+public: /*delegates:*/
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnChaseNewActor")
+		FOnChaseNewActorDelegate OnChaseNewActorDelegate;
+	
 private:
 	void ChasingActorCheck(float DeltaTime);
 	UFUNCTION()

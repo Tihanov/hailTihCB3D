@@ -27,18 +27,20 @@ void AANpcEnemyController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(CurrentChasingActor.IsValid())
-		ULog::ObjectName(CurrentChasingActor.Get(), false, LO_Both);
-	else
-		ULog::Info("nullptr", LO_Both);
-
 	ChasingActorCheck(DeltaTime);
 }
 
 AActor* AANpcEnemyController::GetCurrentChasingActor(bool& OutIsChasingActor) const
 {
-	OutIsChasingActor = CurrentChasingActor.IsNull();
+	OutIsChasingActor = CurrentChasingActor.IsValid();
 	return CurrentChasingActor.Get();
+}
+
+void AANpcEnemyController::ChaiseActor(AActor* NewActor)
+{
+	const auto OldActor = CurrentChasingActor.Get();
+	CurrentChasingActor = NewActor;
+	OnChaseNewActorDelegate.Broadcast(NewActor, OldActor);
 }
 
 void AANpcEnemyController::ChasingActorCheck(float DeltaTime)
@@ -49,12 +51,12 @@ void AANpcEnemyController::ChasingActorCheck(float DeltaTime)
 	if(Info == nullptr)
 		return;
 	if(!Info->HasAnyKnownStimulus())
-		CurrentChasingActor.Reset();
+		ChaiseActor(nullptr);
 }
 
 void AANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
 	if(CurrentChasingActor.IsNull() && UpdateInfo.Target.IsValid())
-		CurrentChasingActor = UpdateInfo.Target.Get();
+		ChaiseActor(UpdateInfo.Target.Get());
 }
 

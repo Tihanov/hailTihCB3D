@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Ai/Utils/NpcUtils.h"
 #include "NpcAiController.generated.h"
 
 class ANpcAiCharacter;
@@ -20,6 +21,7 @@ public:
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "PointOfInterest")
@@ -39,9 +41,12 @@ protected:
 private:
 	ANpcAiCharacter* GetControlledAiCharacter() const;	
 	void SpawnPoiFromInstance(UAiPointOfInterestInstance* Instance);
-
+	void RerunBehavior();
+	UFUNCTION()
+		void OnNpcStateChangeCallback(ENpcState NewState, ENpcState OldState);
+	
 private:
-	bool bIsAfterSetOfPoi = false;	
+	bool bIsAfterSetOfPoi = false;
 };
 
 
