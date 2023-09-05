@@ -6,6 +6,8 @@
 #include "Log.h"
 #include "Ai/Utils/PointOfInterest/AiPointOfInterest.h"
 #include "Ai/Npc/NpcAiCharacter.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "HealthPoints/HealthPointsComponent.h"
 
 
 ANpcAiController::ANpcAiController()
@@ -26,6 +28,10 @@ void ANpcAiController::OnPossess(APawn* InPawn)
 	RerunBehavior();
 	if(!NpcAiCharacter->PointsOfInterest.IsEmpty())
 		SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[0]);
+
+	const auto NpcHpComponent = NpcAiCharacter->GetHpComponent();
+	check(NpcHpComponent);
+	NpcHpComponent->OnPawnDeathDelegate.AddDynamic(this, &ANpcAiController::OnPawnDeathCallback);
 }
 
 void ANpcAiController::OnUnPossess()
@@ -82,20 +88,39 @@ void ANpcAiController::RerunBehavior()
 {
 	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(GetPawn());
 	check(NpcAiCharacter);
-#if WITH_EDITOR
-	if(NpcAiCharacter->GetCurrentBehavior() == nullptr)
+	if(NpcAiCharacter->GetCurrentBehavior() == nullptr && NpcAiCharacter->GetCurrentState() != ENpcState::Dead)
 	{
-		ULog::Error(FString::Printf(TEXT("%s state dont have behaviour"),
+		ULog::Info(FString::Printf(TEXT("%s state dont have behaviour"),
 			*UEnum::GetValueAsString(NpcAiCharacter->GetCurrentState())), LO_Both);
 		return;
 	}
-#endif
-	RunBehaviorTree(NpcAiCharacter->GetCurrentBehavior());
+	
+	const auto Behavior = NpcAiCharacter->GetCurrentBehavior();
+	if(Behavior)
+		RunBehaviorTree(Behavior);
+	else
+	{
+		const auto BTComp = Cast<UBehaviorTreeComponent>(BrainComponent);
+		if(BTComp)
+			BTComp->StopTree(EBTStopMode::Forced);
+	}
 }
 
 void ANpcAiController::OnNpcStateChangeCallback(ENpcState NewState, ENpcState OldState)
 {
 	RerunBehavior();
+}
+
+void ANpcAiController::OnPawnDeathCallback(UHealthPointsComponent* HpComponent)
+{
+	const auto NpcAiCharacter = Cast<ANpcAiCharacter>(GetPawn());
+	if(!NpcAiCharacter)
+	{
+		ULog::Error("!NpcAiCharacter", LO_Both);
+		return;
+	}
+
+	NpcAiCharacter->SetCurrentState(ENpcState::Dead);
 }
 
 ANpcAiCharacter* ANpcAiController::GetControlledAiCharacter() const

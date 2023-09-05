@@ -52,15 +52,18 @@ public:
 		bool bUseTakeDamageTimeout;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=HealthPoints, meta=(EditCondition = "bUseTakeDamageTimeout"))
 		float TakeDamageTimeout;
-private:
+protected:
 	UPROPERTY(BlueprintGetter=GetMaxHealthPoints, BlueprintSetter=SetMaxHealthPoints, EditAnywhere, Category=HealthPoints, meta=(ClampMin=0, ClampMax=100.f, AllowPrivateAccess=true))
 		float MaxHealthPoints;
 	UPROPERTY(BlueprintGetter=GetHealthPoints, BlueprintSetter=SetHealthPoints, Category=HealthPoints, meta=(AllowPrivateAccess=true))
 		float HealthPoints;
 
 private:
+	FTimerHandle TakeDamageTimeoutHandler;
+	bool bIsDead = false;
+	
+private:
 	UFUNCTION()
 		void OnTakeAnyDamagePureHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-		void CheckOnDeath();
-	FTimerHandle TakeDamageTimeoutHandler;
+	void CheckOnDeath();
 };

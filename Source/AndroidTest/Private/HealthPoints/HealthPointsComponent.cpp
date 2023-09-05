@@ -17,6 +17,11 @@ void UHealthPointsComponent::BeginPlay()
 	HealthPoints = MaxHealthPoints;
 
 	auto Owner = GetOwner();
+	if(const auto Controller = Cast<AController>(Owner); Controller)
+	{
+		Controller->GetPawn()->OnTakeAnyDamage.AddDynamic(this, &UHealthPointsComponent::OnTakeAnyDamagePureHandler);
+		return;
+	}
 	Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthPointsComponent::OnTakeAnyDamagePureHandler);
 }
 
@@ -43,7 +48,7 @@ void UHealthPointsComponent::SetMaxHealthPoints(float MaxHp)
 
 bool UHealthPointsComponent::IsDead() const
 {
-	return HealthPoints <= 0;
+	return bIsDead;
 }
 
 void UHealthPointsComponent::OnTakeAnyDamagePureHandler(AActor* DamagedActor, float Damage,
@@ -66,8 +71,9 @@ void UHealthPointsComponent::OnTakeAnyDamagePureHandler(AActor* DamagedActor, fl
 
 void UHealthPointsComponent::CheckOnDeath()
 {
-	if(HealthPoints <= 0)
+	if(HealthPoints <= 0 && !bIsDead)
 	{
+		bIsDead = true;
 		OnPawnDeathDelegate.Broadcast(this);
 	}
 }

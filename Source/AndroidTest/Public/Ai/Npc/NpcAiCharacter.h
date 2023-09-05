@@ -9,6 +9,7 @@
 #include "Npc/NpcBaseCharacter.h"
 #include "NpcAiCharacter.generated.h"
 
+class UHealthPointsComponent;
 class UAIPerceptionStimuliSourceComponent;
 class UBehaviorTree;
 class UAiPointOfInterestInstance;
@@ -29,10 +30,13 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
+	template<class T = UHealthPointsComponent> UHealthPointsComponent* GetHpComponent() const { return Cast<T>(HpComponent); }
+	
 	bool IsHaveWeapon() const { return bHaveWeapon; }
 	FName GetWeaponItemName() const { return WeaponItemName; }
 	bool IsEquipWeapon() const { return EquippedWeapon.IsValid(); }
@@ -41,6 +45,11 @@ public:
 		void EquipWeapon(FName SocketName = TEXT("PistolSocket"));
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
 		void UnequipWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
+		void StartShooting(float Interval);
+	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
+		void StopShooting();
 	
 	ENpcState GetCurrentState() const { return CurrentState; }
 	UFUNCTION(BlueprintCallable, Category = "Ai")
@@ -53,6 +62,8 @@ public:
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UHealthPointsComponent* HpComponent;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Ai|Point Of Interest")
 		TArray<UAiPointOfInterestInstance*> PointsOfInterest;
@@ -66,13 +77,24 @@ protected:
 		bool bHaveWeapon = false;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
 		FName WeaponItemName = TEXT("None");
-
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
+		UAnimMontage* AimWithWeaponAnimation = nullptr;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|State")
 		ENpcState CurrentState = ENpcState::Patrol;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ai|State")
 		TMap<ENpcState, UBehaviorTree*> StateBehavior;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai")
+		float HealPoints = 100.f;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Ai|Weapon")
 		TSoftObjectPtr<AWeaponBase> EquippedWeapon = nullptr;
+
+private:
+	FTimerHandle ShootTimerHandler;
+
+private:
+	void ShootTimeCallback();
 };

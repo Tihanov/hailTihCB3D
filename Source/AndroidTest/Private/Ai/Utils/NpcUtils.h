@@ -17,4 +17,6 @@ enum class ENpcState : uint8
 	Scared,
 	// Should be use without other states 
 	Custom,
+	// Should be without behaviour tree
+	Dead, 
 };

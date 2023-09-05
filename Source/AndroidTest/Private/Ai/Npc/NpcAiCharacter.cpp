@@ -9,6 +9,7 @@
 #include "Ai/Npc/NpcAiController.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DataTable.h"
+#include "HealthPoints/HealthPointsComponent.h"
 #include "Inventory/InventoryStructures.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Weapon/WeaponBase.h"
@@ -24,11 +25,32 @@ ANpcAiCharacter::ANpcAiCharacter()
 	
 	AIControllerClass = ANpcAiController::StaticClass();
 	GetCapsuleComponent()->ComponentTags.Add(FName(TEXT("MainCapsule")));
+
+	HpComponent = CreateDefaultSubobject<UHealthPointsComponent>("HealthPointsComponent");
+	HpComponent->SetMaxHealthPoints(HealPoints);
+	HpComponent->SetHealthPoints(HpComponent->GetMaxHealthPoints());
 }
 
 void ANpcAiCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if WITH_EDITOR
+	if(bHaveWeapon && !AimWithWeaponAnimation)
+		ULog::Error(FString::Printf(TEXT("%s: bHaveWeapon == true, but AimWithWeaponAnimation == nullptr"), *GetName()),
+		            LO_Both);
+#endif
+}
+
+void ANpcAiCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	if(EquippedWeapon.IsValid())
+	{
+		const auto Weapon = EquippedWeapon.Get();
+		StopShooting();
+		Weapon->Destroy();
+	}
 }
 
 FGenericTeamId ANpcAiCharacter::GetGenericTeamId() const
@@ -83,6 +105,23 @@ void ANpcAiCharacter::UnequipWeapon()
 	EquippedWeapon.Reset();
 }
 
+void ANpcAiCharacter::StartShooting(float Interval)
+{
+	if(EquippedWeapon.IsNull())
+		return;
+	PlayAnimMontage(AimWithWeaponAnimation);
+	GetWorld()->GetTimerManager().SetTimer(ShootTimerHandler, this, &ANpcAiCharacter::ShootTimeCallback, Interval, true,
+				                           0);
+}
+
+void ANpcAiCharacter::StopShooting()
+{
+	if(!GetWorld()->GetTimerManager().IsTimerActive(ShootTimerHandler))
+		return;
+	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandler);
+	StopAnimMontage();
+}
+
 void ANpcAiCharacter::SetCurrentState(const ENpcState NewState)
 {
 	const auto OldState = CurrentState;
@@ -101,3 +140,15 @@ UBehaviorTree* ANpcAiCharacter::GetCurrentBehavior() const
 {
 	return GetBehaviorByState(CurrentState);
 }
+
+void ANpcAiCharacter::ShootTimeCallback()
+{
+	if(EquippedWeapon.IsNull())
+	{
+		StopShooting();
+		return;
+	}
+	const auto Weapon = EquippedWeapon.Get();
+	Weapon->StartShooting();
+}
+

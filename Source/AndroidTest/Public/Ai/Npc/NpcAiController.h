@@ -7,6 +7,7 @@
 #include "Ai/Utils/NpcUtils.h"
 #include "NpcAiController.generated.h"
 
+class UHealthPointsComponent;
 class ANpcAiCharacter;
 class UAiPointOfInterestInstance;
 class AAiPointOfInterest;
@@ -47,6 +48,10 @@ private:
 	
 private:
 	bool bIsAfterSetOfPoi = false;
+
+private:
+	UFUNCTION()
+		void OnPawnDeathCallback(UHealthPointsComponent* HpComponent);
 };
 
 
