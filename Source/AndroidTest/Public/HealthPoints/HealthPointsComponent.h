@@ -53,7 +53,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=HealthPoints, meta=(EditCondition = "bUseTakeDamageTimeout"))
 		float TakeDamageTimeout;
 protected:
-	UPROPERTY(BlueprintGetter=GetMaxHealthPoints, BlueprintSetter=SetMaxHealthPoints, EditAnywhere, Category=HealthPoints, meta=(ClampMin=0, ClampMax=100.f, AllowPrivateAccess=true))
+	UPROPERTY(BlueprintGetter=GetMaxHealthPoints, BlueprintSetter=SetMaxHealthPoints, EditAnywhere, Category=HealthPoints, meta=(ClampMin=0, UIMax = 100, AllowPrivateAccess=true))
 		float MaxHealthPoints;
 	UPROPERTY(BlueprintGetter=GetHealthPoints, BlueprintSetter=SetHealthPoints, Category=HealthPoints, meta=(AllowPrivateAccess=true))
 		float HealthPoints;
