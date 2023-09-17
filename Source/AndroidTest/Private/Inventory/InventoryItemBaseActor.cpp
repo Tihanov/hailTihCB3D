@@ -81,7 +81,7 @@ void AInventoryItemBaseActor::DoAction_Implementation(AActor* CausedBy)
 			LO_Console);
 	
 	InvComp->PickUpItem(this);
-	if( this && !this->IsActorBeingDestroyed())
+	if(!this->IsActorBeingDestroyed())
 	{
 		const auto ActComp = Cast<UActionManagerComponent>(CausedBy->GetComponentByClass(UActionManagerComponent::StaticClass()));
 		ActComp->OnRefreshActionDelegate.Broadcast(ActComp, this);

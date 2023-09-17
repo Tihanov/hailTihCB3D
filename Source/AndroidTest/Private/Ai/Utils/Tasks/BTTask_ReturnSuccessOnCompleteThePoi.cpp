@@ -39,6 +39,10 @@ EBTNodeResult::Type UBTTask_ReturnSuccessOnCompleteThePoi::ExecuteTask(UBehavior
 
 	const auto Data = CastInstanceNodeMemory<FTaskData_ReturnSuccessOnCompleteThePoi>(NodeMemory);
 	Data->PointOfInterest = PointOfInterest_;
+
+	if(Data->PointOfInterest->IsComplete())
+		return EBTNodeResult::Succeeded;
+	
 	return EBTNodeResult::InProgress;
 }
 
