@@ -34,6 +34,11 @@ FInvItemDataTable AWeaponBase::GetWeaponSettings() const
 	return ItemSettings;
 }
 
+TArray<AActor*> AWeaponBase::MakeTestShoot_Implementation()
+{
+	return {};
+}
+
 
 bool AWeaponBase::CanWeaponShoot_Implementation() const
 {

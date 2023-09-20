@@ -79,6 +79,9 @@ protected:
 		FName WeaponItemName = TEXT("None");
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
 		UAnimMontage* AimWithWeaponAnimation = nullptr;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon|Options", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
+		bool bDontShootIfNotReachable = true;
+
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|State")
 		ENpcState CurrentState = ENpcState::Patrol;

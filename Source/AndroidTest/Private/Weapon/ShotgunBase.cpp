@@ -132,6 +132,11 @@ bool AShotgunBase::CanWeaponShoot_Implementation() const
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
+TArray<AActor*> AShotgunBase::MakeTestShoot_Implementation()
+{
+	return Super::MakeTestShoot_Implementation();
+}
+
 float AShotgunBase::GetWeaponScatter_Implementation() const
 {
 	return CurrentScatter;

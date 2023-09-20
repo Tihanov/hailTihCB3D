@@ -134,6 +134,47 @@ bool APistolBase::CanWeaponShoot_Implementation() const
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
+TArray<AActor*> APistolBase::MakeTestShoot_Implementation()
+{
+	FHitResult HitResult;
+	FVector Start = OwnerAimCameraRight->GetComponentLocation();
+	FVector End = Start
+		+ OwnerAimCameraRight->GetForwardVector()
+		* ItemSettings.Other.WeaponItemSettings.ShotRange;
+
+	auto Result = UKismetSystemLibrary::LineTraceSingle(
+			GetWorld(),
+			Start, End,
+			TraceTypeQuery1,
+			false,
+			TArray<AActor*>{this, GetOwner()},
+			EDrawDebugTrace::None,
+			HitResult,
+			true);
+	
+	FVector ShootFromLocation = RootMeshComponent->GetSocketLocation("ShootFrom");
+	Start = ShootFromLocation;
+	End = Start
+		+ UKismetMathLibrary::GetForwardVector(
+			UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
+		* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+	
+	Result = UKismetSystemLibrary::LineTraceSingle(
+			GetWorld(),
+			Start, End,
+			TraceTypeQuery1,
+			false,
+			TArray<AActor*>{this, GetOwner()},
+			EDrawDebugTrace::None,
+			HitResult,
+			true);
+
+	if(Result)
+		return {HitResult.GetActor()};
+	else
+		return {};
+}
+
 float APistolBase::GetWeaponScatter_Implementation() const
 {
 	return CurrentScatter;

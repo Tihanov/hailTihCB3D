@@ -32,6 +32,8 @@ public:
 	virtual void StartShooting_Implementation() override;
 	virtual void StopShooting_Implementation() override;
 	virtual bool CanWeaponShoot_Implementation() const override;
+
+	virtual TArray<AActor*> MakeTestShoot_Implementation() override;
 	
 	virtual float GetWeaponScatter_Implementation() const override;
 

@@ -149,6 +149,7 @@ void ANpcAiCharacter::ShootTimeCallback()
 		return;
 	}
 	const auto Weapon = EquippedWeapon.Get();
-	Weapon->StartShooting();
+	if(Weapon->MakeTestShoot().Find(GetController<AAIController>()->GetFocusActor()) != INDEX_NONE)
+		Weapon->StartShooting();
 }
 

@@ -53,6 +53,9 @@ public:
 		void StopShooting();
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon")
 		bool CanWeaponShoot() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon|Shoot")
+		TArray<AActor*> MakeTestShoot();
 	
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Weapon|Scatter")
 		float GetWeaponScatter() const;

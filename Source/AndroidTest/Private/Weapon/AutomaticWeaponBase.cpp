@@ -74,9 +74,10 @@ bool AAutomaticWeaponBase::CanWeaponShoot_Implementation() const
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading;
 }
 
-
-
-
+TArray<AActor*> AAutomaticWeaponBase::MakeTestShoot_Implementation()
+{
+	return Super::MakeTestShoot_Implementation();
+}
 
 float AAutomaticWeaponBase::GetWeaponScatter_Implementation() const
 {
