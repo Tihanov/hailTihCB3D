@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Engine/DataTable.h"
 #include "HealthPoints/HealthPointsComponent.h"
+#include "Inventory/ChestComponent.h"
 #include "Inventory/InventoryStructures.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Weapon/WeaponBase.h"
@@ -29,6 +30,8 @@ ANpcAiCharacter::ANpcAiCharacter()
 	HpComponent = CreateDefaultSubobject<UHealthPointsComponent>("HealthPointsComponent");
 	HpComponent->SetMaxHealthPoints(HealPoints);
 	HpComponent->SetHealthPoints(HpComponent->GetMaxHealthPoints());
+
+	ChestComponent = CreateDefaultSubobject<UChestComponent>("ChestComponent");
 }
 
 void ANpcAiCharacter::BeginPlay()

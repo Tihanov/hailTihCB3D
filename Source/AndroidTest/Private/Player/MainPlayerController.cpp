@@ -52,6 +52,10 @@ void AMainPlayerController::SelectDialogueOption(int OptionIndex)
 	}
 }
 
+void AMainPlayerController::OpenChest_Implementation(AChestCollision* ChestCollision)
+{
+}
+
 FText AMainPlayerController::GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const
 {
 	return DlgDisplayName;

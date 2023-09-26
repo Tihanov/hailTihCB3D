@@ -13,10 +13,13 @@ class UInventoryItemDefaultInfo : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite) FName RowName;
-	UPROPERTY(BlueprintReadWrite) int32 Count;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) FName RowName = TEXT("None");
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) int32 Count = -1;
 	UPROPERTY(BlueprintReadWrite) FInvItemDataTable Info;
 
+	// FOR INSTANCED INIT ONLY
+	UPROPERTY(BlueprintReadOnly, EditAnywhere) bool bInitInstanced = false;
+	
 	static UInventoryItemDefaultInfo* Create(FName RowName, int32 Count, FInvItemDataTable Info,
 		TSubclassOf<UInventoryItemDefaultInfo> Class = UInventoryItemDefaultInfo::StaticClass());
 

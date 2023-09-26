@@ -3,8 +3,10 @@
 
 #include "Inventory/InventoryItemDefaultInfo.h"
 
+#include "MainGameState.h"
+
 UInventoryItemDefaultInfo* UInventoryItemDefaultInfo::Create(FName RowName, int32 Count,
-	FInvItemDataTable Info, TSubclassOf<UInventoryItemDefaultInfo> Class)
+                                                             FInvItemDataTable Info, TSubclassOf<UInventoryItemDefaultInfo> Class)
 {
 	const auto ToRet = NewObject<UInventoryItemDefaultInfo>(GetTransientPackage(), Class);
 	ToRet->RowName = RowName;

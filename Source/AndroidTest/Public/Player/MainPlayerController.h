@@ -7,6 +7,8 @@
 #include "DlgSystem/DlgDialogueParticipant.h"
 #include "MainPlayerController.generated.h"
 
+class AChestCollision;
+
 USTRUCT(BlueprintType)
 struct FProxyStructArrayOfParticipants
 {
@@ -47,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Dialogue)
 		void SelectDialogueOption(int OptionIndex);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Chest")
+		void OpenChest(AChestCollision* ChestCollision);
+	
 	/*Implementation of IDlgDialogueParticipant*/
 	virtual FText GetParticipantDisplayName_Implementation(FName ActiveSpeaker) const override;
 	virtual FName GetParticipantName_Implementation() const override;

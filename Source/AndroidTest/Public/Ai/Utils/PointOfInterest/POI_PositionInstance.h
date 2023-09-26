@@ -12,7 +12,8 @@ UENUM()
 enum class EPOI_PositionInstancePositionSource : uint8
 {
 	Location		UMETA(DisplayName = "Location"),
-	Actor			UMETA(DisplayName = "Actor")
+	Actor			UMETA(DisplayName = "Actor"),
+	Route			UMETA(DisplayName = "Route")
 };
 
 UCLASS()
@@ -35,6 +36,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options",
 		meta = (EditCondition = "PositionSource == EPOI_PositionInstancePositionSource::Actor", EditConditionHides))
 		bool bAttachToActor = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options",
+		meta = (EditCondition = "PositionSource == EPOI_PositionInstancePositionSource::Route", EditConditionHides))
+		TSoftObjectPtr<AActor> Route;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options")
 		float CollisionRadius = 300.f;

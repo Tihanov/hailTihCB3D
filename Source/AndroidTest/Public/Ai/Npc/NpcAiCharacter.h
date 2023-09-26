@@ -9,6 +9,7 @@
 #include "Npc/NpcBaseCharacter.h"
 #include "NpcAiCharacter.generated.h"
 
+class UChestComponent;
 class UHealthPointsComponent;
 class UAIPerceptionStimuliSourceComponent;
 class UBehaviorTree;
@@ -64,6 +65,8 @@ public:
 		UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UHealthPointsComponent* HpComponent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UChestComponent* ChestComponent;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Ai|Point Of Interest")
 		TArray<UAiPointOfInterestInstance*> PointsOfInterest;
@@ -87,6 +90,8 @@ protected:
 		ENpcState CurrentState = ENpcState::Patrol;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ai|State")
 		TMap<ENpcState, UBehaviorTree*> StateBehavior;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ai|State", meta = (Bitmask, BitmaskEnum = ENpcState))
+		uint8 FaceFocusStates = uint8(ENpcState::Patrol | ENpcState::Aggressive);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai")
 		float HealPoints = 100.f;

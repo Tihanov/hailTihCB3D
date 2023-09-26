@@ -61,7 +61,6 @@ public:
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfItems() const;
 
-
 public: /* Delegates */
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnItemAdded")
 		FOnItemAddedDelegate OnItemAddedDelegate;
