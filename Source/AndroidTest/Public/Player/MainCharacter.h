@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
+class UTeamIdComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 UENUM(BlueprintType)
@@ -23,7 +24,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterStateChangeDelegate,
 UCLASS(Blueprintable, BlueprintType)
 class ANDROIDTEST_API AMainCharacter
 	: public ACharacter
-	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -35,8 +35,6 @@ public:
 	UFUNCTION(BlueprintPure, Category="Character")
 		EMainCharacterState GetCharacterState() const;
 
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
 public:
 	/*delegates:*/
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnCharacterStateChange")
@@ -45,6 +43,8 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UTeamIdComponent* TeamIdComponent;
 	
 protected:
 	EMainCharacterState CharacterState;

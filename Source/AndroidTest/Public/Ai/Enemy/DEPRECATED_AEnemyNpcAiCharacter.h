@@ -26,8 +26,6 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 public:
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
 	UFUNCTION(BlueprintPure)
 		AActor* GetFocusedActor() const;
 	UFUNCTION(BlueprintCallable)

@@ -32,6 +32,8 @@ ANpcAiCharacter::ANpcAiCharacter()
 	HpComponent->SetHealthPoints(HpComponent->GetMaxHealthPoints());
 
 	ChestComponent = CreateDefaultSubobject<UChestComponent>("ChestComponent");
+
+	TeamIdComponent = CreateDefaultSubobject<UTeamIdComponent>("TeamIdComponent");
 }
 
 void ANpcAiCharacter::BeginPlay()
@@ -54,11 +56,6 @@ void ANpcAiCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		StopShooting();
 		Weapon->Destroy();
 	}
-}
-
-FGenericTeamId ANpcAiCharacter::GetGenericTeamId() const
-{
-	return TI_DefaultNpc;
 }
 
 void ANpcAiCharacter::EquipWeapon(FName SocketName /*= TEXT("PistolSocket")*/)

@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ThrowOutItem(UInventoryItemDefaultInfo* ItemStack, int32 CountToDel);
 
+	UFUNCTION(BlueprintCallable)
+		void MoveItemToOtherInventory(UInventoryItemDefaultInfo* ItemStack, UInventoryComponent* OtherInventory);
+	
 	UFUNCTION(BlueprintPure)
 		int32 GetCountOfSpecificItemsByInfo(UInventoryItemDefaultInfo* ItemInfo) const;
 	// Ignore unique of item

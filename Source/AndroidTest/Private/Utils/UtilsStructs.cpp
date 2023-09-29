@@ -27,3 +27,13 @@ ETeamAttitude::Type MainTeamIdSolver(FGenericTeamId A, FGenericTeamId B)
 
 	return static_cast<ETeamAttitude::Type>(TeamAttitudeMap[A.GetId()][B.GetId()]);
 }
+
+bool UTeamIdComponent::IsEnemyWith(ETeamId InTeamId) const
+{
+	return MainTeamIdSolver(GetTeamId(), InTeamId) == ETeamAttitude::Hostile;
+}
+
+bool UTeamIdComponent::IsFriendWith(ETeamId InTeamId) const
+{
+	return !IsEnemyWith(InTeamId);
+}

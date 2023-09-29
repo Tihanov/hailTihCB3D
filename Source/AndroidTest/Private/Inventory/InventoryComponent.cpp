@@ -211,6 +211,19 @@ void UInventoryComponent::ThrowOutItem(UInventoryItemDefaultInfo* ItemStack, int
 		Item->InitWithRowName(ItemStack->RowName, CountToDel);
 }
 
+void UInventoryComponent::MoveItemToOtherInventory(UInventoryItemDefaultInfo* ItemStack,
+	UInventoryComponent* OtherInventory)
+{
+	if(ItemStack->Count * ItemStack->Info.WeightKg + OtherInventory->Weight > OtherInventory->MaxWeight)
+		return;
+	InventoryArray.Remove(ItemStack);
+	OnItemTrashedDelegate.Broadcast(ItemStack);
+	
+	OtherInventory->InventoryArray.Add(ItemStack);
+	OtherInventory->OnItemAddedDelegate.Broadcast(ItemStack);
+	OtherInventory->InventoryArray.Sort();
+}
+
 int32 UInventoryComponent::GetCountOfSpecificItemsByInfo(UInventoryItemDefaultInfo* ItemInfo) const
 {
 	if(ItemInfo->Info.IsItemUnique)

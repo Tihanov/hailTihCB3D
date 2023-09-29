@@ -4,6 +4,8 @@
 #include "Ai/Enemy/ANpcEnemyController.h"
 
 #include "Log.h"
+#include "Ai/Enemy/NpcPerceptionComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Damage.h"
 
@@ -12,7 +14,7 @@ AANpcEnemyController::AANpcEnemyController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	EnemyPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>("EnemyPerceptionComponent");
+	EnemyPerceptionComponent = CreateDefaultSubobject<UNpcPerceptionComponent>("EnemyPerceptionComponent");
 }
 
 void AANpcEnemyController::BeginPlay()
@@ -34,9 +36,6 @@ void AANpcEnemyController::OnPossess(APawn* InPawn)
 void AANpcEnemyController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	ChasingActorCheck(DeltaTime);
-	//FocusCheck(DeltaTime);
 }
 
 AActor* AANpcEnemyController::GetCurrentChasingActor(bool& OutIsChasingActor) const
@@ -59,49 +58,19 @@ const AActor* AANpcEnemyController::GetLastChasingActor(bool& OutDoesExists) con
 	return LastChasingActor.Get();
 }
 
-void AANpcEnemyController::FocusOnChasingActor()
-{
-	bIsFocusingNow = true;
-}
-
-void AANpcEnemyController::StopFocusingOnChasingActor()
-{
-	bIsFocusingNow = false;
-}
-
-void AANpcEnemyController::ChasingActorCheck(float DeltaTime)
-{
-	if(CurrentChasingActor.IsNull())
-		return;
-	const auto Info = EnemyPerceptionComponent->GetActorInfo(*CurrentChasingActor.Get());
-	if(Info == nullptr)
-		return;
-	if(!Info->HasAnyKnownStimulus())
-		ChaiseActor(nullptr);
-}
-
-void AANpcEnemyController::FocusCheck(float DeltaTime)
-{
-	if (!bIsFocusingNow)
-		return;
-	if(CurrentChasingActor.IsNull())
-	{
-		StopFocusingOnChasingActor();
-		return;
-	}
-
-	const auto TurnAngle = FMath::RadiansToDegrees(FMath::Acos(
-		FVector::DotProduct(-GetPawn()->GetActorForwardVector(), CurrentChasingActor->GetActorForwardVector())));
-
-	if(FMath::Abs(TurnAngle) > FMath::Abs(FocusTurnAngle))
-	{
-	}
-}
-
 void AANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
-	if(CurrentChasingActor.IsNull() && UpdateInfo.Target.IsValid())
-		ChaiseActor(UpdateInfo.Target.Get());
+	TArray<AActor*> Actors;
+	GetEnemyPerceptionComponent()->GetHostileActors(Actors);
+	if(Actors.Num() == 0)
+	{
+		ChaiseActor(nullptr);
+		return;
+	}
+
+	float Dist;
+	const auto ToChaise = UGameplayStatics::FindNearestActor(GetPawn()->GetActorLocation(), Actors, Dist);
+	ChaiseActor(ToChaise);
 }
 
 void AANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage, AController* InstigatedBy,

@@ -9,6 +9,7 @@
 #include "Npc/NpcBaseCharacter.h"
 #include "NpcAiCharacter.generated.h"
 
+class UTeamIdComponent;
 class UChestComponent;
 class UHealthPointsComponent;
 class UAIPerceptionStimuliSourceComponent;
@@ -22,7 +23,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNpcChangeStateDelegate,
 UCLASS(BlueprintType, Blueprintable)
 class ANDROIDTEST_API ANpcAiCharacter
 	: public ANpcBaseCharacter
-	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -34,8 +34,6 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
 	template<class T = UHealthPointsComponent> UHealthPointsComponent* GetHpComponent() const { return Cast<T>(HpComponent); }
 	
 	bool IsHaveWeapon() const { return bHaveWeapon; }
@@ -67,6 +65,8 @@ public:
 		UHealthPointsComponent* HpComponent;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UChestComponent* ChestComponent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UTeamIdComponent* TeamIdComponent;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Ai|Point Of Interest")
 		TArray<UAiPointOfInterestInstance*> PointsOfInterest;

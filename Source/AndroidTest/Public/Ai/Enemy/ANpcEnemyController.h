@@ -6,6 +6,7 @@
 #include "Ai/Npc/NpcAiController.h"
 #include "ANpcEnemyController.generated.h"
 
+class UNpcPerceptionComponent;
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
 
@@ -29,7 +30,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	
-	UAIPerceptionComponent* GetEnemyPerceptionComponent() const { return EnemyPerceptionComponent; }
+	UNpcPerceptionComponent* GetEnemyPerceptionComponent() const { return EnemyPerceptionComponent; }
 	
 	UFUNCTION(BlueprintPure, Category = "Ai")
 		AActor* GetCurrentChasingActor(UPARAM(DisplayName = "IsChasingActor?") bool& OutIsChasingActor) const;
@@ -39,16 +40,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Ai")
 		const AActor* GetLastChasingActor(UPARAM(DisplayName = "OutDoesExists?") bool& OutDoesExists) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void FocusOnChasingActor();
-	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void StopFocusingOnChasingActor();
-	UFUNCTION(BlueprintPure, Category = "Ai")
-		bool IsFocusingNow() const { return bIsFocusingNow; }
-	
 public: /*components:*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
-		UAIPerceptionComponent* EnemyPerceptionComponent;
+		UNpcPerceptionComponent* EnemyPerceptionComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Options")
@@ -59,8 +53,6 @@ public: /*delegates:*/
 		FOnChaseNewActorDelegate OnChaseNewActorDelegate;
 	
 private:
-	void ChasingActorCheck(float DeltaTime);
-	void FocusCheck(float DeltaTime);
 	UFUNCTION()
 		void ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo);
 	UFUNCTION()
@@ -71,5 +63,4 @@ private:
 private:
 	TSoftObjectPtr<AActor> CurrentChasingActor = nullptr;
 	TSoftObjectPtr<AActor> LastChasingActor = nullptr;
-	bool bIsFocusingNow = false;
 };

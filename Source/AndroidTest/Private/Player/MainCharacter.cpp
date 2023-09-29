@@ -13,6 +13,9 @@ AMainCharacter::AMainCharacter()
 	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(
 		"PerceptionStimuliSourceComponent");
 	PerceptionStimuliSourceComponent->RegisterWithPerceptionSystem();
+
+	TeamIdComponent = CreateDefaultSubobject<UTeamIdComponent>("TeamIdComponent");
+	TeamIdComponent->SetTeamId(TI_MainPlayer);
 }
 
 void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)
@@ -26,9 +29,4 @@ void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)
 EMainCharacterState AMainCharacter::GetCharacterState() const
 {
 	return CharacterState;
-}
-
-FGenericTeamId AMainCharacter::GetGenericTeamId() const
-{
-	return {TI_MainPlayer};
 }

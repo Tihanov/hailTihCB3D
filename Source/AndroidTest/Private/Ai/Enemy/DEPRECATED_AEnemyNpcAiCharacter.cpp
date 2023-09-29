@@ -27,11 +27,6 @@ void ADEPRECATED_AEnemyNpcAiCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-FGenericTeamId ADEPRECATED_AEnemyNpcAiCharacter::GetGenericTeamId() const
-{
-	return TI_DefaultEnemy;
-}
-
 AActor* ADEPRECATED_AEnemyNpcAiCharacter::GetFocusedActor() const
 {
 	return FocusedActor;

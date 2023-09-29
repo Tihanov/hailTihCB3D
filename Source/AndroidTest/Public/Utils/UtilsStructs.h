@@ -22,3 +22,20 @@ enum ETeamId
 ETeamAttitude::Type DefaultTeamIdSolver(FGenericTeamId A, FGenericTeamId B);
 ETeamAttitude::Type MainTeamIdSolver(FGenericTeamId A, FGenericTeamId B);
 
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class ANDROIDTEST_API UTeamIdComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:
+	ETeamId GetTeamId() const { return TeamId; }
+	void SetTeamId(ETeamId InTeamId) { TeamId = InTeamId; }
+
+	bool IsEnemyWith(ETeamId InTeamId) const;
+	bool IsFriendWith(ETeamId InTeamId) const;
+	
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options")
+		TEnumAsByte<ETeamId> TeamId = TI_DefaultNpc;
+};
+
