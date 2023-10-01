@@ -22,3 +22,9 @@ enum class ENpcState : uint8
 	Dead		= 1 << 4, 
 };
 ENUM_CLASS_FLAGS(ENpcState);
+
+UENUM(BlueprintType)
+enum class EHostileNoticeState : uint8
+{
+	None, Notice, Chaise
+};
