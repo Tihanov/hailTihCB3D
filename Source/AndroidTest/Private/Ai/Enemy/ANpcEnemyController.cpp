@@ -6,7 +6,10 @@
 #include "Log.h"
 #include "Ai/Enemy/NpcPerceptionComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISense_Damage.h"
 #include "Perception/AISense_Hearing.h"
 #include "Perception/AISense_Sight.h"
@@ -42,76 +45,63 @@ void AANpcEnemyController::Tick(float DeltaTime)
 	ChaiseStressUpdate(DeltaTime);
 }
 
-AActor* AANpcEnemyController::GetCurrentNoticedActor(EHostileNoticeState& OutHostileNoticeState) const
+AActor* AANpcEnemyController::GetTargetActor(bool& IsNull) const
 {
-	OutHostileNoticeState = HostileNoticeState;
-	return CurrentNoticingActor.Get();
+	IsNull = TargetActor.IsNull();
+	return TargetActor.Get();
 }
 
-void AANpcEnemyController::NoticeActor(AActor* NewActor)
+void AANpcEnemyController::SetTargetActor(AActor* NewActor)
 {
-	if(!NewActor)
-		SetChaiseStressProgress(0.f);
-	else
-		SetChaiseStressProgress(OnNoticedAdder);
-	const auto OldActor = CurrentNoticingActor.Get();
-	CurrentNoticingActor = NewActor;
-	OnNoticeActorDelegate.Broadcast(this, NewActor, HostileNoticeState, OldActor);
-	LastNoticingActor = OldActor;
+	if(NewActor == TargetActor.Get())
+		return;
+	const auto OldActor = TargetActor.Get();
+	TargetActor = NewActor;
+	OnTargetActorSetDelegate.Broadcast(this, NewActor);
+	LastTargetActor = OldActor;
 }
 
-const AActor* AANpcEnemyController::GetLastNoticedActor(bool& OutDoesExists) const
+const AActor* AANpcEnemyController::GetLastTargetActor(bool& OutDoesExist) const
 {
-	OutDoesExists = LastNoticingActor.IsValid();
-	return LastNoticingActor.Get();
+	OutDoesExist = LastTargetActor.IsValid();
+	return LastTargetActor.Get();
 }
 
-void AANpcEnemyController::SetChaiseStressProgress(float InChaiseStressProgress)
+void AANpcEnemyController::SetStressProgress(float InChaiseStressProgress)
 {
-	ChaiseStressProgress = FMath::Clamp(InChaiseStressProgress, 0.f, 1.f);
-	if(ChaiseStressProgress == 0.f && GetHostileNoticeState() != EHostileNoticeState::None)
-		SetHostileNoticeState(EHostileNoticeState::None);
-	if(ChaiseStressProgress == 1.f && GetHostileNoticeState() != EHostileNoticeState::Chaise)
-		SetHostileNoticeState(EHostileNoticeState::Chaise);
-	if(ChaiseStressProgress != 0.f && ChaiseStressProgress != 1.f && GetHostileNoticeState() != EHostileNoticeState::Notice)
-		SetHostileNoticeState(EHostileNoticeState::Notice);
+	if(IsFreezeStressProgress())
+		return;
+	StressProgress = FMath::Clamp(InChaiseStressProgress, 0.f, 1.f);
 }
 
-void AANpcEnemyController::AddDeltaToChaiseStressProgress(float Delta)
+void AANpcEnemyController::AddDeltaToStressProgress(float Delta)
 {
-	SetChaiseStressProgress( GetChaiseStressProgress() + Delta );
-}
-
-void AANpcEnemyController::SetHostileNoticeState(EHostileNoticeState InHostileNoticeState)
-{
-	HostileNoticeState = InHostileNoticeState;
-	OnNoticeStateUpdateDelegate.Broadcast(this, CurrentNoticingActor.Get(), InHostileNoticeState);
+	SetStressProgress( GetStressProgress() + Delta );
 }
 
 void AANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
-	if(UpdateInfo.Target == CurrentNoticingActor.Get())
+	if(UpdateInfo.Target == TargetActor.Get())
 	{
 		// If Actor was damaged
 		if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Damage::StaticClass()))
-			AddDeltaToChaiseStressProgress(DamageAdder);
+			AddDeltaToStressProgress(DamageAdder);
 		return;
 	}
 	TArray<AActor*> Actors;
 	GetEnemyPerceptionComponent()->GetHostileActors(Actors);
 	if(Actors.Num() == 0)
 	{
-		NoticeActor(nullptr);
+		SetTargetActor(nullptr);
 		return;
 	}
-	EHostileNoticeState Hns;
-	if (const auto ChasingActor = GetCurrentNoticedActor(Hns);
-		Hns != EHostileNoticeState::None && Actors.Find(ChasingActor) != INDEX_NONE)
+	
+	if (TargetActor.IsValid() && Actors.Find(TargetActor.Get()) != INDEX_NONE)
 		return;
 
 	float Dist;
-	const auto ToChaise = UGameplayStatics::FindNearestActor(GetPawn()->GetActorLocation(), Actors, Dist);
-	NoticeActor(ToChaise);
+	const auto NewTargetActor = UGameplayStatics::FindNearestActor(GetPawn()->GetActorLocation(), Actors, Dist);
+	SetTargetActor(NewTargetActor);
 }
 
 void AANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage, AController* InstigatedBy,
@@ -123,29 +113,44 @@ void AANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage
 
 void AANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
 {
-	ULog::Number(GetChaiseStressProgress(), "ChaiseStressProgress: ", "", LO_Both);
-	if (GetHostileNoticeState() != EHostileNoticeState::Notice || CurrentNoticingActor.IsNull())
-		return;
-	FActorPerceptionBlueprintInfo Info;
-	if(!EnemyPerceptionComponent->GetActorsPerception(CurrentNoticingActor.Get(), Info))
+	if (TargetActor.IsNull() || IsFreezeStressProgress())
 	{
-		AddDeltaToChaiseStressProgress(SightDiffEverySecond * DeltaTime);
-		AddDeltaToChaiseStressProgress(HearingDiffEverySecond * DeltaTime);
+		if(StressProgress != 0.f)
+			AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
 		return;
 	}
-	const auto SensedStimuli = Info.LastSensedStimuli;
-	TArray<FAISenseID> SensedStimuliIds;
-	for (const auto& SensedStimul : SensedStimuli)
-		SensedStimuliIds.Add(SensedStimul.Type);
+	const FActorPerceptionInfo* Info;
+	if(Info = EnemyPerceptionComponent->GetActorInfo(*TargetActor.Get()); !Info && !Info->HasAnyCurrentStimulus())
+	{
+		AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
+		return;
+	}
+	const auto SensedStimuli = Info->LastSensedStimuli;
+
+	const auto Distance = FVector::Distance(GetPawn()->GetActorLocation(), TargetActor->GetActorLocation());
+	const auto SightConfig = Cast<UAISenseConfig_Sight>(
+		GetEnemyPerceptionComponent()->GetSenseConfig(UAISense::GetSenseID(UAISense_Sight::StaticClass())));
+	const auto HearingConfig = Cast<UAISenseConfig_Hearing>(
+		GetEnemyPerceptionComponent()->GetSenseConfig(UAISense::GetSenseID(UAISense_Hearing::StaticClass())));
 	
-	if(SensedStimuliIds.Contains(UAISense::GetSenseID(UAISense_Sight::StaticClass())))
-		AddDeltaToChaiseStressProgress(SightAdderEverySecond * DeltaTime);
-	else
-		AddDeltaToChaiseStressProgress(SightDiffEverySecond * DeltaTime);
-	if(SensedStimuliIds.Contains(UAISense::GetSenseID(UAISense_Hearing::StaticClass())))
-		AddDeltaToChaiseStressProgress(HearingAdderEverySecond * DeltaTime);
-	else
-		AddDeltaToChaiseStressProgress(HearingDiffEverySecond * DeltaTime);
+	const auto SightStressAdder =
+		(DoInterpolationOnSightDependsOnDistance
+			? UKismetMathLibrary::Lerp(SightAdderEverySecondMin, SightAdderEverySecondMax, Distance / SightConfig->SightRadius)
+			: SightAdderEverySecondMax);
+	const auto HearingStressAdder =
+		(DoInterpolationOnHearingDependsOnDistance
+			? UKismetMathLibrary::Lerp(HearingAdderEverySecondMin, HearingAdderEverySecondMax, Distance / HearingConfig->HearingRange)
+			: HearingAdderEverySecondMax);
+
+	if(SensedStimuli.ContainsByPredicate( [](const FAIStimulus& Stimulus)-> bool {
+		return Stimulus.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass()) && !Stimulus.IsExpired();}))
+	{
+		AddDeltaToStressProgress(SightStressAdder * DeltaTime);
+		ULog::Warning("Sight", LO_Both);
+	}
+	if(SensedStimuli.ContainsByPredicate( [](const FAIStimulus& Stimulus)-> bool {
+		return Stimulus.Type == UAISense::GetSenseID(UAISense_Hearing::StaticClass()) && !Stimulus.IsExpired();}))
+		AddDeltaToStressProgress(HearingStressAdder * DeltaTime);
 }
 
 

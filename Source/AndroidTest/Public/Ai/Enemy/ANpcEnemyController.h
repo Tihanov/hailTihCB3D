@@ -10,16 +10,9 @@ class UNpcPerceptionComponent;
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnNoticeActorDelegate,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTargetActorSetDelegate,
 	AANpcEnemyController*, EnemyNpcController, 
-	AActor*, NoticedActor,
-	EHostileNoticeState, HostileNoticeState,
-	AActor*, OldActor);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnNoticeStateUpdateDelegate,
-	AANpcEnemyController*, EnemyNpcController, 
-	AActor*, NoticedActor,
-	EHostileNoticeState, HostileNoticeState);
+	AActor*, TargetActor);
 
 UCLASS()
 class ANDROIDTEST_API AANpcEnemyController : public ANpcAiController
@@ -39,70 +32,70 @@ public:
 	UNpcPerceptionComponent* GetEnemyPerceptionComponent() const { return EnemyPerceptionComponent; }
 	
 	UFUNCTION(BlueprintPure, Category = "Ai")
-		AActor* GetCurrentNoticedActor(EHostileNoticeState& OutHostileNoticeState) const;
-	// Sets Stress Progress Too
+		AActor* GetTargetActor(UPARAM(DisplayName = "IsNull?") bool& IsNull) const;
+	AActor* GetTargetActor() const { return TargetActor.Get(); };
 	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void NoticeActor(AActor* NewActor);
-
-	EHostileNoticeState GetHostileNoticeState() const { return HostileNoticeState; }
+		void SetTargetActor(AActor* NewActor);
 
 	UFUNCTION(BlueprintPure, Category = "Ai")
-		const AActor* GetLastNoticedActor(UPARAM(DisplayName = "OutDoesExists?") bool& OutDoesExists) const;
+		const AActor* GetLastTargetActor(UPARAM(DisplayName = "DoesExist?") bool& OutDoesExist) const;
+	const AActor* GetLastTargetActor() const {return LastTargetActor.Get(); }
 
-	// Sets Hostile Notice State
 	// 0.f => None
-	// 1.f => Chaise
+	// 1.f => Aggressive
 	// else => Notice
 	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void SetChaiseStressProgress(float InChaiseStressProgress);
+		void SetStressProgress(float InChaiseStressProgress);
 	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void AddDeltaToChaiseStressProgress(float Delta);
-	float GetChaiseStressProgress() const { return ChaiseStressProgress; }
+		void AddDeltaToStressProgress(float Delta);
+	float GetStressProgress() const { return StressProgress; }
+
+	bool IsFreezeStressProgress() const { return bFreezeStressProgress; }
+	void SetFreezeStressProgress(bool bInFreezeStressProgress) { bFreezeStressProgress = bInFreezeStressProgress; }
 
 	/*components:*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UNpcPerceptionComponent* EnemyPerceptionComponent;
 
-protected:
-	UPROPERTY(EditAnywhere, Category = "Options")
-		float FocusTurnAngle = 45;
-	
 public: /*delegates:*/
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnNoticeActor")
-		FOnNoticeActorDelegate OnNoticeActorDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnNoticeStateUpdate")
-		FOnNoticeStateUpdateDelegate OnNoticeStateUpdateDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTargetActorSet")
+		FOnTargetActorSetDelegate OnTargetActorSetDelegate;
 	
 protected:
-	TSoftObjectPtr<AActor> CurrentNoticingActor = nullptr;
-	TSoftObjectPtr<AActor> LastNoticingActor = nullptr;
-	UPROPERTY(BlueprintReadOnly, Category = "Ai")
-		EHostileNoticeState HostileNoticeState = EHostileNoticeState::None;
+	TSoftObjectPtr<AActor> TargetActor = nullptr;
+	TSoftObjectPtr<AActor> LastTargetActor = nullptr;
 	// If stress == 1 then chaise starts
 	// If stress == 0 then chaise stops
 	UPROPERTY(BlueprintReadOnly, Category = "Ai", meta = (ClampMin = 0.f, ClampMax = 1.f))
-		float ChaiseStressProgress = 0.f;
+		float StressProgress = 0.f;
+	UPROPERTY(BlueprintReadWrite, Category = "Ai")
+		bool bFreezeStressProgress = false;
 
 protected:	/* Stress options: */
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
 		float OnNoticedAdder = 0.1;
-
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
 		float DamageAdder = 1.f;
 
+	UPROPERTY(EditAnywhere, Category = "Ai|Stress")
+		bool DoInterpolationOnSightDependsOnDistance = true;
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
-		float SightAdderEverySecond = 0.4f;	
+		float SightAdderEverySecondMax = 1.f;	
+	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f,
+		EditCondition = "DoInterpolationOnSightDependsOnDistance", EditConditionHides))
+		float SightAdderEverySecondMin = 0.1f;	
+
+	UPROPERTY(EditAnywhere, Category = "Ai|Stress")
+		bool DoInterpolationOnHearingDependsOnDistance = true;
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
-		float SightDiffEverySecond = 0.02f;
+		float HearingAdderEverySecondMax = 0.2f;
+	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f,
+		EditCondition = "DoInterpolationOnHearingDependsOnDistance", EditConditionHides))
+		float HearingAdderEverySecondMin = 0.f;	
 
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
-		float HearingAdderEverySecond = 0.2f;
-	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
-		float HearingDiffEverySecond = 0.f;
+		float NoPerceptionAdderEverySecond = -0.2f;
 
-protected:
-	void SetHostileNoticeState(EHostileNoticeState InHostileNoticeState);
-	
 private:
 	UFUNCTION()
 		void ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo);
