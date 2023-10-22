@@ -86,7 +86,7 @@ void ANpcAiCharacter::EquipWeapon(FName SocketName /*= TEXT("PistolSocket")*/)
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetScale3D(ItemData->Other.Scale);
-	const auto Weapon = GetWorld()->SpawnActor<AWeaponBase>(ItemData->Other.WeaponItemSettings.WeaponClass,
+	const auto Weapon = GetWorld()->SpawnActor<AWeaponBase>(ItemData->Other.WeaponInfo->WeaponClass,
 	                                                        SpawnTransform);
 	EquippedWeapon = Weapon;
 	Weapon->InitAsEquippedWeapon(this, *ItemData, WeaponItemName);
@@ -149,7 +149,7 @@ void ANpcAiCharacter::ShootTimeCallback()
 		return;
 	}
 	const auto Weapon = EquippedWeapon.Get();
-	if(Weapon->MakeTestShoot().Find(GetController<AAIController>()->GetFocusActor()) != INDEX_NONE)
-		Weapon->StartShooting();
+	if(Weapon->MakeTestAttack().Find(GetController<AAIController>()->GetFocusActor()) != INDEX_NONE)
+		Weapon->PullTheTrigger();
 }
 

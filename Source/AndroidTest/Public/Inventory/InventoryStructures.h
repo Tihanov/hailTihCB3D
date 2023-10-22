@@ -64,7 +64,8 @@ struct FInvItemDataTableOptional
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) TSubclassOf<class UInventoryItemDefaultInfo>InfoClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FVector										Scale = { 1,1,1 };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvHealingItemSettings						HealingItemSettings;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings						WeaponItemSettings;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite) FInvWeaponItemSettings						WeaponItemSettings;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) class UWeaponInfo*				WeaponInfo = nullptr;
 };
 
 USTRUCT(BlueprintType)

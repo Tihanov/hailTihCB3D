@@ -36,68 +36,71 @@ void AAutomaticWeaponBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwne
 	RootMeshComponent->SetSimulatePhysics(false);
 	RootMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	CurrentScatter = ItemSettings.Other.WeaponItemSettings.MinScatter;
-	CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+	CurrentScatter = GetInfo<UAutomaticWeaponInfo>()->MinScatter;
+	CurrentMagazineCapacity = GetInfo<UAutomaticWeaponInfo>()->MagazineCapacity;
 }
 
-void AAutomaticWeaponBase::StartShooting_Implementation()
+void AAutomaticWeaponBase::PullTheTrigger()
 {
-	Super::StartShooting_Implementation();
+	Super::PullTheTrigger();
 	if(CurrentMagazineCapacity <= 0)
 	{
-		ReloadWeapon_Implementation();
 		return;
 	}
-	if(!CanWeaponShoot_Implementation())
+	if(!CanBeUsedNow())
 		return;
 	IsShotDelay = true;
 	GetWorld()
 		->GetTimerManager()
 		.SetTimer(ShootTimerHandler,
 			this, &AAutomaticWeaponBase::TryShoot,
-			ItemSettings.Other.WeaponItemSettings.ShotDelayInSec,
+			GetInfo<UAutomaticWeaponInfo>()->ShotDelayInSec,
 			true, 0);
-	OnStartShootingDelegate.Broadcast(this);
+	OnPullTheTriggerDelegate.Broadcast(this);
 }
 
-void AAutomaticWeaponBase::StopShooting_Implementation()
+void AAutomaticWeaponBase::ReleaseTheTrigger()
 {
-	Super::StopShooting_Implementation();
+	Super::ReleaseTheTrigger();
 	GetWorld()
 		->GetTimerManager()
 		.ClearTimer(ShootTimerHandler);
-	OnStopShootingDelegate.Broadcast(this);
+	OnReleaseTheTriggerDelegate.Broadcast(this);
 }
 
-bool AAutomaticWeaponBase::CanWeaponShoot_Implementation() const
+bool AAutomaticWeaponBase::CanBeUsedNow() const
 {
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading;
 }
 
-TArray<AActor*> AAutomaticWeaponBase::MakeTestShoot_Implementation()
+TArray<AActor*> AAutomaticWeaponBase::MakeTestAttack() // TODO
 {
-	return Super::MakeTestShoot_Implementation();
+	return Super::MakeTestAttack();
 }
 
-float AAutomaticWeaponBase::GetWeaponScatter_Implementation() const
+float AAutomaticWeaponBase::GetScatter() const
 {
 	return CurrentScatter;
 }
 
-void AAutomaticWeaponBase::ReloadWeapon_Implementation()
+bool AAutomaticWeaponBase::CanBeReloaded() const
 {
-	StopShooting_Implementation();
+	return true;
+}
+
+void AAutomaticWeaponBase::Reload()
+{
 	IsWeaponInReloading = true;
 }
-bool AAutomaticWeaponBase::IsWeaponReloading_Implementation() const
+bool AAutomaticWeaponBase::IsReloading() const
 {
 	return IsWeaponInReloading;
 }
-float AAutomaticWeaponBase::GetCurrentWeaponReloadingTimeout_Implementation() const
+float AAutomaticWeaponBase::GetCurrentReloadingTimeout() const
 {
 	return CurrentReloadTimeout;
 }
-int AAutomaticWeaponBase::GetMagazineCapacity_Implementation() const
+int AAutomaticWeaponBase::GetMagazineCapacity() const
 {
 	return CurrentMagazineCapacity;
 }
@@ -105,9 +108,9 @@ int AAutomaticWeaponBase::GetMagazineCapacity_Implementation() const
 void AAutomaticWeaponBase::ReduceScatter(float DeltaTime)
 {
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter - ItemSettings.Other.WeaponItemSettings.ScatterReductionInOneSec * DeltaTime,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter
+		CurrentScatter - GetInfo<UAutomaticWeaponInfo>()->ScatterReductionInOneSec * DeltaTime,
+		GetInfo<UAutomaticWeaponInfo>()->MinScatter,
+		GetInfo<UAutomaticWeaponInfo>()->MaxScatter
 	);
 }
 
@@ -118,18 +121,20 @@ void AAutomaticWeaponBase::TryReload(float DeltaTime)
 	CurrentReloadTimeout = FMath::Clamp(
 		CurrentReloadTimeout + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec
+		GetInfo<UAutomaticWeaponInfo>()->ReloadTimeoutInSec
 	);
-	if(CurrentReloadTimeout >= ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec)
+	if(CurrentReloadTimeout >= GetInfo<UAutomaticWeaponInfo>()->ReloadTimeoutInSec)
 	{
 		CurrentReloadTimeout = 0.f;
 		IsWeaponInReloading = false;
-		CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+		CurrentMagazineCapacity = GetInfo<UAutomaticWeaponInfo>()->MagazineCapacity;
 	}
 }
 
+
 void AAutomaticWeaponBase::TryShoot()
 {
+#if 0
 	if(CurrentMagazineCapacity <= 0)
 	{
 		ReloadWeapon_Implementation();
@@ -205,7 +210,8 @@ void AAutomaticWeaponBase::TryShoot()
 	decltype(FDamagedActorsAndDamageProxyMap::DamagedActors) TempMap;
 	if(IsDamageWasDone)
 		TempMap.Add(DamagedActor, DoneDamage);
-	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
+	OnAttackDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
+#endif
 }
 
 void AAutomaticWeaponBase::ShotDelay(float DeltaTime)
@@ -215,9 +221,9 @@ void AAutomaticWeaponBase::ShotDelay(float DeltaTime)
 	CurrentShotDelay = FMath::Clamp(
 		CurrentShotDelay + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ShotDelayInSec
+		GetInfo<UAutomaticWeaponInfo>()->ShotDelayInSec
 	);
-	if(CurrentShotDelay >= ItemSettings.Other.WeaponItemSettings.ShotDelayInSec)
+	if(CurrentShotDelay >= GetInfo<UAutomaticWeaponInfo>()->ShotDelayInSec)
 	{
 		CurrentShotDelay = 0.f;
 		IsShotDelay = false;

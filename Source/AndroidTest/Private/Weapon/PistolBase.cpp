@@ -35,22 +35,22 @@ void APistolBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvIt
 	RootMeshComponent->SetSimulatePhysics(false);
 	RootMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	CurrentScatter = ItemSettings.Other.WeaponItemSettings.MinScatter;
-	CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+	CurrentScatter = GetInfo<UPistolInfo>()->MinScatter;
+	CurrentMagazineCapacity = GetInfo<UPistolInfo>()->MagazineCapacity;
 }
 
 
-void APistolBase::StartShooting_Implementation()
+void APistolBase::PullTheTrigger()
 {
-	Super::StartShooting_Implementation();
+	Super::PullTheTrigger();
 	if(CurrentMagazineCapacity <= 0)
 	{
-		ReloadWeapon_Implementation();
+		Reload();
 		return;
 	}
-	if(!CanWeaponShoot_Implementation())
+	if(!CanBeUsedNow())
 		return;
-	OnStartShootingDelegate.Broadcast(this);
+	OnPullTheTriggerDelegate.Broadcast(this);
 	CurrentMagazineCapacity -= 1;
 
 	FHitResult HitResult;
@@ -60,12 +60,12 @@ void APistolBase::StartShooting_Implementation()
 	FVector Start = OwnerAimCameraRight->GetComponentLocation();
 	FVector End = Start
 		+ UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OwnerAimCameraRight->GetForwardVector(), CurrentScatter)
-		* ItemSettings.Other.WeaponItemSettings.ShotRange;
+		* GetInfo<UPistolInfo>()->ShotRange;
 	auto MainGameState = Cast<AMainGameState>(GetWorld()->GetGameState());
 
 	UGameplayStatics::PlaySoundAtLocation(
 		GetWorld(),
-		ItemSettings.Other.WeaponItemSettings.ShotSound,
+		GetInfo<UPistolInfo>()->ShotSound,
 		RootMeshComponent->GetSocketLocation("ShootFrom"),
 		FRotator::ZeroRotator);
 
@@ -84,7 +84,7 @@ void APistolBase::StartShooting_Implementation()
 	End = Start
 		+ UKismetMathLibrary::GetForwardVector(
 			UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
-		* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+		* GetInfo<UPistolInfo>()->ShotRange * 1.1;
 	
 	Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
@@ -102,8 +102,8 @@ void APistolBase::StartShooting_Implementation()
 		DoneDamage =
 			UGameplayStatics::ApplyPointDamage(
 				HitResult.GetActor(),
-				ItemSettings.Other.WeaponItemSettings.Damage
-				* (1.f - (HitResult.Distance / ItemSettings.Other.WeaponItemSettings.ShotRange)),
+				GetInfo<UPistolInfo>()->Damage
+				* (1.f - (HitResult.Distance / GetInfo<UPistolInfo>()->ShotRange)),
 				FVector::ZeroVector /*TODO*/,
 				HitResult,
 				GetOwner()->GetInstigatorController(),
@@ -113,34 +113,34 @@ void APistolBase::StartShooting_Implementation()
 	}
 
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter + ItemSettings.Other.WeaponItemSettings.ShotScatter,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter);
+		CurrentScatter + GetInfo<UPistolInfo>()->ShotScatter,
+		GetInfo<UPistolInfo>()->MinScatter,
+		GetInfo<UPistolInfo>()->MaxScatter);
 	IsShotDelay = true;
 	decltype(FDamagedActorsAndDamageProxyMap::DamagedActors) TempMap;
 	if(IsDamageWasDone)
 		TempMap.Add(DamagedActor, DoneDamage);
-	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
+	OnAttackDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
 }
 
-void APistolBase::StopShooting_Implementation()
+void APistolBase::ReleaseTheTrigger()
 {
-	Super::StopShooting_Implementation();
-	OnStopShootingDelegate.Broadcast(this);
+	Super::ReleaseTheTrigger();
+	OnReleaseTheTriggerDelegate.Broadcast(this);
 }
 
-bool APistolBase::CanWeaponShoot_Implementation() const
+bool APistolBase::CanBeUsedNow() const
 {
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
-TArray<AActor*> APistolBase::MakeTestShoot_Implementation()
+TArray<AActor*> APistolBase::MakeTestAttack()
 {
 	FHitResult HitResult;
 	FVector Start = OwnerAimCameraRight->GetComponentLocation();
 	FVector End = Start
 		+ OwnerAimCameraRight->GetForwardVector()
-		* ItemSettings.Other.WeaponItemSettings.ShotRange;
+		* GetInfo<UPistolInfo>()->ShotRange;
 
 	auto Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
@@ -157,7 +157,7 @@ TArray<AActor*> APistolBase::MakeTestShoot_Implementation()
 	End = Start
 		+ UKismetMathLibrary::GetForwardVector(
 			UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
-		* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+		* GetInfo<UPistolInfo>()->ShotRange * 1.1;
 	
 	Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
@@ -175,25 +175,30 @@ TArray<AActor*> APistolBase::MakeTestShoot_Implementation()
 		return {};
 }
 
-float APistolBase::GetWeaponScatter_Implementation() const
+float APistolBase::GetScatter() const
 {
 	return CurrentScatter;
 }
 
-void APistolBase::ReloadWeapon_Implementation()
+bool APistolBase::CanBeReloaded() const
 {
-	Super::ReloadWeapon_Implementation();
+	return true;
+}
+
+void APistolBase::Reload()
+{
+	Super::Reload();
 	IsWeaponInReloading = true;
 }
-bool APistolBase::IsWeaponReloading_Implementation() const
+bool APistolBase::IsReloading() const
 {
 	return IsWeaponInReloading;
 }
-float APistolBase::GetCurrentWeaponReloadingTimeout_Implementation() const
+float APistolBase::GetCurrentReloadingTimeout() const
 {
 	return CurrentReloadTimeout;
 }
-int APistolBase::GetMagazineCapacity_Implementation() const
+int APistolBase::GetMagazineCapacity() const
 {
 	return CurrentMagazineCapacity;
 }
@@ -201,9 +206,9 @@ int APistolBase::GetMagazineCapacity_Implementation() const
 void APistolBase::ReduceScatter(float DeltaTime)
 {
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter - ItemSettings.Other.WeaponItemSettings.ScatterReductionInOneSec * DeltaTime,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter
+		CurrentScatter - GetInfo<UPistolInfo>()->ScatterReductionInOneSec * DeltaTime,
+		GetInfo<UPistolInfo>()->MinScatter,
+		GetInfo<UPistolInfo>()->MaxScatter
 	);
 }
 
@@ -214,13 +219,13 @@ void APistolBase::TryReload(float DeltaTime)
 	CurrentReloadTimeout = FMath::Clamp(
 		CurrentReloadTimeout + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec
+		GetInfo<UPistolInfo>()->ReloadTimeoutInSec
 	);
-	if(CurrentReloadTimeout >= ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec)
+	if(CurrentReloadTimeout >= GetInfo<UPistolInfo>()->ReloadTimeoutInSec)
 	{
 		CurrentReloadTimeout = 0.f;
 		IsWeaponInReloading = false;
-		CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+		CurrentMagazineCapacity = GetInfo<UPistolInfo>()->MagazineCapacity;
 	}
 }
 
@@ -231,9 +236,9 @@ void APistolBase::ShotDelay(float DeltaTime)
 	CurrentShotDelay = FMath::Clamp(
 		CurrentShotDelay + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ShotDelayInSec
+		GetInfo<UPistolInfo>()->ShotDelayInSec
 	);
-	if(CurrentShotDelay >= ItemSettings.Other.WeaponItemSettings.ShotDelayInSec)
+	if(CurrentShotDelay >= GetInfo<UPistolInfo>()->ShotDelayInSec)
 	{
 		CurrentShotDelay = 0.f;
 		IsShotDelay = false;

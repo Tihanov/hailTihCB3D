@@ -36,22 +36,22 @@ void AShotgunBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvI
 	RootMeshComponent->SetSimulatePhysics(false);
 	RootMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	CurrentScatter = ItemSettings.Other.WeaponItemSettings.MinScatter;
-	CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+	CurrentScatter = GetInfo<UShotgunInfo>()->MinScatter;
+	CurrentMagazineCapacity = GetInfo<UShotgunInfo>()->MagazineCapacity;
 }
 
 
-void AShotgunBase::StartShooting_Implementation()
+void AShotgunBase::PullTheTrigger()
 {
-	Super::StartShooting_Implementation();
+	Super::PullTheTrigger();
 	if(CurrentMagazineCapacity <= 0)
 	{
-		ReloadWeapon_Implementation();
+		Reload();
 		return;
 	}
-	if(!CanWeaponShoot_Implementation())
+	if(!CanBeUsedNow())
 		return;
-	OnStartShootingDelegate.Broadcast(this);
+	OnPullTheTriggerDelegate.Broadcast(this);
 	CurrentMagazineCapacity -= 1;
 
 	FHitResult HitResult;
@@ -63,7 +63,7 @@ void AShotgunBase::StartShooting_Implementation()
 
 	UGameplayStatics::PlaySoundAtLocation(
 		GetWorld(),
-		ItemSettings.Other.WeaponItemSettings.ShotSound,
+		GetInfo<UShotgunInfo>()->ShotSound,
 		RootMeshComponent->GetSocketLocation("ShootFrom"),
 		FRotator::ZeroRotator);
 
@@ -71,7 +71,7 @@ void AShotgunBase::StartShooting_Implementation()
 	{
 		End = Start
 			+ UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OwnerAimCameraRight->GetForwardVector(), CurrentScatter)
-			* ItemSettings.Other.WeaponItemSettings.ShotRange;
+			* GetInfo<UShotgunInfo>()->ShotRange;
 		auto Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
 			Start, End,
@@ -87,7 +87,7 @@ void AShotgunBase::StartShooting_Implementation()
 		End = Start
 			+ UKismetMathLibrary::GetForwardVector(
 				UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
-			* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+			* GetInfo<UShotgunInfo>()->ShotRange * 1.1;
 	
 		Result = UKismetSystemLibrary::LineTraceSingle(
 				GetWorld(),
@@ -105,8 +105,8 @@ void AShotgunBase::StartShooting_Implementation()
 				.FindOrAdd(HitResult.GetActor())
 				+= UGameplayStatics::ApplyPointDamage(
                		HitResult.GetActor(),
-               		ItemSettings.Other.WeaponItemSettings.Damage
-					* (1.f - (HitResult.Distance / ItemSettings.Other.WeaponItemSettings.ShotRange)),
+               		GetInfo<UShotgunInfo>()->Damage
+					* (1.f - (HitResult.Distance / GetInfo<UShotgunInfo>()->ShotRange)),
                		FVector::ZeroVector /*TODO*/,
                		HitResult,
                		GetOwner()->GetInstigatorController(),
@@ -116,46 +116,51 @@ void AShotgunBase::StartShooting_Implementation()
 	}
 
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter + ItemSettings.Other.WeaponItemSettings.ShotScatter,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter);
+		CurrentScatter + GetInfo<UShotgunInfo>()->ShotScatter,
+		GetInfo<UShotgunInfo>()->MinScatter,
+		GetInfo<UShotgunInfo>()->MaxScatter);
 	IsShotDelay = true;
-	OnMadeShotDelegate.Broadcast(this, IsDamageWasDone, {DamagedActorAndDamage});
+	OnAttackDelegate.Broadcast(this, IsDamageWasDone, {DamagedActorAndDamage});
 }
-void AShotgunBase::StopShooting_Implementation()
+void AShotgunBase::ReleaseTheTrigger()
 {
-	Super::StopShooting_Implementation();
-	OnStopShootingDelegate.Broadcast(this);
+	Super::ReleaseTheTrigger();
+	OnReleaseTheTriggerDelegate.Broadcast(this);
 }
-bool AShotgunBase::CanWeaponShoot_Implementation() const
+bool AShotgunBase::CanBeUsedNow() const
 {
 	return CurrentMagazineCapacity > 0 && !IsWeaponInReloading && !IsShotDelay;
 }
 
-TArray<AActor*> AShotgunBase::MakeTestShoot_Implementation()
+TArray<AActor*> AShotgunBase::MakeTestAttack()
 {
-	return Super::MakeTestShoot_Implementation();
+	return Super::MakeTestAttack();
 }
 
-float AShotgunBase::GetWeaponScatter_Implementation() const
+float AShotgunBase::GetScatter() const
 {
 	return CurrentScatter;
 }
 
-void AShotgunBase::ReloadWeapon_Implementation()
+bool AShotgunBase::CanBeReloaded() const
 {
-	Super::ReloadWeapon_Implementation();
+	return true;
+}
+
+void AShotgunBase::Reload()
+{
+	Super::Reload();
 	IsWeaponInReloading = true;
 }
-bool AShotgunBase::IsWeaponReloading_Implementation() const
+bool AShotgunBase::IsReloading() const
 {
 	return IsWeaponInReloading;
 }
-float AShotgunBase::GetCurrentWeaponReloadingTimeout_Implementation() const
+float AShotgunBase::GetCurrentReloadingTimeout() const
 {
 	return CurrentReloadTimeout;
 }
-int AShotgunBase::GetMagazineCapacity_Implementation() const
+int AShotgunBase::GetMagazineCapacity() const
 {
 	return CurrentMagazineCapacity;
 }
@@ -163,9 +168,9 @@ int AShotgunBase::GetMagazineCapacity_Implementation() const
 void AShotgunBase::ReduceScatter(float DeltaTime)
 {
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter - ItemSettings.Other.WeaponItemSettings.ScatterReductionInOneSec * DeltaTime,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter
+		CurrentScatter - GetInfo<UShotgunInfo>()->ScatterReductionInOneSec * DeltaTime,
+		GetInfo<UShotgunInfo>()->MinScatter,
+		GetInfo<UShotgunInfo>()->MaxScatter
 	);
 }
 
@@ -176,13 +181,13 @@ void AShotgunBase::TryReload(float DeltaTime)
 	CurrentReloadTimeout = FMath::Clamp(
 		CurrentReloadTimeout + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec
+		GetInfo<UShotgunInfo>()->ReloadTimeoutInSec
 	);
-	if(CurrentReloadTimeout >= ItemSettings.Other.WeaponItemSettings.ReloadTimeoutInSec)
+	if(CurrentReloadTimeout >= GetInfo<UShotgunInfo>()->ReloadTimeoutInSec)
 	{
 		CurrentReloadTimeout = 0.f;
 		IsWeaponInReloading = false;
-		CurrentMagazineCapacity = ItemSettings.Other.WeaponItemSettings.MagazineCapacity;
+		CurrentMagazineCapacity = GetInfo<UShotgunInfo>()->MagazineCapacity;
 	}
 }
 
@@ -193,9 +198,9 @@ void AShotgunBase::ShotDelay(float DeltaTime)
 	CurrentShotDelay = FMath::Clamp(
 		CurrentShotDelay + DeltaTime,
 		0.f,
-		ItemSettings.Other.WeaponItemSettings.ShotDelayInSec
+		GetInfo<UShotgunInfo>()->ShotDelayInSec
 	);
-	if(CurrentShotDelay >= ItemSettings.Other.WeaponItemSettings.ShotDelayInSec)
+	if(CurrentShotDelay >= GetInfo<UShotgunInfo>()->ShotDelayInSec)
 	{
 		CurrentShotDelay = 0.f;
 		IsShotDelay = false;

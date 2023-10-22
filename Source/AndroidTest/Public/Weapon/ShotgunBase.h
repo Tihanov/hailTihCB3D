@@ -28,23 +28,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvItemDataTable Options, FName ItemName) override;
-	
-	virtual void StartShooting_Implementation() override;
-	virtual void StopShooting_Implementation() override;
-	virtual bool CanWeaponShoot_Implementation() const override;
 
-	// #TODO MakeTestShoot for Shotgun
-	virtual TArray<AActor*> MakeTestShoot_Implementation() override;
+	virtual void PullTheTrigger() override;
+	virtual void ReleaseTheTrigger() override;
+	virtual bool CanBeUsedNow() const override;
 	
-	virtual float GetWeaponScatter_Implementation() const override;
-
-	virtual void ReloadWeapon_Implementation() override;
-	virtual bool IsWeaponReloading_Implementation() const override;
-	virtual float GetCurrentWeaponReloadingTimeout_Implementation() const override;
-	virtual int GetMagazineCapacity_Implementation() const override;
+	virtual TArray<AActor*> MakeTestAttack() override;
+	
+	virtual float GetScatter() const override;
+	
+	virtual bool CanBeReloaded() const override;
+	virtual void Reload() override;
+	virtual bool IsReloading() const override;
+	virtual float GetCurrentReloadingTimeout() const override;
+	virtual int GetMagazineCapacity() const override;
 
 private:
 	void ReduceScatter(float DeltaTime);
 	void TryReload(float DeltaTime);
 	void ShotDelay(float DeltaTime);
 };
+
+UCLASS(BlueprintType)
+class UShotgunInfo : public UFirearmsInfo { GENERATED_BODY() };
+

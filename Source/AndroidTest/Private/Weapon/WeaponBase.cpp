@@ -34,45 +34,49 @@ FInvItemDataTable AWeaponBase::GetWeaponSettings() const
 	return ItemSettings;
 }
 
-TArray<AActor*> AWeaponBase::MakeTestShoot_Implementation()
+void AWeaponBase::PullTheTrigger()
+{
+}
+
+void AWeaponBase::ReleaseTheTrigger()
+{
+}
+
+bool AWeaponBase::CanBeUsedNow() const
+{
+	return false;
+}
+
+TArray<AActor*> AWeaponBase::MakeTestAttack()
 {
 	return {};
 }
 
+float AWeaponBase::GetScatter() const
+{
+	return 0;
+}
 
-bool AWeaponBase::CanWeaponShoot_Implementation() const
+bool AWeaponBase::CanBeReloaded() const
 {
 	return false;
 }
 
-void AWeaponBase::StartShooting_Implementation()
+void AWeaponBase::Reload()
 {
 }
 
-void AWeaponBase::StopShooting_Implementation()
-{
-}
-
-float AWeaponBase::GetWeaponScatter_Implementation() const
-{
-	return 0.f;
-}
-
-void AWeaponBase::ReloadWeapon_Implementation()
-{
-}
-
-bool AWeaponBase::IsWeaponReloading_Implementation() const
+bool AWeaponBase::IsReloading() const
 {
 	return false;
 }
 
-float AWeaponBase::GetCurrentWeaponReloadingTimeout_Implementation() const
+float AWeaponBase::GetCurrentReloadingTimeout() const
 {
 	return 0.f;
 }
 
-int AWeaponBase::GetMagazineCapacity_Implementation() const
+int AWeaponBase::GetMagazineCapacity() const
 {
 	return 0;
 }
