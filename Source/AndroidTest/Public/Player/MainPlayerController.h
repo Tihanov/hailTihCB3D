@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "DlgSystem/DlgDialogueParticipant.h"
+#include "DlgSystem/DlgEdge.h"
 #include "MainPlayerController.generated.h"
 
 class AChestCollision;
@@ -24,8 +25,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnDialogueStartedDelegate,
 	APlayerController*, PlayerController,
 	FProxyStructArrayOfParticipants, Participants,
 	UDlgContext*, DlgContext);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogueUpdatedDelegate,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnDialogueUpdatedDelegate,
 	APlayerController*, PlayerController,
+	FDlgEdge, Option,
 	UDlgContext*, DlgContext);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialogueFinishedDelegate,
 	APlayerController*, PlayerController);

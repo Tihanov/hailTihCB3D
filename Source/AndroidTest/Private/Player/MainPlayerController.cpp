@@ -43,8 +43,9 @@ void AMainPlayerController::SelectDialogueOption(int OptionIndex)
 {
 	if(!DlgContext || !DlgContext->IsValidOptionIndex(OptionIndex))
 		return;
+	const auto LastOption = DlgContext->GetOption(OptionIndex);
 	if(DlgContext->ChooseOption(OptionIndex))
-		OnDialogueUpdatedDelegate.Broadcast(this, DlgContext);
+		OnDialogueUpdatedDelegate.Broadcast(this, LastOption, DlgContext);
 	else
 	{
 		DlgContext = nullptr;
