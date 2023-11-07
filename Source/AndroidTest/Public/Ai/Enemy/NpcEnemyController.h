@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Ai/Npc/NpcAiController.h"
-#include "ANpcEnemyController.generated.h"
+#include "NpcEnemyController.generated.h"
 
 class UNpcPerceptionComponent;
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTargetActorSetDelegate,
-	AANpcEnemyController*, EnemyNpcController, 
+	ANpcEnemyController*, EnemyNpcController, 
 	AActor*, TargetActor);
 
 UCLASS()
-class ANDROIDTEST_API AANpcEnemyController : public ANpcAiController
+class ANDROIDTEST_API ANpcEnemyController : public ANpcAiController
 {
 	GENERATED_BODY()
 
 public:
-	AANpcEnemyController();
+	ANpcEnemyController();
 
 protected:
 	virtual void BeginPlay() override;
@@ -63,7 +63,7 @@ public: /*delegates:*/
 	
 protected:
 	TSoftObjectPtr<AActor> TargetActor = nullptr;
-	TSoftObjectPtr<AActor> LastTargetActor = nullptr;
+	TSoftObjectPtr<AActor> LastTargetActor = nullptr; // TODO DEPRECATED
 	// If stress == 1 then chaise starts
 	// If stress == 0 then chaise stops
 	UPROPERTY(BlueprintReadOnly, Category = "Ai", meta = (ClampMin = 0.f, ClampMax = 1.f))

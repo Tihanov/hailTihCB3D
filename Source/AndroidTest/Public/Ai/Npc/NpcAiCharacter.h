@@ -9,6 +9,7 @@
 #include "Npc/NpcBaseCharacter.h"
 #include "NpcAiCharacter.generated.h"
 
+class UNpcMovementComponent;
 class UTeamIdComponent;
 class UChestComponent;
 class UHealthPointsComponent;
@@ -27,7 +28,7 @@ class ANDROIDTEST_API ANpcAiCharacter
 	GENERATED_BODY()
 
 public:
-	ANpcAiCharacter();
+	ANpcAiCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,15 +39,17 @@ public:
 	
 	bool IsHaveWeapon() const { return bHaveWeapon; }
 	FName GetWeaponItemName() const { return WeaponItemName; }
+	FName GetWeaponSocket() const { return WeaponSocket; }
 	bool IsEquipWeapon() const { return EquippedWeapon.IsValid(); }
 	TSoftObjectPtr<AWeaponBase> GetEquippedWeapon() const { return EquippedWeapon; }
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
-		void EquipWeapon(FName SocketName = TEXT("PistolSocket"));
+		void EquipWeapon(FName SocketName = NAME_None);
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
 		void UnequipWeapon();
 
+	// -1.f take interval from DataTable
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
-		void StartShooting(float Interval);
+		void StartShooting(float Interval = -1.f);
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
 		void StopShooting();
 	
@@ -80,6 +83,8 @@ protected:
 		bool bHaveWeapon = false;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
 		FName WeaponItemName = TEXT("None");
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
+		FName WeaponSocket = NAME_None;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))
 		UAnimMontage* AimWithWeaponAnimation = nullptr;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon|Options", meta=(EditCondition = "bHaveWeapon", EditConditionHides))

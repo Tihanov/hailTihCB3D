@@ -7,6 +7,7 @@
 #include "MainGameState.h"
 #include "Utils/UtilsStructs.h"
 #include "Ai/Npc/NpcAiController.h"
+#include "Ai/Npc/NpcMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DataTable.h"
 #include "HealthPoints/HealthPointsComponent.h"
@@ -14,9 +15,12 @@
 #include "Inventory/InventoryStructures.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Weapon/WeaponBase.h"
+#include "Utils/Utils.h"
 
 
-ANpcAiCharacter::ANpcAiCharacter()
+ANpcAiCharacter::ANpcAiCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer
+		.SetDefaultSubobjectClass(ACharacter::CharacterMovementComponentName, UNpcMovementComponent::StaticClass()))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -58,7 +62,7 @@ void ANpcAiCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-void ANpcAiCharacter::EquipWeapon(FName SocketName /*= TEXT("PistolSocket")*/)
+void ANpcAiCharacter::EquipWeapon(FName SocketName /*= NAME_None*/)
 {
 	if(EquippedWeapon.IsValid())
 		UnequipWeapon();
@@ -67,6 +71,8 @@ void ANpcAiCharacter::EquipWeapon(FName SocketName /*= TEXT("PistolSocket")*/)
 		ULog::Warning(FString::Printf(TEXT("%s cant equip weapon"), *GetName()), LO_Both);
 		return;
 	}
+	if(SocketName == NAME_None)
+		SocketName = WeaponSocket;
 #if WITH_EDITOR
 	check(GetMesh());
 	if(!GetMesh()->DoesSocketExist(SocketName))
@@ -105,11 +111,16 @@ void ANpcAiCharacter::UnequipWeapon()
 	EquippedWeapon.Reset();
 }
 
-void ANpcAiCharacter::StartShooting(float Interval)
+void ANpcAiCharacter::StartShooting(float Interval /* = -1.f */)
 {
 	if(EquippedWeapon.IsNull())
 		return;
 	PlayAnimMontage(AimWithWeaponAnimation);
+	if(Interval == -1.f)
+	{
+		CHECK_RETURN_ON_FAIL(EquippedWeapon.Get()->GetInfo() == nullptr);
+		Interval = EquippedWeapon.Get()->GetInfo()->ShotDelayInSec;
+	}
 	GetWorld()->GetTimerManager().SetTimer(ShootTimerHandler, this, &ANpcAiCharacter::ShootTimeCallback, Interval, true,
 				                           0);
 }

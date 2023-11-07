@@ -7,7 +7,8 @@
 #include "Player/MainPlayerController.h"
 
 
-ANpcBaseCharacter::ANpcBaseCharacter()
+ANpcBaseCharacter::ANpcBaseCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	QuestSignMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("QuestSign");

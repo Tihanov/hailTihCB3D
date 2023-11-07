@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ai/Enemy/ANpcEnemyController.h"
+#include "Ai/Enemy/NpcEnemyController.h"
 
 #include "Log.h"
 #include "Ai/Enemy/NpcPerceptionComponent.h"
@@ -15,103 +15,97 @@
 #include "Perception/AISense_Sight.h"
 
 
-AANpcEnemyController::AANpcEnemyController()
+ANpcEnemyController::ANpcEnemyController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	EnemyPerceptionComponent = CreateDefaultSubobject<UNpcPerceptionComponent>("EnemyPerceptionComponent");
 }
 
-void AANpcEnemyController::BeginPlay()
+void ANpcEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	EnemyPerceptionComponent->OnTargetPerceptionInfoUpdated.AddDynamic(
 		this,
-		&AANpcEnemyController::ActorPerceptionInfoUpdatedCallback);
+		&ANpcEnemyController::ActorPerceptionInfoUpdatedCallback);
 }
 
-void AANpcEnemyController::OnPossess(APawn* InPawn)
+void ANpcEnemyController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	InPawn->OnTakePointDamage.AddDynamic(this, &AANpcEnemyController::PawnDamageCallback);
+	InPawn->OnTakePointDamage.AddDynamic(this, &ANpcEnemyController::PawnDamageCallback);
 }
 
-void AANpcEnemyController::Tick(float DeltaTime)
+void ANpcEnemyController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	ChaiseStressUpdate(DeltaTime);
 }
 
-AActor* AANpcEnemyController::GetTargetActor(bool& IsNull) const
+AActor* ANpcEnemyController::GetTargetActor(bool& IsNull) const
 {
 	IsNull = TargetActor.IsNull();
 	return TargetActor.Get();
 }
 
-void AANpcEnemyController::SetTargetActor(AActor* NewActor)
+void ANpcEnemyController::SetTargetActor(AActor* NewActor)
 {
 	if(NewActor == TargetActor.Get())
 		return;
 	const auto OldActor = TargetActor.Get();
 	TargetActor = NewActor;
 	OnTargetActorSetDelegate.Broadcast(this, NewActor);
-	LastTargetActor = OldActor;
+	LastTargetActor = OldActor; 
 }
 
-const AActor* AANpcEnemyController::GetLastTargetActor(bool& OutDoesExist) const
+const AActor* ANpcEnemyController::GetLastTargetActor(bool& OutDoesExist) const
 {
 	OutDoesExist = LastTargetActor.IsValid();
 	return LastTargetActor.Get();
 }
 
-void AANpcEnemyController::SetStressProgress(float InChaiseStressProgress)
+void ANpcEnemyController::SetStressProgress(float InChaiseStressProgress)
 {
 	if(IsFreezeStressProgress())
 		return;
 	StressProgress = FMath::Clamp(InChaiseStressProgress, 0.f, 1.f);
 }
 
-void AANpcEnemyController::AddDeltaToStressProgress(float Delta)
+void ANpcEnemyController::AddDeltaToStressProgress(float Delta)
 {
 	SetStressProgress( GetStressProgress() + Delta );
 }
 
-void AANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
+void ANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
-	if(UpdateInfo.Target == TargetActor.Get())
-	{
-		// If Actor was damaged
-		if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Damage::StaticClass()))
-			AddDeltaToStressProgress(DamageAdder);
+	if(!UpdateInfo.Target.IsValid())
 		return;
-	}
-	TArray<AActor*> Actors;
-	GetEnemyPerceptionComponent()->GetHostileActors(Actors);
-	if(Actors.Num() == 0)
+	if( GetTargetActor() && GetTargetActor() == UpdateInfo.Target.Get() && !UpdateInfo.Stimulus.WasSuccessfullySensed())
 	{
 		SetTargetActor(nullptr);
 		return;
 	}
-	
-	if (TargetActor.IsValid() && Actors.Find(TargetActor.Get()) != INDEX_NONE)
-		return;
-
-	float Dist;
-	const auto NewTargetActor = UGameplayStatics::FindNearestActor(GetPawn()->GetActorLocation(), Actors, Dist);
-	SetTargetActor(NewTargetActor);
+	if( !GetTargetActor() && UpdateInfo.Stimulus.WasSuccessfullySensed())
+		SetTargetActor(UpdateInfo.Target.Get());
+	if( GetTargetActor() && UpdateInfo.Target == GetTargetActor())
+	{
+		// If Actor was damaged
+		if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Damage::StaticClass()))
+			AddDeltaToStressProgress(DamageAdder);
+	}
 }
 
-void AANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage, AController* InstigatedBy,
+void ANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage, AController* InstigatedBy,
 	FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection,
 	const UDamageType* DamageType, AActor* DamageCauser)
 {
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this, DamageCauser, Damage, HitLocation, HitLocation);
 }
 
-void AANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
+void ANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
 {
 	if (TargetActor.IsNull() || IsFreezeStressProgress())
 	{

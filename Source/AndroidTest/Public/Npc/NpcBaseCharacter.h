@@ -29,7 +29,7 @@ class ANDROIDTEST_API ANpcBaseCharacter
 	GENERATED_BODY()
 
 public:
-	ANpcBaseCharacter();
+	ANpcBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
