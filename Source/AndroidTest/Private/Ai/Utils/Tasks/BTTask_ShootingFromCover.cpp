@@ -53,7 +53,7 @@ EBTNodeResult::Type UBTTask_ShootingFromCover::ExecuteTask(UBehaviorTreeComponen
 
 	FQueryFinishedSignature QueryFinishedDelegate;
 	QueryFinishedDelegate.BindUObject(this, &UBTTask_ShootingFromCover::OnEqsFinishedCallback, NodeMemory);
-	TaskData->CoverFindingEqsRequest.Execute(EEnvQueryRunMode::RandomBest5Pct, QueryFinishedDelegate);
+	TaskData->CoverFindingEqsRequest.Execute(EEnvQueryRunMode::RandomBest25Pct, QueryFinishedDelegate);
 	return EBTNodeResult::InProgress;
 }
 

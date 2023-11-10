@@ -20,6 +20,7 @@ ANpcEnemyController::ANpcEnemyController()
 	PrimaryActorTick.bCanEverTick = true;
 
 	EnemyPerceptionComponent = CreateDefaultSubobject<UNpcPerceptionComponent>("EnemyPerceptionComponent");
+	SetPerceptionComponent(*EnemyPerceptionComponent);
 }
 
 void ANpcEnemyController::BeginPlay()
