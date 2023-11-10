@@ -32,10 +32,10 @@ EBTNodeResult::Type UBTTask_ShootingFromCover::ExecuteTask(UBehaviorTreeComponen
 		ULog::Error("UBTTask_ShootingFromCover is using only with ANpcEnemyController", LO_Both);
 		return EBTNodeResult::Aborted;
 	}
-	if(!Controller->GetTargetActor())
+	if(!Controller->GetHostileActor())
 		return EBTNodeResult::Failed;
-	Controller->SetFocus(Controller->GetTargetActor());
 	Controller->SetFreezeStressProgress(true);
+	Controller->SetHostilePointFromHostileActor();
 	
 	const auto Character = Controller->GetPawn<ANpcAiCharacter>();
 	CHECK_RETURN(!Character, return EBTNodeResult::Aborted);
@@ -85,7 +85,8 @@ void UBTTask_ShootingFromCover::OnEqsFinishedCallback(TSharedPtr<FEnvQueryResult
 	check(Result->Owner.IsValid());
 	
 	const auto Controller = Cast<ANpcEnemyController>(Result->Owner.Get());
-	const FAIMoveRequest MoveReq(Result->GetItemAsLocation(0));
+	FAIMoveRequest MoveReq(Result->GetItemAsLocation(0));
+	MoveReq.SetCanStrafe(false);
 	Controller->MoveTo(MoveReq);
 	Controller->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &UBTTask_ShootingFromCover::OnArrivedCallback,
 		NodeMemory);

@@ -46,28 +46,6 @@ void ANpcEnemyController::Tick(float DeltaTime)
 	ChaiseStressUpdate(DeltaTime);
 }
 
-AActor* ANpcEnemyController::GetTargetActor(bool& IsNull) const
-{
-	IsNull = TargetActor.IsNull();
-	return TargetActor.Get();
-}
-
-void ANpcEnemyController::SetTargetActor(AActor* NewActor)
-{
-	if(NewActor == TargetActor.Get())
-		return;
-	const auto OldActor = TargetActor.Get();
-	TargetActor = NewActor;
-	OnTargetActorSetDelegate.Broadcast(this, NewActor);
-	LastTargetActor = OldActor; 
-}
-
-const AActor* ANpcEnemyController::GetLastTargetActor(bool& OutDoesExist) const
-{
-	OutDoesExist = LastTargetActor.IsValid();
-	return LastTargetActor.Get();
-}
-
 void ANpcEnemyController::SetStressProgress(float InChaiseStressProgress)
 {
 	if(IsFreezeStressProgress())
@@ -80,18 +58,74 @@ void ANpcEnemyController::AddDeltaToStressProgress(float Delta)
 	SetStressProgress( GetStressProgress() + Delta );
 }
 
+void ANpcEnemyController::SetHostilePoint(FVector HostilePoint)
+{
+	SetFocalPoint(HostilePoint, EAIFocusPriority::Default);
+}
+
+void ANpcEnemyController::SetHostileActor(AActor* HostileActor)
+{
+	SetFocus(HostileActor, EAIFocusPriority::Default);
+}
+
+void ANpcEnemyController::SetHostilePointFromHostileActor()
+{
+	if(!GetHostileActor())
+		return;
+	const auto LastLoc = GetHostileActor()->GetActorLocation();
+	ClearHostileActor();
+	SetHostilePoint(LastLoc);
+}
+
+AActor* ANpcEnemyController::GetHostileActor() const
+{
+	return GetFocusActorForPriority(EAIFocusPriority::Default);
+}
+
+FVector ANpcEnemyController::GetHostilePoint() const
+{
+	return GetFocalPointForPriority(EAIFocusPriority::Default);
+}
+
+void ANpcEnemyController::ClearHostileActor()
+{
+	ClearFocus(EAIFocusPriority::Default);
+}
+
+bool ANpcEnemyController::IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const
+{
+	for (int32 Index = FocusInformation.Priorities.Num() - 1; Index > ThanThis; --Index)
+	{
+		if(FocusPrioritySet(FocusInformation.Priorities[Index]))
+			return true;
+	}
+	return false;
+}
+
+bool ANpcEnemyController::FocusPrioritySet(const FFocusKnowledge::FFocusItem& FocusItem)
+{
+	return FAISystem::IsValidLocation(FocusItem.Position) || FocusItem.Actor.IsValid();
+}
+
 void ANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
 	if(!UpdateInfo.Target.IsValid())
 		return;
-	if( GetTargetActor() && GetTargetActor() == UpdateInfo.Target.Get() && !UpdateInfo.Stimulus.WasSuccessfullySensed())
+	if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass())
+		&& !IsHigherPrioritiesSets(EAIFocusPriority::Default))
 	{
-		SetTargetActor(nullptr);
-		return;
+		if (GetHostileActor() && GetHostileActor() == UpdateInfo.Target.Get()
+			&& !UpdateInfo.Stimulus.WasSuccessfullySensed())
+		{
+			SetHostilePointFromHostileActor();
+			return;
+		}
+		if (!GetHostileActor() && UpdateInfo.Stimulus.WasSuccessfullySensed())
+		{
+			SetHostileActor(UpdateInfo.Target.Get());
+		}
 	}
-	if( !GetTargetActor() && UpdateInfo.Stimulus.WasSuccessfullySensed())
-		SetTargetActor(UpdateInfo.Target.Get());
-	if( GetTargetActor() && UpdateInfo.Target == GetTargetActor())
+	if( GetHostileActor() && UpdateInfo.Target == GetHostileActor())
 	{
 		// If Actor was damaged
 		if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Damage::StaticClass()))
@@ -108,21 +142,21 @@ void ANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage,
 
 void ANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
 {
-	if (TargetActor.IsNull() || IsFreezeStressProgress())
+	if (!GetFocusActor() || IsFreezeStressProgress())
 	{
 		if(StressProgress != 0.f)
 			AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
 		return;
 	}
 	const FActorPerceptionInfo* Info;
-	if(Info = EnemyPerceptionComponent->GetActorInfo(*TargetActor.Get()); !Info && !Info->HasAnyCurrentStimulus())
+	if(Info = EnemyPerceptionComponent->GetActorInfo(*GetFocusActor()); !Info && !Info->HasAnyCurrentStimulus())
 	{
 		AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
 		return;
 	}
 	const auto SensedStimuli = Info->LastSensedStimuli;
 
-	const auto Distance = FVector::Distance(GetPawn()->GetActorLocation(), TargetActor->GetActorLocation());
+	const auto Distance = FVector::Distance(GetPawn()->GetActorLocation(), GetFocusActor()->GetActorLocation());
 	const auto SightConfig = Cast<UAISenseConfig_Sight>(
 		GetEnemyPerceptionComponent()->GetSenseConfig(UAISense::GetSenseID(UAISense_Sight::StaticClass())));
 	const auto HearingConfig = Cast<UAISenseConfig_Hearing>(

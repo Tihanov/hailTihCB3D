@@ -30,16 +30,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UNpcPerceptionComponent* GetEnemyPerceptionComponent() const { return EnemyPerceptionComponent; }
-	
-	UFUNCTION(BlueprintPure, Category = "Ai")
-		AActor* GetTargetActor(UPARAM(DisplayName = "IsNull?") bool& IsNull) const;
-	AActor* GetTargetActor() const { return TargetActor.Get(); };
-	UFUNCTION(BlueprintCallable, Category = "Ai")
-		void SetTargetActor(AActor* NewActor);
-
-	UFUNCTION(BlueprintPure, Category = "Ai")
-		const AActor* GetLastTargetActor(UPARAM(DisplayName = "DoesExist?") bool& OutDoesExist) const;
-	const AActor* GetLastTargetActor() const {return LastTargetActor.Get(); }
 
 	// 0.f => None
 	// 1.f => Aggressive
@@ -53,6 +43,22 @@ public:
 	bool IsFreezeStressProgress() const { return bFreezeStressProgress; }
 	void SetFreezeStressProgress(bool bInFreezeStressProgress) { bFreezeStressProgress = bInFreezeStressProgress; }
 
+	UFUNCTION(BlueprintCallable, Category = "Ai")
+		void SetHostilePoint(FVector HostilePoint);
+	UFUNCTION(BlueprintCallable, Category = "Ai")
+		void SetHostileActor(AActor* HostileActor);
+	UFUNCTION(BlueprintCallable, Category = "Ai")
+		void SetHostilePointFromHostileActor();
+	UFUNCTION(BlueprintPure, Category = "Ai")
+		AActor* GetHostileActor() const;
+	UFUNCTION(BlueprintPure, Category = "Ai")
+		FVector GetHostilePoint() const;
+	UFUNCTION(BlueprintCallable, Category = "Ai")
+		void ClearHostileActor();
+	
+	bool IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const;
+	static bool FocusPrioritySet(const FFocusKnowledge::FFocusItem& FocusItem);
+	
 	/*components:*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UNpcPerceptionComponent* EnemyPerceptionComponent;
@@ -62,8 +68,6 @@ public: /*delegates:*/
 		FOnTargetActorSetDelegate OnTargetActorSetDelegate;
 	
 protected:
-	TSoftObjectPtr<AActor> TargetActor = nullptr;
-	TSoftObjectPtr<AActor> LastTargetActor = nullptr; // TODO DEPRECATED
 	// If stress == 1 then chaise starts
 	// If stress == 0 then chaise stops
 	UPROPERTY(BlueprintReadOnly, Category = "Ai", meta = (ClampMin = 0.f, ClampMax = 1.f))

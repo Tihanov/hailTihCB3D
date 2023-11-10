@@ -35,6 +35,9 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
+	virtual FVector GetPawnViewLocation() const override;
+	
+public:
 	template<class T = UHealthPointsComponent> UHealthPointsComponent* GetHpComponent() const { return Cast<T>(HpComponent); }
 	
 	bool IsHaveWeapon() const { return bHaveWeapon; }
@@ -79,6 +82,9 @@ public: /*delegates:*/
 		FOnNpcChangeStateDelegate OnNpcChangeStateDelegate;
 	
 protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Sight")
+		FName HeadSocketName = NAME_None;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", DisplayName = "Have Weapon?")
 		bool bHaveWeapon = false;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ai|Weapon", meta=(EditCondition = "bHaveWeapon", EditConditionHides))

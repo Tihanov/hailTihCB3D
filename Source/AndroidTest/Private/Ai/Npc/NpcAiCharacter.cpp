@@ -62,6 +62,13 @@ void ANpcAiCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
+FVector ANpcAiCharacter::GetPawnViewLocation() const
+{
+	if(HeadSocketName == NAME_None)
+		return Super::GetPawnViewLocation();
+	return GetMesh()->GetSocketLocation(HeadSocketName);
+}
+
 void ANpcAiCharacter::EquipWeapon(FName SocketName /*= NAME_None*/)
 {
 	if(EquippedWeapon.IsValid())
