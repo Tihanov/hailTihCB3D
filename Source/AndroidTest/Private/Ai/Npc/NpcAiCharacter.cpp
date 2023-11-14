@@ -57,7 +57,6 @@ void ANpcAiCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if(EquippedWeapon.IsValid())
 	{
 		const auto Weapon = EquippedWeapon.Get();
-		StopShooting();
 		Weapon->Destroy();
 	}
 }
@@ -118,28 +117,6 @@ void ANpcAiCharacter::UnequipWeapon()
 	EquippedWeapon.Reset();
 }
 
-void ANpcAiCharacter::StartShooting(float Interval /* = -1.f */)
-{
-	if(EquippedWeapon.IsNull())
-		return;
-	PlayAnimMontage(AimWithWeaponAnimation);
-	if(Interval == -1.f)
-	{
-		CHECK_RETURN_ON_FAIL(EquippedWeapon.Get()->GetInfo() == nullptr);
-		Interval = EquippedWeapon.Get()->GetInfo()->ShotDelayInSec;
-	}
-	GetWorld()->GetTimerManager().SetTimer(ShootTimerHandler, this, &ANpcAiCharacter::ShootTimeCallback, Interval, true,
-				                           0);
-}
-
-void ANpcAiCharacter::StopShooting()
-{
-	if(!GetWorld()->GetTimerManager().IsTimerActive(ShootTimerHandler))
-		return;
-	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandler);
-	StopAnimMontage();
-}
-
 void ANpcAiCharacter::SetCurrentState(const ENpcState NewState)
 {
 	const auto OldState = CurrentState;
@@ -158,16 +135,3 @@ UBehaviorTree* ANpcAiCharacter::GetCurrentBehavior() const
 {
 	return GetBehaviorByState(CurrentState);
 }
-
-void ANpcAiCharacter::ShootTimeCallback()
-{
-	if(EquippedWeapon.IsNull())
-	{
-		StopShooting();
-		return;
-	}
-	const auto Weapon = EquippedWeapon.Get();
-	if(Weapon->MakeTestAttack().Find(GetController<AAIController>()->GetFocusActor()) != INDEX_NONE)
-		Weapon->PullTheTrigger();
-}
-

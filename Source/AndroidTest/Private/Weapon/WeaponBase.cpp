@@ -5,6 +5,9 @@
 
 #include "Log.h"
 #include "Camera/CameraComponent.h"
+#include "Weapon/AutomaticWeaponBase.h"
+#include "Weapon/PistolBase.h"
+#include "Weapon/ShotgunBase.h"
 
 
 AWeaponBase::AWeaponBase()

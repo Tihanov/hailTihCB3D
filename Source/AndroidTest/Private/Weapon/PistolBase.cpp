@@ -226,6 +226,7 @@ void APistolBase::TryReload(float DeltaTime)
 		CurrentReloadTimeout = 0.f;
 		IsWeaponInReloading = false;
 		CurrentMagazineCapacity = GetInfo<UPistolInfo>()->MagazineCapacity;
+		OnReloadingFinishedDelegate.Broadcast(this);
 	}
 }
 

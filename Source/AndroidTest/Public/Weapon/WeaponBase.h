@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
 #include "GameFramework/Actor.h"
 #include "Inventory/InventoryStructures.h"
 #include "WeaponBase.generated.h"
@@ -25,6 +26,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPullTheTriggerDelegate,
 	class AWeaponBase*, Weapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReleaseTheTriggerDelegate,
 	class AWeaponBase*, Weapon);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReloadingFinishedDelegate,
+	class AWeaponBase*, Weapon);
+
 
 UCLASS(Abstract, BlueprintType, Blueprintable)
 class ANDROIDTEST_API AWeaponBase : public AActor
@@ -81,7 +86,17 @@ public: /*DELEGATES*/
 		FOnPullTheTriggerDelegate OnPullTheTriggerDelegate;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnReleaseTheTrigger")
 		FOnReleaseTheTriggerDelegate OnReleaseTheTriggerDelegate;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Delegates", DisplayName = "OnReloadingFinished")
+		FOnReloadingFinishedDelegate OnReloadingFinishedDelegate;
 };
+
+namespace EWeaponShootingType
+{
+	using Type = int8;
+	inline const Type Unknown = -1; 
+	inline const Type Single = 0; 
+	inline const Type Auto = 1;
+}
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UWeaponInfo : public UDataAsset
@@ -104,6 +119,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recoil") float						RecoilTimeLenghtInSec = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recoil") bool						StopRecoilImmediatelyAfterStopShooting = false;
 	/*RECOIL END*/
+
+	virtual EWeaponShootingType::Type GetType() const { return EWeaponShootingType::Unknown; }
 };
 
 UCLASS(BlueprintType, Abstract)

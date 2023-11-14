@@ -5,7 +5,7 @@
 
 #include "Log.h"
 #include "Ai/Enemy/NpcPerceptionComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "Ai/Utils/Components/AIShootComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Hearing.h"
@@ -21,6 +21,7 @@ ANpcEnemyController::ANpcEnemyController()
 
 	EnemyPerceptionComponent = CreateDefaultSubobject<UNpcPerceptionComponent>("EnemyPerceptionComponent");
 	SetPerceptionComponent(*EnemyPerceptionComponent);
+	AIShootComponent = CreateDefaultSubobject<UAIShootComponent>("AIShootComponent");
 }
 
 void ANpcEnemyController::BeginPlay()

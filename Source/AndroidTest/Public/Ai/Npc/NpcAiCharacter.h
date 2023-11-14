@@ -50,12 +50,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
 		void UnequipWeapon();
 
-	// -1.f take interval from DataTable
-	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
-		void StartShooting(float Interval = -1.f);
-	UFUNCTION(BlueprintCallable, Category = "Ai|Weapon")
-		void StopShooting();
-	
+	UAnimMontage* GetAimWithWeaponAnimation() const { return AimWithWeaponAnimation; }
+
 	ENpcState GetCurrentState() const { return CurrentState; }
 	UFUNCTION(BlueprintCallable, Category = "Ai")
 		void SetCurrentState(const ENpcState NewState);
@@ -111,9 +107,4 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Ai|Weapon")
 		TSoftObjectPtr<AWeaponBase> EquippedWeapon = nullptr;
 
-private:
-	FTimerHandle ShootTimerHandler;
-
-private:
-	void ShootTimeCallback();
 };

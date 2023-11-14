@@ -50,4 +50,11 @@ private:
 };
 
 UCLASS(BlueprintType)
-class UPistolInfo : public UFirearmsInfo { GENERATED_BODY() };
+class UPistolInfo : public UFirearmsInfo
+{
+	GENERATED_BODY()
+
+public:
+	virtual EWeaponShootingType::Type GetType() const override { return EWeaponShootingType::Single; }
+	
+};

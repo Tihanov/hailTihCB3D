@@ -5,21 +5,20 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
-#include "BTTask_ShootingFromCover.generated.h"
+#include "BTTask_RunToCover.generated.h"
 
 class UEnvQuery;
 struct FPathFollowingResult;
 
 UCLASS()
-class ANDROIDTEST_API UBTTask_ShootingFromCover : public UBTTaskNode
+class ANDROIDTEST_API UBTTask_RunToCover : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_ShootingFromCover();
+	UBTTask_RunToCover();
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	virtual uint16 GetInstanceMemorySize() const override;
 
 protected:

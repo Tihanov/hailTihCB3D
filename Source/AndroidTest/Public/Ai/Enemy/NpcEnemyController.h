@@ -6,6 +6,7 @@
 #include "Ai/Npc/NpcAiController.h"
 #include "NpcEnemyController.generated.h"
 
+class UAIShootComponent;
 class UNpcPerceptionComponent;
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
@@ -28,7 +29,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	
+
+	UAIShootComponent* GetAIShootComponent() const { return AIShootComponent; }
 	UNpcPerceptionComponent* GetEnemyPerceptionComponent() const { return EnemyPerceptionComponent; }
 
 	// 0.f => None
@@ -58,8 +60,11 @@ public:
 	
 	bool IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const;
 	static bool FocusPrioritySet(const FFocusKnowledge::FFocusItem& FocusItem);
+
 	
-	/*components:*/
+public: /*components:*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
+		UAIShootComponent* AIShootComponent;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UNpcPerceptionComponent* EnemyPerceptionComponent;
 
