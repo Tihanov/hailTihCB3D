@@ -7,7 +7,7 @@
 #include "Weapon/WeaponBase.h"
 #include "AIShootComponent.generated.h"
 
-class ANpcAiController;
+class ANpcEnemyController;
 class ANpcAiCharacter;
 class UAIShootComponent;
 
@@ -16,8 +16,7 @@ enum class EShootingState : uint8
 {
 	None, Shooting, Reloading 
 };
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeShootingStateDelegate,
-	UAIShootComponent*, ShootComponent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeShootingStateDelegate, UAIShootComponent* /*ShootComponent*/);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANDROIDTEST_API UAIShootComponent : public UActorComponent
@@ -39,12 +38,15 @@ protected:
 	TSoftObjectPtr<AWeaponBase> Weapon = nullptr;
 
 public:
-	UPROPERTY(BlueprintAssignable, Category = "Delegates")
-		FOnChangeShootingStateDelegate OnChangeShootingStateDelegate;
+	FOnChangeShootingStateDelegate OnChangeShootingStateDelegate;
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Options")
+		bool bShootOnlyIfSeeHostileActor = true;
+	
+protected:
 	void StopShootingViaReloading();
-	ANpcAiController* GetNpcAiController() const;
+	ANpcEnemyController* GetNpcEnemyController() const;
 	ANpcAiCharacter* GetNpcAiCharacter() const;
 	
 private:

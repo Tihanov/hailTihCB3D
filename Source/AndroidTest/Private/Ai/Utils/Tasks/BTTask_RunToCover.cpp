@@ -32,7 +32,6 @@ EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& Owne
 	}
 	if(!Controller->GetHostileActor())
 		return EBTNodeResult::Failed;
-	Controller->SetFreezeStressProgress(true);
 	Controller->SetHostilePointFromHostileActor();
 	
 	const auto Character = Controller->GetPawn<ANpcAiCharacter>();
@@ -49,7 +48,7 @@ EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	FQueryFinishedSignature QueryFinishedDelegate;
 	QueryFinishedDelegate.BindUObject(this, &UBTTask_RunToCover::OnEqsFinishedCallback, NodeMemory);
-	TaskData->CoverFindingEqsRequest.Execute(EEnvQueryRunMode::RandomBest25Pct, QueryFinishedDelegate);
+	TaskData->CoverFindingEqsRequest.Execute(EEnvQueryRunMode::RandomBest5Pct, QueryFinishedDelegate);
 	return EBTNodeResult::InProgress;
 }
 

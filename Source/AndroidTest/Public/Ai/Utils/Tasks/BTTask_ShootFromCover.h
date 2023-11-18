@@ -22,13 +22,21 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	virtual uint16 GetInstanceMemorySize() const override;
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
+	
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Options")
+		float ForgetTimeSec = 20.f;
 
 private:
-	UFUNCTION()
 	void OnChangeShootingStateCallback(UAIShootComponent* ShootComponent);
 
 	bool GetControllerAndCharacterFromContComponent(const UActorComponent* ActorComponent,
 	                                                ANpcEnemyController*& OutNpcEnemyController,
 	                                                ANpcAiCharacter*& OutNpcAiCharacter) const;
 	UBehaviorTreeComponent* GetBTCompFromController(const AAIController* Controller) const;
+
+	void OnForgetCallback(uint8* NodeMemory);
+	
+	FTimerHandle ForgetTimerHandle;
 };

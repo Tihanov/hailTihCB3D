@@ -10,10 +10,19 @@ class UAIShootComponent;
 class UNpcPerceptionComponent;
 class UAIPerceptionComponent;
 struct FActorPerceptionUpdateInfo;
+class ANpcEnemyController;
 
+/*
+ * DEPRECATED TODO DELETE
+ */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTargetActorSetDelegate,
 	ANpcEnemyController*, EnemyNpcController, 
 	AActor*, TargetActor);
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnHostileActorUpdateDelegate,
+	ANpcEnemyController* /*EnemyNpcController*/, 
+	AActor* /*HostileActor*/,
+	FVector /*FocalPoint*/);
 
 UCLASS()
 class ANDROIDTEST_API ANpcEnemyController : public ANpcAiController
@@ -57,6 +66,8 @@ public:
 		FVector GetHostilePoint() const;
 	UFUNCTION(BlueprintCallable, Category = "Ai")
 		void ClearHostileActor();
+
+	virtual FVector GetFocalPointOnActor(const AActor* Actor) const override;
 	
 	bool IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const;
 	static bool FocusPrioritySet(const FFocusKnowledge::FFocusItem& FocusItem);
@@ -69,8 +80,12 @@ public: /*components:*/
 		UNpcPerceptionComponent* EnemyPerceptionComponent;
 
 public: /*delegates:*/
-	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTargetActorSet")
+	/*
+	 * DEPRECATED
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTargetActorSet", meta = (DeprecatedProperty))
 		FOnTargetActorSetDelegate OnTargetActorSetDelegate;
+	FOnHostileActorUpdateDelegate OnHostileActorUpdateDelegate;
 	
 protected:
 	// If stress == 1 then chaise starts

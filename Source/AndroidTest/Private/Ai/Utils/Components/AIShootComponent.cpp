@@ -4,8 +4,8 @@
 #include "Ai/Utils/Components/AIShootComponent.h"
 
 #include "Log.h"
+#include "Ai/Enemy/NpcEnemyController.h"
 #include "Ai/Npc/NpcAiCharacter.h"
-#include "Ai/Npc/NpcAiController.h"
 #include "Utils/Utils.h"
 
 
@@ -56,16 +56,16 @@ void UAIShootComponent::StopShootingViaReloading()
 	StopShootingImplementation();
 }
 
-ANpcAiController* UAIShootComponent::GetNpcAiController() const
+ANpcEnemyController*  UAIShootComponent::GetNpcEnemyController() const
 {
-	const auto Controller = GetOwner<ANpcAiController>();
+	const auto Controller = GetOwner<ANpcEnemyController>();
 	check(Controller);
 	return Controller;
 }
 
 ANpcAiCharacter* UAIShootComponent::GetNpcAiCharacter() const
 {
-	const auto Character = GetNpcAiController()->GetPawn<ANpcAiCharacter>();
+	const auto Character = GetNpcEnemyController()->GetPawn<ANpcAiCharacter>();
 	return Character;
 }
 
@@ -118,14 +118,18 @@ void UAIShootComponent::StopShootingImplementation()
 
 void UAIShootComponent::ShootSingleCallback()
 {
-	CHECK_RETURN_ON_FAIL(Weapon.IsNull());
+	CHECK_RETURN_ON_FAIL(!Weapon.IsValid());
 	if(Weapon->GetMagazineCapacity() <= 0)
 	{
 		StopShootingViaReloading();
 		return;
 	}
-	Weapon->PullTheTrigger();
-	Weapon->ReleaseTheTrigger();
+
+	if(GetNpcEnemyController()->GetHostileActor() || !bShootOnlyIfSeeHostileActor)
+	{
+		Weapon->PullTheTrigger();
+		Weapon->ReleaseTheTrigger();
+	}
 }
 
 void UAIShootComponent::ShootAutoCallback()

@@ -62,11 +62,13 @@ void ANpcEnemyController::AddDeltaToStressProgress(float Delta)
 void ANpcEnemyController::SetHostilePoint(FVector HostilePoint)
 {
 	SetFocalPoint(HostilePoint, EAIFocusPriority::Default);
+	OnHostileActorUpdateDelegate.Broadcast(this, GetHostileActor(), GetHostilePoint());
 }
 
 void ANpcEnemyController::SetHostileActor(AActor* HostileActor)
 {
 	SetFocus(HostileActor, EAIFocusPriority::Default);
+	OnHostileActorUpdateDelegate.Broadcast(this, GetHostileActor(), GetHostilePoint());
 }
 
 void ANpcEnemyController::SetHostilePointFromHostileActor()
@@ -91,6 +93,20 @@ FVector ANpcEnemyController::GetHostilePoint() const
 void ANpcEnemyController::ClearHostileActor()
 {
 	ClearFocus(EAIFocusPriority::Default);
+	OnHostileActorUpdateDelegate.Broadcast(this, GetHostileActor(), GetHostilePoint());
+}
+
+FVector ANpcEnemyController::GetFocalPointOnActor(const AActor* Actor) const
+{
+	if( !Actor || GetHostileActor() != Actor )
+		return Super::GetFocalPointOnActor(Actor);
+	
+	const FActorPerceptionInfo* Info;
+	const auto SenseSightID = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+	if(Info = EnemyPerceptionComponent->GetActorInfo(*GetFocusActor()); !Info || !Info->HasAnyCurrentStimulus() || !Info->IsSenseActive(SenseSightID))
+		return Super::GetFocalPointOnActor(Actor);
+	
+	return Info->GetStimulusLocation( SenseSightID );
 }
 
 bool ANpcEnemyController::IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const
@@ -143,21 +159,21 @@ void ANpcEnemyController::PawnDamageCallback(AActor* DamagedActor, float Damage,
 
 void ANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
 {
-	if (!GetFocusActor() || IsFreezeStressProgress())
+	if (!GetHostileActor() || IsFreezeStressProgress())
 	{
 		if(StressProgress != 0.f)
 			AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
 		return;
 	}
 	const FActorPerceptionInfo* Info;
-	if(Info = EnemyPerceptionComponent->GetActorInfo(*GetFocusActor()); !Info && !Info->HasAnyCurrentStimulus())
+	if(Info = EnemyPerceptionComponent->GetActorInfo(*GetHostileActor()); !Info || !Info->HasAnyCurrentStimulus())
 	{
 		AddDeltaToStressProgress(NoPerceptionAdderEverySecond * DeltaTime);
 		return;
 	}
 	const auto SensedStimuli = Info->LastSensedStimuli;
 
-	const auto Distance = FVector::Distance(GetPawn()->GetActorLocation(), GetFocusActor()->GetActorLocation());
+	const auto Distance = FVector::Distance(GetPawn()->GetActorLocation(), GetHostileActor()->GetActorLocation());
 	const auto SightConfig = Cast<UAISenseConfig_Sight>(
 		GetEnemyPerceptionComponent()->GetSenseConfig(UAISense::GetSenseID(UAISense_Sight::StaticClass())));
 	const auto HearingConfig = Cast<UAISenseConfig_Hearing>(
