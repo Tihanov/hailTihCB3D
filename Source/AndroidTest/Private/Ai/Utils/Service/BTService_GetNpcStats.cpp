@@ -12,6 +12,10 @@ UBTService_GetNpcStats::UBTService_GetNpcStats()
 {
 	NodeName = "Get Npc Stats";
 	INIT_SERVICE_NODE_NOTIFY_FLAGS();
+
+	OutHostileActor.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UBTService_GetNpcStats, OutHostileActor),
+	                                AActor::StaticClass());
+	OutStress.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UBTService_GetNpcStats, OutStress));
 }
 
 void UBTService_GetNpcStats::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)

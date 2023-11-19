@@ -20,6 +20,7 @@ struct FTaskData_ShootingFromCover
 UBTTask_RunToCover::UBTTask_RunToCover()
 {
 	NodeName = "Run To Cover";
+	bNotifyTaskFinished = true;
 }
 
 EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -33,7 +34,15 @@ EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& Owne
 	if(!Controller->GetHostileActor())
 		return EBTNodeResult::Failed;
 	Controller->SetHostilePointFromHostileActor();
-	
+
+	/*
+	 * TODO make is property
+	 */
+	Controller->SetSenseHostile(false);
+
+	/*
+	 * TODO move EquipWeapon to ShootFromCover
+	 */
 	const auto Character = Controller->GetPawn<ANpcAiCharacter>();
 	CHECK_RETURN(!Character, return EBTNodeResult::Aborted);
 	Character->EquipWeapon();
@@ -50,6 +59,22 @@ EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& Owne
 	QueryFinishedDelegate.BindUObject(this, &UBTTask_RunToCover::OnEqsFinishedCallback, NodeMemory);
 	TaskData->CoverFindingEqsRequest.Execute(EEnvQueryRunMode::RandomBest5Pct, QueryFinishedDelegate);
 	return EBTNodeResult::InProgress;
+}
+
+void UBTTask_RunToCover::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
+	EBTNodeResult::Type TaskResult)
+{
+	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootingFromCover>(NodeMemory);
+	check(TaskData);
+	if(!IsValid(TaskData->NpcController))
+		return;
+
+	TaskData->NpcController->SetSenseHostile(true);
+	
+	const auto MovComp = Cast<UNpcMovementComponent>(TaskData->NpcController->GetPawn()->GetMovementComponent());
+	if(!IsValid(MovComp))
+		return;
+	MovComp->StopRunning();
 }
 
 uint16 UBTTask_RunToCover::GetInstanceMemorySize() const

@@ -128,8 +128,7 @@ void ANpcEnemyController::ActorPerceptionInfoUpdatedCallback(const FActorPercept
 {
 	if(!UpdateInfo.Target.IsValid())
 		return;
-	if(UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass())
-		&& !IsHigherPrioritiesSets(EAIFocusPriority::Default))
+	if( IsSenseHostile() && UpdateInfo.Stimulus.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass()) )
 	{
 		if (GetHostileActor() && GetHostileActor() == UpdateInfo.Target.Get()
 			&& !UpdateInfo.Stimulus.WasSuccessfullySensed())
@@ -192,7 +191,6 @@ void ANpcEnemyController::ChaiseStressUpdate(float DeltaTime)
 		return Stimulus.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass()) && !Stimulus.IsExpired();}))
 	{
 		AddDeltaToStressProgress(SightStressAdder * DeltaTime);
-		ULog::Warning("Sight", LO_Both);
 	}
 	if(SensedStimuli.ContainsByPredicate( [](const FAIStimulus& Stimulus)-> bool {
 		return Stimulus.Type == UAISense::GetSenseID(UAISense_Hearing::StaticClass()) && !Stimulus.IsExpired();}))

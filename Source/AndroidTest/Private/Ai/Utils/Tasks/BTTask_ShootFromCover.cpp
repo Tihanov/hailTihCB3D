@@ -11,6 +11,7 @@
 struct FTaskData_ShootFromCover
 {
 	UBehaviorTreeComponent* BTComponent;
+	FTimerHandle ForgetTimerHandle;
 };
 
 UBTTask_ShootFromCover::UBTTask_ShootFromCover()
@@ -48,22 +49,25 @@ void UBTTask_ShootFromCover::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 		return FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
 	const auto HostileActor = EnemyController->GetHostileActor();
 
+	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootFromCover>(NodeMemory);
+	CHECK_RETURN(TaskData == nullptr, FinishLatentTask(OwnerComp, EBTNodeResult::Aborted));
+	
 	// Stop forgeting
-	if (HostileActor && GetWorld()->GetTimerManager().IsTimerActive(ForgetTimerHandle)
+	if (HostileActor && GetWorld()->GetTimerManager().IsTimerActive(TaskData->ForgetTimerHandle)
 		&& EnemyController->GetAIShootComponent()->GetShootingState() == EShootingState::Shooting)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(ForgetTimerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(TaskData->ForgetTimerHandle);
 		return;
 	}
 
 	// Start forgeting
-	if (!HostileActor && !GetWorld()->GetTimerManager().IsTimerActive(ForgetTimerHandle)
+	if (!HostileActor && !GetWorld()->GetTimerManager().IsTimerActive(TaskData->ForgetTimerHandle)
 		&& EnemyController->GetAIShootComponent()->GetShootingState() == EShootingState::Shooting)
 	{
 		FTimerDelegate Delegate;
 		Delegate.BindUObject(this, &UBTTask_ShootFromCover::OnForgetCallback, NodeMemory);
 
-		GetWorld()->GetTimerManager().SetTimer(ForgetTimerHandle, Delegate, ForgetTimeSec, false);
+		GetWorld()->GetTimerManager().SetTimer(TaskData->ForgetTimerHandle, Delegate, ForgetTimeSec, false);
 	}
 }
 
@@ -75,9 +79,6 @@ uint16 UBTTask_ShootFromCover::GetInstanceMemorySize() const
 void UBTTask_ShootFromCover::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
 	EBTNodeResult::Type TaskResult)
 {
-	if(TaskResult == EBTNodeResult::Aborted)
-		return;
-	
 	ANpcEnemyController* EnemyController;
 	ANpcAiCharacter* NpcCharacter;
 	if (!GetControllerAndCharacterFromContComponent(&OwnerComp, EnemyController, NpcCharacter))

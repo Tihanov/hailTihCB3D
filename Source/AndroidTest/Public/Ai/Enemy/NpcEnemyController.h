@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ai")
 		void ClearHostileActor();
 
+	bool IsSenseHostile() const { return bSenseHostile; }
+	void SetSenseHostile(const bool bNewSenseHostile) { bSenseHostile = bNewSenseHostile; }
+
 	virtual FVector GetFocalPointOnActor(const AActor* Actor) const override;
 	
 	bool IsHigherPrioritiesSets(EAIFocusPriority::Type ThanThis) const;
@@ -120,6 +123,8 @@ protected:	/* Stress options: */
 	UPROPERTY(EditAnywhere, Category = "Ai|Stress", meta = (ClampMin = 0.f, ClampMax = 1.f))
 		float NoPerceptionAdderEverySecond = -0.2f;
 
+	bool bSenseHostile = true;
+	
 private:
 	UFUNCTION()
 		void ActorPerceptionInfoUpdatedCallback(const FActorPerceptionUpdateInfo& UpdateInfo);

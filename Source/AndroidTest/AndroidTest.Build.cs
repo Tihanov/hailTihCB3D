@@ -15,7 +15,8 @@ public class AndroidTest : ModuleRules
             "Engine", 
             "InputCore",
             "AIModule",
-            "GameplayTasks"
+            "GameplayTasks",
+            "NavigationSystem"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[]

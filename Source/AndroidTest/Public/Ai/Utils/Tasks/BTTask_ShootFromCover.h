@@ -37,6 +37,4 @@ private:
 	UBehaviorTreeComponent* GetBTCompFromController(const AAIController* Controller) const;
 
 	void OnForgetCallback(uint8* NodeMemory);
-	
-	FTimerHandle ForgetTimerHandle;
 };
