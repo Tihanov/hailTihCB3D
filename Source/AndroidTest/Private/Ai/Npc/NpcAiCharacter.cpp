@@ -5,7 +5,6 @@
 
 #include "Log.h"
 #include "MainGameState.h"
-#include "Utils/UtilsStructs.h"
 #include "Ai/Npc/NpcAiController.h"
 #include "Ai/Npc/NpcMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -36,8 +35,6 @@ ANpcAiCharacter::ANpcAiCharacter(const FObjectInitializer& ObjectInitializer)
 	HpComponent->SetHealthPoints(HpComponent->GetMaxHealthPoints());
 
 	ChestComponent = CreateDefaultSubobject<UChestComponent>("ChestComponent");
-
-	TeamIdComponent = CreateDefaultSubobject<UTeamIdComponent>("TeamIdComponent");
 }
 
 void ANpcAiCharacter::BeginPlay()

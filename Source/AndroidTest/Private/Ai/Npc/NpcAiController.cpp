@@ -15,6 +15,12 @@ ANpcAiController::ANpcAiController()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ANpcAiController::BeginPlay()
+{
+	Super::BeginPlay();
+	SetGenericTeamId(NpcTeamId.GetIntValue());
+}
+
 void ANpcAiController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -75,6 +81,18 @@ void ANpcAiController::SwapToNextInterest()
 	if(!NpcAiCharacter->PointsOfInterest.IsValidIndex(IndexOfCurrentPointOfInterest))
 		IndexOfCurrentPointOfInterest = 0;
 	SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[IndexOfCurrentPointOfInterest]);
+}
+
+ETeamAttitude::Type ANpcAiController::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	if (const APawn* OtherPawn = Cast<APawn>(&Other))
+	{
+		if (const IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(OtherPawn->GetController()))
+		{
+			return Super::GetTeamAttitudeTowards(*OtherPawn->GetController());
+		}
+	}
+	return Super::GetTeamAttitudeTowards(Other);
 }
 
 void ANpcAiController::SpawnPoiFromInstance(UAiPointOfInterestInstance* Instance)

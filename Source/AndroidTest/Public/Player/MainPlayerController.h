@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "DlgSystem/DlgDialogueParticipant.h"
 #include "DlgSystem/DlgEdge.h"
@@ -36,6 +37,7 @@ UCLASS()
 class ANDROIDTEST_API AMainPlayerController
 	: public APlayerController
 	, public IDlgDialogueParticipant
+	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 

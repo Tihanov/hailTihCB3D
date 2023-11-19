@@ -4,7 +4,6 @@
 #include "Player/MainCharacter.h"
 
 #include "Kismet/KismetSystemLibrary.h"
-#include "Utils/UtilsStructs.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 AMainCharacter::AMainCharacter()
@@ -14,9 +13,6 @@ AMainCharacter::AMainCharacter()
 	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(
 		"PerceptionStimuliSourceComponent");
 	PerceptionStimuliSourceComponent->RegisterWithPerceptionSystem();
-
-	TeamIdComponent = CreateDefaultSubobject<UTeamIdComponent>("TeamIdComponent");
-	TeamIdComponent->SetTeamId(TI_MainPlayer);
 }
 
 void AMainCharacter::SetCharacterState(EMainCharacterState CharacterState_)

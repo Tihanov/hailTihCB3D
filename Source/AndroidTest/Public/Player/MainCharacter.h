@@ -54,8 +54,6 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
-		UTeamIdComponent* TeamIdComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Options|Sight")

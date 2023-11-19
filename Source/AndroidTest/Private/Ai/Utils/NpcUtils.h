@@ -22,3 +22,12 @@ enum class ENpcState : uint8
 	Dead		= 1 << 4, 
 };
 ENUM_CLASS_FLAGS(ENpcState);
+
+UENUM(BlueprintType)
+enum ENpcTeamId
+{
+	NTI_None			UMETA(DisplayName = "None"),
+	NTI_Villager		UMETA(DisplayName = "Villager"),
+	NTI_Hostile			UMETA(DisplayName = "Hostile"),
+	NTI_MainPlayer		UMETA(DisplayName = "MainPlayer"),
+};

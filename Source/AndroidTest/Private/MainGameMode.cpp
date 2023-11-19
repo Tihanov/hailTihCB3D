@@ -3,8 +3,6 @@
 
 #include "MainGameMode.h"
 
-#include "Utils/UtilsStructs.h"
-#include "GenericTeamAgentInterface.h"
 #include "AndroidTest/Public/Ai/Utils/TimeManager.h"
 
 AMainGameMode::AMainGameMode()
@@ -20,8 +18,6 @@ void AMainGameMode::PreInitializeComponents()
 
 	TimeManager = GetWorld()->SpawnActor<ATimeManager>(TimeManagerClass);
 	check(TimeManager);
-
-	FGenericTeamId::SetAttitudeSolver(&MainTeamIdSolver);
 }
 
 ATimeManager* AMainGameMode::GetTimeManager() const

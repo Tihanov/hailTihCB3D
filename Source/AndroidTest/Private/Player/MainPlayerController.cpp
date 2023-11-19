@@ -4,6 +4,7 @@
 #include "Player/MainPlayerController.h"
 
 #include "Log.h"
+#include "Ai/Utils/NpcUtils.h"
 #include "DlgSystem/DlgContext.h"
 #include "DlgSystem/DlgDialogue.h"
 #include "DlgSystem/DlgManager.h"
@@ -17,7 +18,8 @@ AMainPlayerController::AMainPlayerController()
 void AMainPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SetGenericTeamId(ENpcTeamId::NTI_MainPlayer);
 }
 
 void AMainPlayerController::StartDialogue(UDlgDialogue* Dialogue, TArray<AActor*> Participants)

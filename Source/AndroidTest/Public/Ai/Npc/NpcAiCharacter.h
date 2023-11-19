@@ -67,8 +67,6 @@ public:
 		UHealthPointsComponent* HpComponent;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
 		UChestComponent* ChestComponent;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Components")
-		UTeamIdComponent* TeamIdComponent;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Ai|Point Of Interest")
 		TArray<UAiPointOfInterestInstance*> PointsOfInterest;

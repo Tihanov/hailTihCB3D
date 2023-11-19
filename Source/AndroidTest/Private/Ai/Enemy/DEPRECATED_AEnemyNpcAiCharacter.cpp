@@ -4,7 +4,6 @@
 #include "Ai/Enemy/DEPRECATED_AEnemyNpcAiCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "Utils/UtilsStructs.h"
 #include "Perception/AIPerceptionComponent.h"
 
 ADEPRECATED_AEnemyNpcAiCharacter::ADEPRECATED_AEnemyNpcAiCharacter()

@@ -21,6 +21,7 @@ public:
 	ANpcAiController();
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
@@ -35,7 +36,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PointOfInterest")
 		void SwapToNextInterest();
 
+	/*
+	 * Implementation of IGenericTeamAgentInterface
+	 */
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+	
 protected:
+	UPROPERTY(EditAnywhere, Category = "Options")
+		TEnumAsByte<ENpcTeamId> NpcTeamId = NTI_Villager;
+	
 	int32 IndexOfCurrentPointOfInterest;
 	AAiPointOfInterest* CurrentPoi = nullptr;
 	

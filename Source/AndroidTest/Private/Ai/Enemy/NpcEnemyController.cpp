@@ -22,6 +22,8 @@ ANpcEnemyController::ANpcEnemyController()
 	EnemyPerceptionComponent = CreateDefaultSubobject<UNpcPerceptionComponent>("EnemyPerceptionComponent");
 	SetPerceptionComponent(*EnemyPerceptionComponent);
 	AIShootComponent = CreateDefaultSubobject<UAIShootComponent>("AIShootComponent");
+
+	NpcTeamId = ENpcTeamId::NTI_Hostile;
 }
 
 void ANpcEnemyController::BeginPlay()

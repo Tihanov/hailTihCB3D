@@ -16,6 +16,4 @@ class ANDROIDTEST_API UNpcPerceptionComponent : public UAIPerceptionComponent
 
 public:
 	UNpcPerceptionComponent();
-
-	virtual void GetHostileActors(TArray<AActor*>& OutActors) const override;
 };
