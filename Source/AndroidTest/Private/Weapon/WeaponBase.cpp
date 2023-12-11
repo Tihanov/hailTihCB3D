@@ -30,6 +30,7 @@ void AWeaponBase::InitAsEquippedWeapon_Implementation(APawn* WeaponOwner, FInvIt
 
 	RootMeshComponent->SetStaticMesh(ItemSettings.Mesh);
 	RootMeshComponent->SetWorldScale3D(ItemSettings.Other.Scale);
+	RootMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 FInvItemDataTable AWeaponBase::GetWeaponSettings() const

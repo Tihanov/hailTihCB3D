@@ -106,9 +106,11 @@ class UWeaponInfo : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)				TSubclassOf<class AWeaponBase>		WeaponClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) 			class UAnimMontage* 				AimAnimationMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 			class UAnimMontage* 				AttackAnimationMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)				class USoundBase*					ShotSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)				float								Damage = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) 			float								ShotDelayInSec = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 			FName								Socket = NAME_None;
 
 	/*RECOIL START*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recoil") float						VerticalRecoilInShot = 1.f;
