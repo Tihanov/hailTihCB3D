@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Utils/Utils.h"
 
 
 AAutomaticWeaponBase::AAutomaticWeaponBase()
@@ -134,16 +135,19 @@ void AAutomaticWeaponBase::TryReload(float DeltaTime)
 
 void AAutomaticWeaponBase::TryShoot()
 {
-#if 0
 	if(CurrentMagazineCapacity <= 0)
 	{
-		ReloadWeapon_Implementation();
+		Reload();
+		ReleaseTheTrigger();
 		return;
 	}
-	if(!CanWeaponShoot_Implementation())
+	if(!CanBeUsedNow())
 		return;
 	CurrentMagazineCapacity -= 1;
 
+	const auto AutomaticWeaponInfo = GetInfo<UAutomaticWeaponInfo>();
+	CHECK_RETURN_ON_FAIL(!AutomaticWeaponInfo);
+	
 	FHitResult HitResult;
 	bool IsDamageWasDone = false;
 	float DoneDamage = 0.f;
@@ -151,12 +155,12 @@ void AAutomaticWeaponBase::TryShoot()
 	FVector Start = OwnerAimCameraRight->GetComponentLocation();
 	FVector End = Start
 		+ UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OwnerAimCameraRight->GetForwardVector(), CurrentScatter)
-		* ItemSettings.Other.WeaponItemSettings.ShotRange;
+		* AutomaticWeaponInfo->ShotRange;
 	auto MainGameState = Cast<AMainGameState>(GetWorld()->GetGameState());
 
 	UGameplayStatics::PlaySoundAtLocation(
 		GetWorld(),
-		ItemSettings.Other.WeaponItemSettings.ShotSound,
+		AutomaticWeaponInfo->ShotSound,
 		RootMeshComponent->GetSocketLocation("ShootFrom"),
 		FRotator::ZeroRotator);
 
@@ -175,7 +179,7 @@ void AAutomaticWeaponBase::TryShoot()
 	End = Start
 		+ UKismetMathLibrary::GetForwardVector(
 			UKismetMathLibrary::FindLookAtRotation(ShootFromLocation, Result ? HitResult.ImpactPoint : End))
-		* ItemSettings.Other.WeaponItemSettings.ShotRange * 1.1;
+		* AutomaticWeaponInfo->ShotRange * 1.1;
 		
 	Result = UKismetSystemLibrary::LineTraceSingle(
 			GetWorld(),
@@ -193,8 +197,8 @@ void AAutomaticWeaponBase::TryShoot()
 		DoneDamage =
 			UGameplayStatics::ApplyPointDamage(
 				HitResult.GetActor(),
-				ItemSettings.Other.WeaponItemSettings.Damage
-				* (1.f - (HitResult.Distance / ItemSettings.Other.WeaponItemSettings.ShotRange)),
+				AutomaticWeaponInfo->Damage
+				* (1.f - (HitResult.Distance / AutomaticWeaponInfo->ShotRange)),
 				FVector::ZeroVector /*TODO*/,
 				HitResult,
 				GetOwner()->GetInstigatorController(),
@@ -204,14 +208,13 @@ void AAutomaticWeaponBase::TryShoot()
 	}
 
 	CurrentScatter = FMath::Clamp(
-		CurrentScatter + ItemSettings.Other.WeaponItemSettings.ShotScatter,
-		ItemSettings.Other.WeaponItemSettings.MinScatter,
-		ItemSettings.Other.WeaponItemSettings.MaxScatter);
+		CurrentScatter + AutomaticWeaponInfo->ShotScatter,
+		AutomaticWeaponInfo->MinScatter,
+		AutomaticWeaponInfo->MaxScatter);
 	decltype(FDamagedActorsAndDamageProxyMap::DamagedActors) TempMap;
 	if(IsDamageWasDone)
 		TempMap.Add(DamagedActor, DoneDamage);
 	OnAttackDelegate.Broadcast(this, IsDamageWasDone, {TempMap});
-#endif
 }
 
 void AAutomaticWeaponBase::ShotDelay(float DeltaTime)
