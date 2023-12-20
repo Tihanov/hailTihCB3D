@@ -42,7 +42,7 @@ public:
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = "Options")
+	UPROPERTY(EditAnywhere, Category = "AI")
 		TEnumAsByte<ENpcTeamId> NpcTeamId = NTI_Villager;
 	
 	int32 IndexOfCurrentPointOfInterest;

@@ -22,8 +22,10 @@ public: /*Vars*/
 		class UQuestAsset* ParentQuestAsset;
 
 public:
+	virtual void S_Init(class APlayerController* PlayerController) { BP_Init(PlayerController); };
+	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-		void Init(class APlayerController* PlayerController);
+		void BP_Init(class APlayerController* PlayerController);
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 		bool IsDone();
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)

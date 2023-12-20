@@ -7,8 +7,9 @@
 #include "Inventory/InventoryItemBaseActor.h"
 #include "QuestStructures.generated.h"
 
+class UQuestManagerComponent;
 class UQuestTask;
-
+class UQuestCallback;
 
 
 ////////////////////////////////////////////////////////
@@ -44,6 +45,9 @@ struct FQuestPartInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine = true)) FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestTask*> Tasks;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestCallback*> BeforeCallbacks;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestCallback*> AfterCallbacks;
 };
 
 
@@ -52,14 +56,14 @@ struct FQuestPartInfo
 ////////////////////////////////////////////////////////
 
 
-UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew)
-class ANDROIDTEST_API UQuestMethodToDoAfter: public UObject 
+UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew, meta = (ShowWorldContextPin = "true"))
+class ANDROIDTEST_API UQuestCallback: public UObject 
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-		void Do();
+		void Do(const UQuestManagerComponent* QuestManagerComponent);
 };
 
 

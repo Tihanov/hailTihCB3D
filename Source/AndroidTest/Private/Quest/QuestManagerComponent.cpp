@@ -6,8 +6,10 @@
 #include "Log.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "UObject/UObjectGlobals.h"
 #include "Quest/QuestTask.h"
+
 
 
 UQuestManagerComponent::UQuestManagerComponent()
@@ -76,7 +78,7 @@ void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 		if(QuestAsset->Parts.Num() == QuestInfo.QuestPart + 1)
 		{
 			for (const auto& DoAfter : QuestAsset->ToDoAfter)
-				DoAfter->Do();
+				DoAfter->Do(this);
 			this->SetQuestComplete(QuestAsset);
 			OnQuestStateChangedDelegate.Broadcast(QuestAsset);
 			return;
@@ -85,6 +87,13 @@ void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 		QuestInfo.TasksAndState.Empty();
 		UpdateQuestCompletingInfoToDoTasks(QuestAsset, QuestInfo);
 		OnQuestStateChangedDelegate.Broadcast(QuestAsset);
+
+		// Call After Callbacks
+		const auto CurrentPart = QuestAsset->Parts[QuestInfo.QuestPart];
+		for (const auto& AfterCallback : CurrentPart.AfterCallbacks)
+		{
+			AfterCallback->Do(this);
+		}
 	}
 }
 
@@ -102,19 +111,27 @@ void UQuestManagerComponent::OnTaskDoneCallback(UQuestTask* Task)
 
 void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo)
 {
-	for (const auto& Task : Quest->Parts[ToInitInfo.QuestPart].Tasks)
+	// Call Before Callbacks
+	const auto CurrentPart = Quest->Parts[ToInitInfo.QuestPart];
+	for (const auto& BeforeCallback : CurrentPart.BeforeCallbacks)
+	{
+		BeforeCallback->Do(this);
+	}
+
+	// Init Quest Part Tasks
+	for (const auto& Task : CurrentPart.Tasks)
 	{
 		auto NewTask = DuplicateObject(Task, nullptr);
 		ToInitInfo.TasksAndState.Add(NewTask, false);
-		NewTask->Init(Cast<APlayerController>(GetOwner()));
+		NewTask->S_Init(Cast<APlayerController>(GetOwner()));
 		NewTask->OnTaskDoneDelegate.AddDynamic(this, &UQuestManagerComponent::OnTaskDoneCallback);
 		NewTask->ParentQuestAsset = Quest;
 		if(NewTask->IsDone())
 		{
 			const auto& QuestInfo = CurrentQuestsAndInfo[Quest];
-			const int CurrentPart = QuestInfo.QuestPart;
+			const int CurrentPartIndex = QuestInfo.QuestPart;
 			OnTaskDoneCallback(NewTask);
-			if(CurrentPart != QuestInfo.QuestPart || CompletedQuests.Contains(Quest))
+			if(CurrentPartIndex != QuestInfo.QuestPart || CompletedQuests.Contains(Quest))
 				break;
 		}
 	}

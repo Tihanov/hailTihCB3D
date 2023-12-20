@@ -20,5 +20,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<FQuestPartInfo> Parts;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<UQuestAsset*> QuestsToDoNext;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestMethodToDoAfter*> ToDoAfter;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestCallback*> ToDoAfter;
 };
