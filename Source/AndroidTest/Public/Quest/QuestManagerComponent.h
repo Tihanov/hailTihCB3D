@@ -70,4 +70,6 @@ private:
 	UFUNCTION() void OnTaskDoneCallback(UQuestTask* Task);
 	bool SetQuestComplete(UQuestAsset* Quest);
 	void UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Quest, FQuestCompletingInfo& ToInitInfo);
+
+	void CallCallbacksOfPart_After(const FQuestPartInfo& Part);
 };

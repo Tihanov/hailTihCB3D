@@ -9,7 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "UObject/UObjectGlobals.h"
 #include "Quest/QuestTask.h"
-
+#include "Utils/Utils.h"
 
 
 UQuestManagerComponent::UQuestManagerComponent()
@@ -69,31 +69,32 @@ void UQuestManagerComponent::TrackQuest(UQuestAsset* ToTrack)
 void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)
 {
 	auto& QuestInfo = CurrentQuestsAndInfo[QuestAsset];
+	const auto PrevPart = QuestAsset->Parts[QuestInfo.QuestPart];
+
 	int CompletedTasks = 0;
 	for(const auto& Task : QuestInfo.TasksAndState)
 		CompletedTasks += Task.Value;
 	
 	if(CompletedTasks == QuestInfo.TasksAndState.Num())
 	{
+		// If the current part is the last part of quest
 		if(QuestAsset->Parts.Num() == QuestInfo.QuestPart + 1)
 		{
 			for (const auto& DoAfter : QuestAsset->ToDoAfter)
 				DoAfter->Do(this);
 			this->SetQuestComplete(QuestAsset);
 			OnQuestStateChangedDelegate.Broadcast(QuestAsset);
+
+			CallCallbacksOfPart_After(PrevPart);
+			
 			return;
 		}
 		QuestInfo.QuestPart += 1;
 		QuestInfo.TasksAndState.Empty();
 		UpdateQuestCompletingInfoToDoTasks(QuestAsset, QuestInfo);
 		OnQuestStateChangedDelegate.Broadcast(QuestAsset);
-
-		// Call After Callbacks
-		const auto CurrentPart = QuestAsset->Parts[QuestInfo.QuestPart];
-		for (const auto& AfterCallback : CurrentPart.AfterCallbacks)
-		{
-			AfterCallback->Do(this);
-		}
+		
+		CallCallbacksOfPart_After(PrevPart);
 	}
 }
 
@@ -134,6 +135,15 @@ void UQuestManagerComponent::UpdateQuestCompletingInfoToDoTasks(UQuestAsset* Que
 			if(CurrentPartIndex != QuestInfo.QuestPart || CompletedQuests.Contains(Quest))
 				break;
 		}
+	}
+}
+
+void UQuestManagerComponent::CallCallbacksOfPart_After(const FQuestPartInfo& Part)
+{
+	for (const auto& AfterCallback : Part.AfterCallbacks)
+	{
+		CHECK_RETURN(!AfterCallback, continue;);
+		AfterCallback->Do(this);
 	}
 }
 

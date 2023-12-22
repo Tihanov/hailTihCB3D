@@ -36,6 +36,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PointOfInterest")
 		void SwapToNextInterest();
 
+	UFUNCTION(BlueprintSetter, BlueprintCallable)
+		void SetNpcTeamId(TEnumAsByte<ENpcTeamId> NewNpcTeamId);
+	UFUNCTION(BlueprintGetter, BlueprintPure)
+		TEnumAsByte<ENpcTeamId> GetNpcTeamId() const;
+
 	/*
 	 * Implementation of IGenericTeamAgentInterface
 	 */
@@ -43,7 +48,7 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "AI")
-		TEnumAsByte<ENpcTeamId> NpcTeamId = NTI_Villager;
+		TEnumAsByte<ENpcTeamId> DefaultNpcTeamId = NTI_Villager;
 	
 	int32 IndexOfCurrentPointOfInterest;
 	AAiPointOfInterest* CurrentPoi = nullptr;

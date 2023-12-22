@@ -56,7 +56,7 @@ UTexture2D* ANpcBaseCharacter::GetIco_Implementation() const
 
 bool ANpcBaseCharacter::CanDoAction_Implementation() const
 {
-	return bCanPlayerSpeakWith;
+	return bCanPlayerSpeakWith && IsValid(Dialogue);
 }
 
 UDlgDialogue* ANpcBaseCharacter::GetDialogue() const

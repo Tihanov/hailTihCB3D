@@ -18,7 +18,7 @@ ANpcAiController::ANpcAiController()
 void ANpcAiController::BeginPlay()
 {
 	Super::BeginPlay();
-	SetGenericTeamId(NpcTeamId.GetIntValue());
+	SetGenericTeamId(DefaultNpcTeamId.GetIntValue());
 }
 
 void ANpcAiController::OnPossess(APawn* InPawn)
@@ -81,6 +81,16 @@ void ANpcAiController::SwapToNextInterest()
 	if(!NpcAiCharacter->PointsOfInterest.IsValidIndex(IndexOfCurrentPointOfInterest))
 		IndexOfCurrentPointOfInterest = 0;
 	SpawnPoiFromInstance(NpcAiCharacter->PointsOfInterest[IndexOfCurrentPointOfInterest]);
+}
+
+void ANpcAiController::SetNpcTeamId(TEnumAsByte<ENpcTeamId> NewNpcTeamId)
+{
+	SetGenericTeamId({NewNpcTeamId.GetIntValue()});
+}
+
+TEnumAsByte<ENpcTeamId> ANpcAiController::GetNpcTeamId() const
+{
+	return static_cast<ENpcTeamId>(GetGenericTeamId().GetId());
 }
 
 ETeamAttitude::Type ANpcAiController::GetTeamAttitudeTowards(const AActor& Other) const
