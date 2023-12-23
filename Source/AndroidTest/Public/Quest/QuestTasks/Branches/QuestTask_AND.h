@@ -15,7 +15,7 @@ public:
 	virtual void S_Init(APlayerController* InPlayerController) override;
 
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options") TArray<UQuestTask*> Tasks;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = "Options", meta = (TitleProperty = "Title")) TArray<UQuestTask*> Tasks;
 
 private:
 	UPROPERTY(BlueprintReadWrite, DisplayName = "bIsDone?", meta = (AllowPrivateAccess = true))

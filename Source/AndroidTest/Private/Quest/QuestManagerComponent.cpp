@@ -21,10 +21,12 @@ void UQuestManagerComponent::AddQuest(UQuestAsset* Quest)
 {
 	if(CompletedQuests.Find(Quest) != INDEX_NONE || CurrentQuestsAndInfo.Find(Quest))
 		return;
-	FQuestCompletingInfo Info;
+
+	CurrentQuestsAndInfo.Add(Quest, {});
+	FQuestCompletingInfo& Info = CurrentQuestsAndInfo[Quest];
 	Info.QuestPart = 0;
+	Info.Memory = Quest->Memory;
 	UpdateQuestCompletingInfoToDoTasks(Quest, Info);
-	CurrentQuestsAndInfo.Add(Quest, Info);
 
 	OnAddNewQuestDelegate.Broadcast(Quest);
 }
@@ -64,6 +66,48 @@ void UQuestManagerComponent::TrackQuest(UQuestAsset* ToTrack)
 	auto OldQuest = TrackedQuest;
 	TrackedQuest = ToTrack;
 	OnTrackedQuestSetDelegate.Broadcast(ToTrack, OldQuest);
+}
+
+void UQuestManagerComponent::SetQuestVariable(UQuestAsset* QuestAsset, FName VarName, int Value)
+{
+	CHECK_RETURN_ON_FAIL(!QuestAsset);
+	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
+	CHECK_RETURN_ON_FAIL(!CompletingInfo);
+
+	CompletingInfo->Memory[VarName] = Value;
+	OnQuestVariableChangedDelegate.Broadcast(this, QuestAsset, VarName, Value);
+}
+
+int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarName, bool& OutExist) const
+{
+	OutExist = false;
+	
+	CHECK_RETURN(!QuestAsset, return INT_MIN);
+	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
+	CHECK_RETURN(!CompletingInfo, return INT_MIN);
+
+	const auto ToRet = CompletingInfo->Memory.Find(VarName);
+	OutExist = !!ToRet;
+	return OutExist ? *ToRet : INT_MIN;
+}
+
+int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarName) const
+{
+	CHECK_RETURN(!QuestAsset, return INT_MIN);
+	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
+	CHECK_RETURN(!CompletingInfo, return INT_MIN);
+
+	const auto ToRet = CompletingInfo->Memory.Find(VarName);
+	return !!ToRet ? *ToRet : INT_MIN;
+}
+
+bool UQuestManagerComponent::DoesQuesVariableExists(UQuestAsset* QuestAsset, FName VarName) const
+{
+	CHECK_RETURN(!QuestAsset, return false);
+	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
+	CHECK_RETURN(!CompletingInfo, return false);
+
+	return CompletingInfo->Memory.Contains(VarName);
 }
 
 void UQuestManagerComponent::CheckOnAllTasksCompleted(UQuestAsset* QuestAsset)

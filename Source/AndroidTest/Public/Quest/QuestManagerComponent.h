@@ -12,6 +12,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleteDelegate, UQuestAsset*
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestStateChangedDelegate, UQuestAsset*, Quest);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTrackedQuestSetDelegate, UQuestAsset*, NewQuest, UQuestAsset*, OldQuest);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FQuestVariableChangedDelegate,
+	UQuestManagerComponent*, QuestManagerComponent,
+	UQuestAsset*, Quest,
+	FName, VarName,
+	int, Value);
+
+
 USTRUCT(BlueprintType)
 struct FQuestCompletingInfo
 {
@@ -19,6 +26,7 @@ struct FQuestCompletingInfo
 
 	UPROPERTY(BlueprintReadWrite) int QuestPart = 0;
 	UPROPERTY(BlueprintReadWrite) TMap<UQuestTask*, bool> TasksAndState;
+	UPROPERTY(BlueprintReadWrite) TMap<FName, int> Memory;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -45,6 +53,20 @@ public:
 		void TrackQuest(UQuestAsset* ToTrack);
 	UFUNCTION(BlueprintGetter)
 		UQuestAsset* GetTrackedQuest() const {return TrackedQuest; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetQuestVariable(UQuestAsset* QuestAsset, FName VarName, int Value);
+
+	// If Var does not exist, return INT_MIN 
+	UFUNCTION(BlueprintPure)
+		int GetQuestVariable(UQuestAsset* QuestAsset,
+			FName VarName,
+			UPARAM(DisplayName = "DoesExist?") bool& OutExist) const;
+	// If Var does not exist, return INT_MIN 
+	int GetQuestVariable(UQuestAsset* QuestAsset, FName VarName) const;
+
+	UFUNCTION(BlueprintPure)
+		bool DoesQuesVariableExists(UQuestAsset* QuestAsset, FName VarName) const;
 	
 public:
 	UPROPERTY(BlueprintReadWrite)
@@ -64,6 +86,8 @@ public: // DELEGATES
 		FQuestStateChangedDelegate OnQuestStateChangedDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnTrackedQuestSet")
 		FTrackedQuestSetDelegate OnTrackedQuestSetDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", DisplayName = "OnQuestVariableChanged")
+		FQuestVariableChangedDelegate OnQuestVariableChangedDelegate;
 	
 private:
 	void CheckOnAllTasksCompleted(UQuestAsset* QuestAsset);

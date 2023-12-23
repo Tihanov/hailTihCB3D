@@ -20,14 +20,18 @@ public: /*Delegates*/
 public: /*Vars*/
 	UPROPERTY(BlueprintReadOnly)
 		class UQuestAsset* ParentQuestAsset;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText Title = FText::FromString(TEXT("BaseTask"));
 
 public:
-	virtual void S_Init(class APlayerController* PlayerController) { BP_Init(PlayerController); };
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable)
+		virtual void S_Init(class APlayerController* PlayerController) { BP_Init(PlayerController); };
+	UFUNCTION(BlueprintImplementableEvent)
 		void BP_Init(class APlayerController* PlayerController);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 		bool IsDone();
+
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
 		FText GetDisplayName();
 };
