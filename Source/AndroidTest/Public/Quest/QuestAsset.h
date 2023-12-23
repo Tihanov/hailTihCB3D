@@ -14,12 +14,12 @@ class ANDROIDTEST_API UQuestAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FText DisplayName;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(MultiLine = true)) FText Description;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "IsMainQuest?") bool IsMain;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (TitleProperty = "{Id}: {DisplayName}")) TArray<FQuestPartInfo> Parts;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) FQuestRewardsInfo Rewards;	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TArray<UQuestAsset*> QuestsToDoNext;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced) TArray<UQuestCallback*> ToDoAfter;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) TMap<FName, int> Memory; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FText DisplayName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(MultiLine = true)) FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "IsMainQuest?") bool IsMain;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (TitleProperty = "{Id}: {DisplayName}")) TArray<FQuestPartInfo> Parts;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) FQuestRewardsInfo Rewards;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<UQuestAsset*> QuestsToDoNext;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced) TArray<UQuestCallback*> ToDoAfter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) TMap<FName, int> Memory; 
 };
