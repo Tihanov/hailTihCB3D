@@ -19,8 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FQuestVariableChangedDelegate,
 	int, Value);
 
 
-USTRUCT(BlueprintType)
-struct FQuestCompletingInfo
+USTRUCT(BlueprintType)struct FQuestCompletingInfo
 {
 	GENERATED_BODY()
 
