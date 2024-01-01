@@ -19,7 +19,8 @@ public class AndroidTest : ModuleRules
             "NavigationSystem",
             "UMGEditor", 
             "Blutility",
-            "AssetRegistry"
+            "AssetRegistry",
+            "SlateCore"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[]

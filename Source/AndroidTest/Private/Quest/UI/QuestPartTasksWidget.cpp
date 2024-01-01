@@ -16,6 +16,7 @@
 #include "Utils/Utils.h"
 #include "AssetRegistry/IAssetRegistry.h"
 #include "Engine/AssetManager.h"
+#include "UObject/UnrealTypePrivate.h"
 
 void UTasksQuestPartWidget::Init(UQuestAsset* InQuestAsset, int32 InIndex)
 {
@@ -75,31 +76,90 @@ void UTasksQuestPartWidget::InitPartTasksArray()
 
 void UTasksQuestPartWidget::InitTasksBox()
 {
+	bIsTaskBoxInitialization = true;
 	int32 i = 0;
 	for (auto Child : TasksBox->GetAllChildren())
 	{
-		CHECK_ON_TRUE_DO_TASK(!PartTasks.IsValidIndex(i) || PartTasks[i] == nullptr, continue;);
-
 		const auto TaskComboBox = GetTaskComboBoxOfTask(Child);
 		CHECK_ON_TRUE_DO_TASK(TaskComboBox == nullptr, continue;);
-
 		InitTaskComboBoxWithAllTasks(TaskComboBox);
-		TaskComboBox->SetSelectedOption(PartTasks[i]->Title.ToString());
-		
+		if(!TaskComboBox->OnSelectionChanged.IsAlreadyBound(this,
+			&UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback))
+		{
+			TaskComboBox->OnSelectionChanged.AddDynamic(
+				this, &UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback);
+		}
+
 		const auto DetailsView = GetDetailsViewOfTask(Child);
 		CHECK_ON_TRUE_DO_TASK(DetailsView == nullptr, continue;);
-		DetailsView->SetObject(PartTasks[i]);
+
+		if(PartTasks.IsValidIndex(i) && PartTasks[i] != nullptr)
+		{
+			TaskComboBox->SetSelectedOption(PartTasks[i]->Title.ToString());
+			DetailsView->SetObject(PartTasks[i]);
+		}
+		else
+		{
+			TaskComboBox->ClearSelection();
+			DetailsView->SetObject(nullptr);
+		}
 
 		i += 1;
 	}
+	bIsTaskBoxInitialization = false;
 }
 
 void UTasksQuestPartWidget::InitTaskComboBoxWithAllTasks(UComboBoxString* const TaskComboBox)
 {
-	// UNRIAL IDI NAHUY
+	InitAllTaskAssetsMapIfEmpty();
 
+	TaskComboBox->ClearOptions();
+	for (const auto& Element : AllTaskAssets)
+	{
+		TaskComboBox->AddOption(Element.Key);
+	}
+}
+
+void UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback(FString SelectedItem,
+	ESelectInfo::Type SelectionType)
+{
+	if(bIsTaskBoxInitialization)
+		return;
+	
+	int32 i = 0;
+	for (auto Child : TasksBox->GetAllChildren())
+	{
+		const auto TaskComboBox = GetTaskComboBoxOfTask(Child);
+		CHECK_ON_TRUE_DO_TASK(TaskComboBox == nullptr, continue;);
+		if(TaskComboBox->IsOpen())
+		{
+			break;
+		}
+			
+		i += 1;
+	}
+	CHECK_ON_TRUE_JUST_RETURN(i == TasksBox->GetChildrenCount());
+	
+	InitAllTaskAssetsMapIfEmpty();
+	
+	if(!PartTasks.IsValidIndex(i))
+		PartTasks.SetNumZeroed(i + 1);
+	
+	PartTasks[i] = NewObject<UQuestTask>(this, AllTaskAssets[SelectedItem]);
+	CHECK_ONLY(PartTasks[i] == nullptr);
+
+	InitTasksBox();
+	OnChangeDelegate.Broadcast(this);
+}
+
+
+TMap<FString, UClass*> UTasksQuestPartWidget::AllTaskAssets = {};
+
+void UTasksQuestPartWidget::InitAllTaskAssetsMap()
+{
 	TArray<FAssetData> AssetDataArray;
-	CHECK_ON_TRUE_JUST_RETURN(!UAssetManager::Get().GetAssetRegistry().GetAssetsByPath(TEXT("/Game"), AssetDataArray, true, false));
+	CHECK_ON_TRUE_JUST_RETURN(!UAssetManager::Get()./*UNRIAL IDI NAHUY*/GetAssetRegistry().GetAssetsByPath(TEXT("/Game"), AssetDataArray, true, false));
+	AllTaskAssets.Empty();
 	for (const auto& AssetData : AssetDataArray)
 	{
 		const auto Asset = Cast<UBlueprint>(AssetData.GetAsset());
@@ -112,7 +172,13 @@ void UTasksQuestPartWidget::InitTaskComboBoxWithAllTasks(UComboBoxString* const 
 		
 		const auto QuestTaskDefObj = AssetClass->GetDefaultObject<UQuestTask>();
 		CHECK_ON_TRUE_DO_TASK(!QuestTaskDefObj, continue;);
-		
-		TaskComboBox->AddOption(QuestTaskDefObj->Title.ToString());
+
+		AllTaskAssets.Add(QuestTaskDefObj->Title.ToString(), AssetClass);
 	}
+}
+
+void UTasksQuestPartWidget::InitAllTaskAssetsMapIfEmpty()
+{
+	if(AllTaskAssets.Num() == 0)
+		InitAllTaskAssetsMap();
 }
