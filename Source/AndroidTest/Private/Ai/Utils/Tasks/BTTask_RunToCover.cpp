@@ -44,10 +44,10 @@ EBTNodeResult::Type UBTTask_RunToCover::ExecuteTask(UBehaviorTreeComponent& Owne
 	 * TODO move EquipWeapon to ShootFromCover
 	 */
 	const auto Character = Controller->GetPawn<ANpcAiCharacter>();
-	CHECK_RETURN(!Character, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(!Character, return EBTNodeResult::Aborted);
 	Character->EquipWeapon();
 	const auto MovementComponent = Cast<UNpcMovementComponent>(Character->GetCharacterMovement());
-	CHECK_RETURN(!MovementComponent, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(!MovementComponent, return EBTNodeResult::Aborted);
 	MovementComponent->Run();
 
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootingFromCover>(NodeMemory);
@@ -108,7 +108,7 @@ void UBTTask_RunToCover::OnArrivedCallback(FAIRequestID RequestID, const FPathFo
 {
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootingFromCover>(NodeMemory);
 	check(TaskData);
-	CHECK_RETURN_ON_FAIL(!IsValid(TaskData->NpcController));
+	CHECK_ON_TRUE_JUST_RETURN(!IsValid(TaskData->NpcController));
 	const auto BTComp = Cast<UBehaviorTreeComponent>(TaskData->NpcController->GetBrainComponent());
 	check(BTComp);
 	if(Result.IsSuccess())

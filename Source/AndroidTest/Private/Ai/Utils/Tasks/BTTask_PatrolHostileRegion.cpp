@@ -30,10 +30,10 @@ UBTTask_PatrolHostileRegion::UBTTask_PatrolHostileRegion()
 EBTNodeResult::Type UBTTask_PatrolHostileRegion::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_PatrolHostileRegion>(NodeMemory);
-	CHECK_RETURN(TaskData == nullptr, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(TaskData == nullptr, return EBTNodeResult::Aborted);
 
 	const auto AiController = OwnerComp.GetOwner<ANpcEnemyController>();
-	CHECK_RETURN(AiController == nullptr, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(AiController == nullptr, return EBTNodeResult::Aborted);
 
 	TaskData->BTComp = &OwnerComp;
 	TaskData->EnemyController = AiController;

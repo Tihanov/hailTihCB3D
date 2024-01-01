@@ -23,7 +23,7 @@ void UBTService_GetNpcStats::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp,
 	Super::OnBecomeRelevant(OwnerComp, NodeMemory);
 
 	const auto EnemyController = OwnerComp.GetOwner<ANpcEnemyController>();
-	CHECK_RETURN_ON_FAIL(EnemyController == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(EnemyController == nullptr);
 	EnemyController->OnHostileActorUpdateDelegate.AddLambda(
 		[this](ANpcEnemyController* EnemyNpcController, AActor* HostileActor, FVector FocalPoint,
 		       UBehaviorTreeComponent* OwnerComp)
@@ -44,7 +44,7 @@ void UBTService_GetNpcStats::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	const auto EnemyController = OwnerComp.GetOwner<ANpcEnemyController>();
-	CHECK_RETURN_ON_FAIL(EnemyController == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(EnemyController == nullptr);
 
 	if(EnemyController->IsFreezeStressProgress())
 		return;

@@ -23,10 +23,10 @@ void UAIShootComponent::StartShooting()
 
 void UAIShootComponent::StopShooting()
 {
-	CHECK_RETURN_ON_FAIL(Weapon.IsNull());
+	CHECK_ON_TRUE_JUST_RETURN(Weapon.IsNull());
 
 	const auto Character = GetNpcAiCharacter();
-	CHECK_RETURN_ON_FAIL(Character == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(Character == nullptr);
 	Character->StopAnimMontage();
 	
 	SetShootingState(EShootingState::None);
@@ -41,13 +41,13 @@ void UAIShootComponent::SetShootingState(EShootingState NewShootingState)
 
 void UAIShootComponent::StopShootingViaReloading()
 {
-	CHECK_RETURN_ON_FAIL(Weapon.IsNull());
+	CHECK_ON_TRUE_JUST_RETURN(Weapon.IsNull());
 
 	/*
 	 * TODO RELOADING ANIMATION
 	 */
 	const auto Character = GetNpcAiCharacter();
-	CHECK_RETURN_ON_FAIL(Character == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(Character == nullptr);
 	Character->StopAnimMontage();
 	
 	Weapon->Reload();
@@ -72,24 +72,24 @@ ANpcAiCharacter* UAIShootComponent::GetNpcAiCharacter() const
 void UAIShootComponent::SetupShooting()
 {
 	const auto Character = GetNpcAiCharacter();
-	CHECK_RETURN_ON_FAIL(Character == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(Character == nullptr);
 
 	const auto SPWeapon = Character->GetEquippedWeapon();
-	CHECK_RETURN_ON_FAIL(SPWeapon.IsNull());
+	CHECK_ON_TRUE_JUST_RETURN(SPWeapon.IsNull());
 
 	Weapon = SPWeapon;
 	WeaponShootingType = SPWeapon->GetInfo()->GetType();
-	CHECK_RETURN_ON_FAIL(WeaponShootingType == EWeaponShootingType::Unknown);
+	CHECK_ON_TRUE_JUST_RETURN(WeaponShootingType == EWeaponShootingType::Unknown);
 }
 
 void UAIShootComponent::StartShootingImplementation()
 {
-	CHECK_RETURN_ON_FAIL(Weapon.IsNull());
+	CHECK_ON_TRUE_JUST_RETURN(Weapon.IsNull());
 	const auto Info = Weapon->GetInfo();
-	CHECK_RETURN_ON_FAIL(Info == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(Info == nullptr);
 
 	const auto Character = GetNpcAiCharacter();
-	CHECK_RETURN_ON_FAIL(Character == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(Character == nullptr);
 	Character->PlayAnimMontage(Character->GetAimWithWeaponAnimation());
 	
 	switch (WeaponShootingType)
@@ -106,7 +106,7 @@ void UAIShootComponent::StartShootingImplementation()
 												   Info->ShotDelayInSec, true, 0.f);
 		}
 	default:
-		CHECK_RETURN_ON_FAIL( __LINE__ && "AIShootComponent" );
+		CHECK_ON_TRUE_JUST_RETURN( __LINE__ && "AIShootComponent" );
 	}
 	SetShootingState(EShootingState::Shooting);
 }
@@ -118,7 +118,7 @@ void UAIShootComponent::StopShootingImplementation()
 
 void UAIShootComponent::ShootSingleCallback()
 {
-	CHECK_RETURN_ON_FAIL(!Weapon.IsValid());
+	CHECK_ON_TRUE_JUST_RETURN(!Weapon.IsValid());
 	if(Weapon->GetMagazineCapacity() <= 0)
 	{
 		StopShootingViaReloading();

@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_StopAggressiveState::ExecuteTask(UBehaviorTreeCompon
 	Controller->SetFreezeStressProgress(false);
 	
 	const auto Character = Controller->GetPawn<ANpcAiCharacter>();
-	CHECK_RETURN(!Character, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(!Character, return EBTNodeResult::Aborted);
 	Character->UnequipWeapon();
 	Character->SetCurrentState(NewState);
 

@@ -24,7 +24,7 @@ UBTTask_ShootFromCover::UBTTask_ShootFromCover()
 EBTNodeResult::Type UBTTask_ShootFromCover::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootFromCover>(NodeMemory);
-	CHECK_RETURN(TaskData == nullptr, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(TaskData == nullptr, return EBTNodeResult::Aborted);
 	TaskData->BTComponent = &OwnerComp;
 
 	ANpcEnemyController* EnemyController;
@@ -33,7 +33,7 @@ EBTNodeResult::Type UBTTask_ShootFromCover::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Aborted;
 
 	const auto AIShootComponent = EnemyController->GetAIShootComponent();
-	CHECK_RETURN(AIShootComponent == nullptr, return EBTNodeResult::Aborted);
+	CHECK_ON_TRUE_DO_TASK(AIShootComponent == nullptr, return EBTNodeResult::Aborted);
 	AIShootComponent->OnChangeShootingStateDelegate.AddUObject(
 		this, &UBTTask_ShootFromCover::OnChangeShootingStateCallback);
 	AIShootComponent->StartShooting();
@@ -50,7 +50,7 @@ void UBTTask_ShootFromCover::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 	const auto HostileActor = EnemyController->GetHostileActor();
 
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootFromCover>(NodeMemory);
-	CHECK_RETURN(TaskData == nullptr, FinishLatentTask(OwnerComp, EBTNodeResult::Aborted));
+	CHECK_ON_TRUE_DO_TASK(TaskData == nullptr, FinishLatentTask(OwnerComp, EBTNodeResult::Aborted));
 	
 	// Stop forgeting
 	if (HostileActor && GetWorld()->GetTimerManager().IsTimerActive(TaskData->ForgetTimerHandle)
@@ -125,10 +125,10 @@ bool UBTTask_ShootFromCover::GetControllerAndCharacterFromContComponent(const UA
                                                                         ANpcAiCharacter*& OutNpcAiCharacter) const
 {
 	OutNpcEnemyController = ActorComponent->GetOwner<ANpcEnemyController>();
-	CHECK_RETURN(OutNpcEnemyController == nullptr, return false);
+	CHECK_ON_TRUE_DO_TASK(OutNpcEnemyController == nullptr, return false);
 
 	OutNpcAiCharacter = OutNpcEnemyController->GetPawn<ANpcAiCharacter>();
-	CHECK_RETURN(OutNpcAiCharacter == nullptr, return false);
+	CHECK_ON_TRUE_DO_TASK(OutNpcAiCharacter == nullptr, return false);
 	return true;
 }
 
@@ -142,8 +142,8 @@ UBehaviorTreeComponent* UBTTask_ShootFromCover::GetBTCompFromController(const AA
 void UBTTask_ShootFromCover::OnForgetCallback(uint8* NodeMemory)
 {
 	const auto TaskData = CastInstanceNodeMemory<FTaskData_ShootFromCover>(NodeMemory);
-	CHECK_RETURN_ON_FAIL(TaskData == nullptr);
-	CHECK_RETURN_ON_FAIL(TaskData->BTComponent == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(TaskData == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(TaskData->BTComponent == nullptr);
 
 	FinishLatentTask(*TaskData->BTComponent, EBTNodeResult::Failed);
 }

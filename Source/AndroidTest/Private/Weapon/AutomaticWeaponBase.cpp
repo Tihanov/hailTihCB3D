@@ -146,7 +146,7 @@ void AAutomaticWeaponBase::TryShoot()
 	CurrentMagazineCapacity -= 1;
 
 	const auto AutomaticWeaponInfo = GetInfo<UAutomaticWeaponInfo>();
-	CHECK_RETURN_ON_FAIL(!AutomaticWeaponInfo);
+	CHECK_ON_TRUE_JUST_RETURN(!AutomaticWeaponInfo);
 	
 	FHitResult HitResult;
 	bool IsDamageWasDone = false;

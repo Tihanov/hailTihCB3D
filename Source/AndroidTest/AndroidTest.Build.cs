@@ -16,13 +16,17 @@ public class AndroidTest : ModuleRules
             "InputCore",
             "AIModule",
             "GameplayTasks",
-            "NavigationSystem"
+            "NavigationSystem",
+            "UMGEditor", 
+            "Blutility",
+            "AssetRegistry"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[]
         {
 			"Debug",
-			"DlgSystem"
+			"DlgSystem",
+			"AssetRegistry"
         });
 
 		// Uncomment if you are using Slate UI

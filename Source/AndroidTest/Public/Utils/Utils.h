@@ -1,15 +1,11 @@
 #pragma once
 
-#define CNR_TO_CSTR_PURE(x) #x
-#define CNR_TO_CSTR(x) CNR_TO_CSTR_PURE(x)
-
-
-#define CHECK_RETURN(COND, TO_RET) \
+#define CHECK_ON_TRUE_DO_TASK(COND, TASK) \
 	if(COND) \
 	{\
-		ULog::Error(__FILE__ ":" CNR_TO_CSTR(__LINE__) ":" #COND, LO_Both); TO_RET; \
+		ULog::Error(__FILE__ ": " #COND, LO_Both); TASK; \
 	} (void)0
 
 
-#define CHECK_RETURN_ON_FAIL(COND) CHECK_RETURN(COND, return)
-
+#define CHECK_ON_TRUE_JUST_RETURN(COND) CHECK_ON_TRUE_DO_TASK(COND, return)
+#define CHECK_ON_TRUE_RETURN(COND, TO_RET) CHECK_ON_TRUE_DO_TASK(COND, return TO_RET)

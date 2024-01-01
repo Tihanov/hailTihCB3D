@@ -9,8 +9,8 @@
 void UQuestTask_OR::S_Init(APlayerController* InPlayerController)
 {
 	QuestManagerComponent = InPlayerController->GetComponentByClass<UQuestManagerComponent>();
-	CHECK_RETURN_ON_FAIL(QuestManagerComponent == nullptr);
-	CHECK_RETURN_ON_FAIL(QTask_A == nullptr || QTask_B == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(QuestManagerComponent == nullptr);
+	CHECK_ON_TRUE_JUST_RETURN(QTask_A == nullptr || QTask_B == nullptr);
 	
 	QTask_A->OnTaskDoneDelegate.AddDynamic(this, &UQuestTask_OR::OnTaskDoneCallback);
 	QTask_B->OnTaskDoneDelegate.AddDynamic(this, &UQuestTask_OR::OnTaskDoneCallback);
@@ -38,7 +38,7 @@ void UQuestTask_OR::OnTaskDoneCallback(UQuestTask* Task)
 	}
 	else
 	{
-		CHECK_RETURN_ON_FAIL(!"UQuestTask_OR: Task != TaskA and Task != TaskB");
+		CHECK_ON_TRUE_JUST_RETURN(!"UQuestTask_OR: Task != TaskA and Task != TaskB");
 	}
 
 	bIsDone = true;

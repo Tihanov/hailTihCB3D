@@ -9,7 +9,7 @@ void UQuestTask_AND::S_Init(APlayerController* InPlayerController)
 {
 	for (const auto& Task : Tasks)
 	{
-		CHECK_RETURN_ON_FAIL(Task == nullptr);
+		CHECK_ON_TRUE_JUST_RETURN(Task == nullptr);
 		Task->OnTaskDoneDelegate.AddDynamic(this, &UQuestTask_AND::OnTaskDoneCallback);
 		Task->S_Init(InPlayerController);
 	}

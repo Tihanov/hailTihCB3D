@@ -70,9 +70,9 @@ void UQuestManagerComponent::TrackQuest(UQuestAsset* ToTrack)
 
 void UQuestManagerComponent::SetQuestVariable(UQuestAsset* QuestAsset, FName VarName, int Value)
 {
-	CHECK_RETURN_ON_FAIL(!QuestAsset);
+	CHECK_ON_TRUE_JUST_RETURN(!QuestAsset);
 	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
-	CHECK_RETURN_ON_FAIL(!CompletingInfo);
+	CHECK_ON_TRUE_JUST_RETURN(!CompletingInfo);
 
 	CompletingInfo->Memory[VarName] = Value;
 	OnQuestVariableChangedDelegate.Broadcast(this, QuestAsset, VarName, Value);
@@ -82,9 +82,9 @@ int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarN
 {
 	OutExist = false;
 	
-	CHECK_RETURN(!QuestAsset, return INT_MIN);
+	CHECK_ON_TRUE_DO_TASK(!QuestAsset, return INT_MIN);
 	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
-	CHECK_RETURN(!CompletingInfo, return INT_MIN);
+	CHECK_ON_TRUE_DO_TASK(!CompletingInfo, return INT_MIN);
 
 	const auto ToRet = CompletingInfo->Memory.Find(VarName);
 	OutExist = !!ToRet;
@@ -93,9 +93,9 @@ int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarN
 
 int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarName) const
 {
-	CHECK_RETURN(!QuestAsset, return INT_MIN);
+	CHECK_ON_TRUE_DO_TASK(!QuestAsset, return INT_MIN);
 	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
-	CHECK_RETURN(!CompletingInfo, return INT_MIN);
+	CHECK_ON_TRUE_DO_TASK(!CompletingInfo, return INT_MIN);
 
 	const auto ToRet = CompletingInfo->Memory.Find(VarName);
 	return !!ToRet ? *ToRet : INT_MIN;
@@ -103,9 +103,9 @@ int UQuestManagerComponent::GetQuestVariable(UQuestAsset* QuestAsset, FName VarN
 
 bool UQuestManagerComponent::DoesQuesVariableExists(UQuestAsset* QuestAsset, FName VarName) const
 {
-	CHECK_RETURN(!QuestAsset, return false);
+	CHECK_ON_TRUE_DO_TASK(!QuestAsset, return false);
 	const auto CompletingInfo = CurrentQuestsAndInfo.Find(QuestAsset);
-	CHECK_RETURN(!CompletingInfo, return false);
+	CHECK_ON_TRUE_DO_TASK(!CompletingInfo, return false);
 
 	return CompletingInfo->Memory.Contains(VarName);
 }
@@ -186,7 +186,7 @@ void UQuestManagerComponent::CallCallbacksOfPart_After(const FQuestPartInfo& Par
 {
 	for (const auto& AfterCallback : Part.AfterCallbacks)
 	{
-		CHECK_RETURN(!AfterCallback, continue;);
+		CHECK_ON_TRUE_DO_TASK(!AfterCallback, continue;);
 		AfterCallback->Do(this);
 	}
 }
