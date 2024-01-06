@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TitleInterface.h"
 #include "UObject/Object.h"
 #include "QuestTask.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTaskDoneDelegate, class UQuestTask*, Task);
 
 UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew, meta = (ShowWorldContextPin))
-class ANDROIDTEST_API UQuestTask: public UObject 
+class ANDROIDTEST_API UQuestTask
+	: public UObject
+	, public ITitleInterface 
 {
 	GENERATED_BODY()
 
@@ -34,5 +37,7 @@ public:
 
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
 		FText GetDisplayName();
+
+	virtual FText GetTitle() const override { return Title; };
 };
 
