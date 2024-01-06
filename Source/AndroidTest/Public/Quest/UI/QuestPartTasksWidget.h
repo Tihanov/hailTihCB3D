@@ -17,8 +17,8 @@ class UTextBlock;
 class UGridPanel;
 class UQuestAsset;
 
-UCLASS(Blueprintable, BlueprintType)
-class ANDROIDTEST_API UTasksQuestPartWidget : public UEditorUtilityWidget
+UCLASS(Blueprintable, BlueprintType, Deprecated)
+class ANDROIDTEST_API UDEPRECATED_TasksQuestPartWidget : public UEditorUtilityWidget
 {
 	GENERATED_BODY()
 

@@ -42,9 +42,12 @@ void UTasksOfQuestPartInstanceMenu::Save()
 		const auto ItmOfInstMenu = Cast<UItemOfInstanceMenu>(Item);
 		CHECK_ON_TRUE_DO_TASK(!ItmOfInstMenu, continue;);
 
-		const auto QuestTask = Cast<UQuestTask>(ItmOfInstMenu->GetCurrentInstance());
-		CHECK_ON_TRUE_DO_TASK(!QuestTask, continue;);
+		const auto QuestTaskBuff = Cast<UQuestTask>(ItmOfInstMenu->GetCurrentInstance());
+		CHECK_ON_TRUE_DO_TASK(!QuestTaskBuff, continue;);
 
+		const auto QuestTask = DuplicateObject<UQuestTask>(QuestTaskBuff, QuestAsset);
+		CHECK_ON_TRUE_DO_TASK(!QuestTask, continue;);
+		
 		Tasks.Add(QuestTask);
 	} 
 }

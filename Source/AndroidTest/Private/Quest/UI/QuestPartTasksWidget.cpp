@@ -19,7 +19,7 @@
 #include "Engine/AssetManager.h"
 #include "UObject/UnrealTypePrivate.h"
 
-void UTasksQuestPartWidget::Init(UQuestAsset* InQuestAsset, int32 InIndex)
+void UDEPRECATED_TasksQuestPartWidget::Init(UQuestAsset* InQuestAsset, int32 InIndex)
 {
 	QuestAsset = InQuestAsset;
 	Index = InIndex;
@@ -28,12 +28,12 @@ void UTasksQuestPartWidget::Init(UQuestAsset* InQuestAsset, int32 InIndex)
 
 	InitTasksBox();
 
-	AddTaskButton->OnClicked.AddDynamic(this, &UTasksQuestPartWidget::OnAddTaskButtonClickedCallback);
+	AddTaskButton->OnClicked.AddDynamic(this, &UDEPRECATED_TasksQuestPartWidget::OnAddTaskButtonClickedCallback);
 
 	BP_Init(InQuestAsset, InIndex);
 }
 
-void UTasksQuestPartWidget::Save()
+void UDEPRECATED_TasksQuestPartWidget::Save()
 {
 	auto& Tasks = QuestAsset->Parts[Index].Tasks;
 	Tasks.SetNum(0);
@@ -48,7 +48,7 @@ void UTasksQuestPartWidget::Save()
 	BP_Save();
 }
 
-UGridPanel* UTasksQuestPartWidget::GetGridPanelAOfTask(UWidget* TaskWidget) const
+UGridPanel* UDEPRECATED_TasksQuestPartWidget::GetGridPanelAOfTask(UWidget* TaskWidget) const
 {
 	const auto Task = Cast<UVerticalBox>(TaskWidget);
 	CHECK_ON_TRUE_RETURN(Task == nullptr, nullptr);
@@ -56,7 +56,7 @@ UGridPanel* UTasksQuestPartWidget::GetGridPanelAOfTask(UWidget* TaskWidget) cons
 	return Cast<UGridPanel>(Task->GetChildAt(INDEX_OF_GRID_PANEL_A));
 }
 
-UButton* UTasksQuestPartWidget::GetRemoveButtonOfTask(UWidget* TaskWidget) const
+UButton* UDEPRECATED_TasksQuestPartWidget::GetRemoveButtonOfTask(UWidget* TaskWidget) const
 {
 	const auto GridPanelA = GetGridPanelAOfTask(TaskWidget);
 	CHECK_ON_TRUE_RETURN(GridPanelA == nullptr, nullptr);
@@ -64,7 +64,7 @@ UButton* UTasksQuestPartWidget::GetRemoveButtonOfTask(UWidget* TaskWidget) const
 	return Cast<UButton>(GridPanelA->GetChildAt(INDEX_OF_TASK_REMOVE_BUTTON));
 }
 
-UComboBoxString* UTasksQuestPartWidget::GetTaskComboBoxOfTask(UWidget* TaskWidget) const
+UComboBoxString* UDEPRECATED_TasksQuestPartWidget::GetTaskComboBoxOfTask(UWidget* TaskWidget) const
 {
 	const auto GridPanelA = GetGridPanelAOfTask(TaskWidget);
 	CHECK_ON_TRUE_RETURN(GridPanelA == nullptr, nullptr);
@@ -72,7 +72,7 @@ UComboBoxString* UTasksQuestPartWidget::GetTaskComboBoxOfTask(UWidget* TaskWidge
 	return Cast<UComboBoxString>(GridPanelA->GetChildAt(INDEX_OF_TASK_COMBO_BOX));
 }
 
-UDetailsView* UTasksQuestPartWidget::GetDetailsViewOfTask(UWidget* TaskWidget) const
+UDetailsView* UDEPRECATED_TasksQuestPartWidget::GetDetailsViewOfTask(UWidget* TaskWidget) const
 {
 	const auto Task = Cast<UVerticalBox>(TaskWidget);
 	CHECK_ON_TRUE_RETURN(Task == nullptr, nullptr);
@@ -80,7 +80,7 @@ UDetailsView* UTasksQuestPartWidget::GetDetailsViewOfTask(UWidget* TaskWidget) c
 	return Cast<UDetailsView>(Task->GetChildAt(INDEX_OF_DETAILS_VIEW));
 }
 
-void UTasksQuestPartWidget::InitPartTasksArray()
+void UDEPRECATED_TasksQuestPartWidget::InitPartTasksArray()
 {
 	const auto& Tasks = QuestAsset->Parts[Index].Tasks;
 	PartTasks.SetNum(0);
@@ -90,7 +90,7 @@ void UTasksQuestPartWidget::InitPartTasksArray()
 	}
 }
 
-void UTasksQuestPartWidget::InitTasksBox()
+void UDEPRECATED_TasksQuestPartWidget::InitTasksBox()
 {
 	bIsTaskBoxInitialization = true;
 	int32 i = -1;
@@ -101,10 +101,10 @@ void UTasksQuestPartWidget::InitTasksBox()
 		CHECK_ON_TRUE_DO_TASK(TaskComboBox == nullptr, continue;);
 		InitTaskComboBoxWithAllTasks(TaskComboBox);
 		if(!TaskComboBox->OnSelectionChanged.IsAlreadyBound(this,
-			&UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback))
+			&UDEPRECATED_TasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback))
 		{
 			TaskComboBox->OnSelectionChanged.AddDynamic(
-				this, &UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback);
+				this, &UDEPRECATED_TasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback);
 		}
 
 		const auto DetailsView = GetDetailsViewOfTask(Child);
@@ -112,7 +112,7 @@ void UTasksQuestPartWidget::InitTasksBox()
 
 		const auto RemoveButton = GetRemoveButtonOfTask(Child);
 		CHECK_ON_TRUE_DO_TASK(RemoveButton == nullptr, continue;);
-		RemoveButton->OnClicked.AddDynamic(this, &UTasksQuestPartWidget::OnRemoveButtonPressedCallback);
+		RemoveButton->OnClicked.AddDynamic(this, &UDEPRECATED_TasksQuestPartWidget::OnRemoveButtonPressedCallback);
 		
 		if(PartTasks.IsValidIndex(i))
 		{
@@ -132,7 +132,7 @@ void UTasksQuestPartWidget::InitTasksBox()
 	bIsTaskBoxInitialization = false;
 }
 
-void UTasksQuestPartWidget::InitTaskComboBoxWithAllTasks(UComboBoxString* const TaskComboBox)
+void UDEPRECATED_TasksQuestPartWidget::InitTaskComboBoxWithAllTasks(UComboBoxString* const TaskComboBox)
 {
 	InitAllTaskAssetsMapIfEmpty();
 
@@ -143,7 +143,7 @@ void UTasksQuestPartWidget::InitTaskComboBoxWithAllTasks(UComboBoxString* const 
 	}
 }
 
-void UTasksQuestPartWidget::AddTaskToArray(const FString& TaskName, const int32 InIndex)
+void UDEPRECATED_TasksQuestPartWidget::AddTaskToArray(const FString& TaskName, const int32 InIndex)
 {
 	if(!PartTasks.IsValidIndex(InIndex))
 		PartTasks.SetNumZeroed(InIndex + 1);
@@ -154,7 +154,7 @@ void UTasksQuestPartWidget::AddTaskToArray(const FString& TaskName, const int32 
 		PartTasks[InIndex] = nullptr;
 }
 
-void UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback(FString SelectedItem,
+void UDEPRECATED_TasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback(FString SelectedItem,
                                                                    ESelectInfo::Type SelectionType)
 {
 	if(bIsTaskBoxInitialization)
@@ -181,7 +181,7 @@ void UTasksQuestPartWidget::OnTaskComboBoxSelectionChangedCallback(FString Selec
 	OnChangeDelegate.Broadcast(this);
 }
 
-void UTasksQuestPartWidget::OnRemoveButtonPressedCallback()
+void UDEPRECATED_TasksQuestPartWidget::OnRemoveButtonPressedCallback()
 {
 	int32 i = 0;
 	for (auto Child : TasksBox->GetAllChildren())
@@ -203,7 +203,7 @@ void UTasksQuestPartWidget::OnRemoveButtonPressedCallback()
 	}
 }
 
-void UTasksQuestPartWidget::OnAddTaskButtonClickedCallback()
+void UDEPRECATED_TasksQuestPartWidget::OnAddTaskButtonClickedCallback()
 {
 	int32 i = 0;
 	for (auto Child : TasksBox->GetAllChildren())
@@ -223,9 +223,9 @@ void UTasksQuestPartWidget::OnAddTaskButtonClickedCallback()
 }
 
 
-TMap<FString, UClass*> UTasksQuestPartWidget::AllTaskAssets = {};
+TMap<FString, UClass*> UDEPRECATED_TasksQuestPartWidget::AllTaskAssets = {};
 
-void UTasksQuestPartWidget::InitAllTaskAssetsMap()
+void UDEPRECATED_TasksQuestPartWidget::InitAllTaskAssetsMap()
 {
 	TArray<FAssetData> AssetDataArray;
 	CHECK_ON_TRUE_JUST_RETURN(!UAssetManager::Get()./*UNRIAL IDI NAHUY*/GetAssetRegistry().GetAssetsByPath(TEXT("/Game"), AssetDataArray, true, false));
@@ -249,7 +249,7 @@ void UTasksQuestPartWidget::InitAllTaskAssetsMap()
 	}
 }
 
-void UTasksQuestPartWidget::InitAllTaskAssetsMapIfEmpty()
+void UDEPRECATED_TasksQuestPartWidget::InitAllTaskAssetsMapIfEmpty()
 {
 	if(AllTaskAssets.Num() == 0)
 		InitAllTaskAssetsMap();

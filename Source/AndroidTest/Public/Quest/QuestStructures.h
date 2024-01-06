@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TitleInterface.h"
 #include "UObject/NoExportTypes.h"
 #include "Inventory/InventoryItemBaseActor.h"
 #include "QuestStructures.generated.h"
@@ -57,13 +58,20 @@ struct FQuestPartInfo
 
 
 UCLASS(BlueprintType, Blueprintable, Abstract, DefaultToInstanced, EditInlineNew, meta = (ShowWorldContextPin = "true"))
-class ANDROIDTEST_API UQuestCallback: public UObject 
+class ANDROIDTEST_API UQuestCallback
+	: public UObject
+	, public ITitleInterface
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 		void Do(const UQuestManagerComponent* QuestManagerComponent);
+
+private:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess))
+		FText SystemTitle = FText::FromString(TEXT("QuestCallback"));
+	virtual FText GetTitle() const override { return SystemTitle; } 
 };
 
 

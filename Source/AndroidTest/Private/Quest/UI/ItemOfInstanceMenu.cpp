@@ -15,7 +15,6 @@ void UItemOfInstanceMenu::Init(UClass* InBaseInstanceClass)
 {
 	BaseInstanceClass = InBaseInstanceClass;
 	InitClassesDataForBaseClass(BaseInstanceClass);
-	ULog::Error(FString::FromInt(ClassesData.Num()));
 	
 	const auto& TtlAndInstClasses = ClassesData[BaseInstanceClass];
 	for (const auto&[Title, _] : TtlAndInstClasses)
@@ -93,7 +92,7 @@ void UItemOfInstanceMenu::InitClassesDataForBaseClass(UClass* BaseClass)
 			continue;
 		
 		const auto AssetClass = Asset->GeneratedClass.Get();
-		if(!AssetClass->IsChildOf(BaseClass))
+		if(!AssetClass || !AssetClass->IsChildOf(BaseClass))
 			continue;
 		
 		const auto QuestTaskDefObj = Cast<ITitleInterface>(AssetClass->GetDefaultObject());
