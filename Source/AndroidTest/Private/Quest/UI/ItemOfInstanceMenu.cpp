@@ -22,8 +22,8 @@ void UItemOfInstanceMenu::Init(UClass* InBaseInstanceClass)
 	{
 		SubclassesComboBox->AddOption(Title);
 	}
+	
 	SubclassesComboBox->OnSelectionChanged.AddDynamic(this, &UItemOfInstanceMenu::SubclassesComboBoxSelectionChangedCallback);
-
 	RemoveButton->OnClicked.AddDynamic(this, &UItemOfInstanceMenu::RemoveButtonClickedCallback);
 
 	BP_Init(InBaseInstanceClass);

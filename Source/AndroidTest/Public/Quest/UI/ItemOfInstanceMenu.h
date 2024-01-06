@@ -15,8 +15,8 @@ class ANDROIDTEST_API UItemOfInstanceMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveButtonClickedDelegate, UItemOfInstanceMenu*, Item);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedDelegate, UItemOfInstanceMenu*, Item);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemoveButtonClickedDelegate, UWidget*, Widget);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedDelegate, UWidget*, Widget);
 	
 public:
 	UFUNCTION(BlueprintCallable)

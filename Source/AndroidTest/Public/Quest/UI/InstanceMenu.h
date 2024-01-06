@@ -19,11 +19,10 @@ class ANDROIDTEST_API UInstanceMenu : public UUserWidget
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeDelegate, UWidget*, Widget);
 	
 public:
-	void Init(const TArray<FString>& Titles);
 	void Init(const TArray<UObject*>& Instances);
 
 	UFUNCTION(BlueprintCallable)
-		virtual void Save();
+		virtual void Save() PURE_VIRTUAL(UInstanceMenu::Save);
 
 public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
@@ -39,4 +38,16 @@ protected:
 		TSubclassOf<UObject> BaseInstanceClass = UObject::StaticClass();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TSubclassOf<UItemOfInstanceMenu> ItemOfInstanceMenuClass;
+
+private:
+	UFUNCTION()
+		void ItemChangedCallback(UWidget* Widget);
+	UFUNCTION()
+		void ItemRemoveButtonClickedCallback(UWidget* Widget);
+	UFUNCTION()
+		void AddNewItemButtonClickedCallback();
+
+	UItemOfInstanceMenu* CreateAndInitItem();
 };
+
+

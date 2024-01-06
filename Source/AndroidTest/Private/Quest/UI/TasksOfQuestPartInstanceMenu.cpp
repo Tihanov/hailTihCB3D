@@ -3,8 +3,12 @@
 
 #include "Quest/UI/TasksOfQuestPartInstanceMenu.h"
 
+#include "Log.h"
+#include "Components/VerticalBox.h"
 #include "Quest/QuestAsset.h"
 #include "Quest/QuestTask.h"
+#include "Quest/UI/ItemOfInstanceMenu.h"
+#include "Utils/Utils.h"
 
 UTasksOfQuestPartInstanceMenu::UTasksOfQuestPartInstanceMenu()
 {
@@ -21,7 +25,7 @@ void UTasksOfQuestPartInstanceMenu::Init(UQuestAsset* InQuestAsset, int32 InInde
 	Instances.Reserve(Tasks.Num());
 	for (const auto& Task : Tasks)
 	{
-		Instances.Add(Task);
+		Instances.Add( DuplicateObject<UObject>(Task, this) );
 	}
 
 	Super::Init(Instances);
@@ -29,5 +33,18 @@ void UTasksOfQuestPartInstanceMenu::Init(UQuestAsset* InQuestAsset, int32 InInde
 
 void UTasksOfQuestPartInstanceMenu::Save()
 {
-	Super::Save();
+	const auto Items = ItemsBox->GetAllChildren();
+	auto& Tasks = QuestAsset->Parts[Index].Tasks;
+
+	Tasks.Empty();
+	for (const auto& Item : Items)
+	{
+		const auto ItmOfInstMenu = Cast<UItemOfInstanceMenu>(Item);
+		CHECK_ON_TRUE_DO_TASK(!ItmOfInstMenu, continue;);
+
+		const auto QuestTask = Cast<UQuestTask>(ItmOfInstMenu->GetCurrentInstance());
+		CHECK_ON_TRUE_DO_TASK(!QuestTask, continue;);
+
+		Tasks.Add(QuestTask);
+	} 
 }
